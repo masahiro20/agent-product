@@ -1,0 +1,33 @@
+{
+  "note": "間取り別の一般的な家財の想定（入居中または退去後に残置された場合）。presence は残っている確率の目安で、空室・退去済みなら 0 として扱う。体積は家具の外形からの概算。出典弱・一般的目安。",
+  "items": {
+    "bed": {"name": "ベッド（シングル）", "m3": 1.2},
+    "futon": {"name": "布団一式", "m3": 0.3},
+    "fridge": {"name": "冷蔵庫", "m3": 0.5, "recycle": "fridge"},
+    "washer": {"name": "洗濯機", "m3": 0.4, "recycle": "washer"},
+    "tv": {"name": "テレビ", "m3": 0.15, "recycle": "tv"},
+    "aircon_indoor": {"name": "エアコン室内機", "m3": 0.1, "recycle": "aircon"},
+    "microwave": {"name": "電子レンジ", "m3": 0.05},
+    "table": {"name": "テーブル・こたつ", "m3": 0.3},
+    "desk": {"name": "机", "m3": 0.4},
+    "chair": {"name": "椅子", "m3": 0.15},
+    "sofa": {"name": "ソファ", "m3": 1.0},
+    "chest": {"name": "タンス・チェスト", "m3": 0.8},
+    "shelf": {"name": "本棚・カラーボックス", "m3": 0.4},
+    "dining_set": {"name": "食卓セット", "m3": 1.0},
+    "cupboard": {"name": "食器棚", "m3": 1.0},
+    "bicycle": {"name": "自転車", "m3": 0.5},
+    "misc_bags": {"name": "雑品・衣類・小物（45L袋換算10袋）", "m3": 0.45},
+    "curtain_lights": {"name": "カーテン・照明", "m3": 0.1}
+  },
+  "layouts": {
+    "1R": {"bed": 1, "fridge": 1, "washer": 1, "tv": 1, "aircon_indoor": 1, "microwave": 1, "table": 1, "shelf": 1, "misc_bags": 1, "curtain_lights": 1},
+    "1K": {"bed": 1, "fridge": 1, "washer": 1, "tv": 1, "aircon_indoor": 1, "microwave": 1, "table": 1, "shelf": 1, "chest": 1, "misc_bags": 1, "curtain_lights": 1},
+    "1DK": {"bed": 1, "fridge": 1, "washer": 1, "tv": 1, "aircon_indoor": 1, "microwave": 1, "table": 1, "shelf": 1, "chest": 1, "dining_set": 1, "misc_bags": 2, "curtain_lights": 1},
+    "2DK": {"bed": 2, "fridge": 1, "washer": 1, "tv": 1, "aircon_indoor": 2, "microwave": 1, "table": 1, "shelf": 2, "chest": 2, "dining_set": 1, "cupboard": 1, "misc_bags": 3, "curtain_lights": 2},
+    "3LDK": {"bed": 3, "fridge": 1, "washer": 1, "tv": 2, "aircon_indoor": 3, "microwave": 1, "sofa": 1, "table": 1, "desk": 1, "chair": 2, "shelf": 3, "chest": 3, "dining_set": 1, "cupboard": 1, "bicycle": 1, "misc_bags": 5, "curtain_lights": 3},
+    "house_4LDK": {"bed": 4, "futon": 2, "fridge": 1, "washer": 1, "tv": 2, "aircon_indoor": 4, "microwave": 1, "sofa": 1, "table": 2, "desk": 2, "chair": 4, "shelf": 4, "chest": 4, "dining_set": 1, "cupboard": 1, "bicycle": 2, "misc_bags": 8, "curtain_lights": 4}
+  },
+  "loose_factor": 1.6,
+  "loose_factor_note": "家具の外形体積の合計に対し、解体・積込み時のすき間を見込んだかさ増し係数（トラック積載量換算用）。"
+}

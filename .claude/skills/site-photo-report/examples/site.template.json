@@ -1,0 +1,78 @@
+{
+  "_readme": "現地写真レポートの入力。'_' で始まるキーは説明なので消してよい。座標は敷地ローカル（m）：x=東、y=北、原点は敷地の南西角が基本。高さは T.P.（m）。数値はすべて推定値で、根拠を basis に書く。",
+  "project": {
+    "name": "○○様 解体・造成 検討",
+    "slug": "site_report",
+    "address": "○○県○○市○○町1-2-3",
+    "purpose": "解体概算・造成計画（建替え用の宅地化）",
+    "author": "現地写真AI推定（参考図）"
+  },
+  "region": "default",
+  "_region": "tokyo23 / kanagawa / osaka / nagoya / fukuoka / hokkaido / default（解体）。造成は tokyo23 / tokyo_metro_suburb / osaka_nagoya_city / rural / default",
+  "conditions": [],
+  "_conditions": "narrow_road_small_machine / narrow_road_handwork / adjacent_close / no_parking_road_use / slope_site / long_carry / mortar_wall_or_tile_roof など（demolition_unit_prices.json の condition_factor）",
+  "conditions_detail": {"guard_days": 0},
+  "summary": ["表紙に載せる要点を3〜6行"],
+  "land_info": [
+    {"item": "用途地域", "value": "第一種低層住居専用地域 50/100", "confidence": "要確認", "source": "社内法令チェック（land_law_check）"}
+  ],
+  "market_notes": ["地域の相場・土地勘メモ"],
+  "photos": [
+    {"no": 1, "path": "photo1.jpg", "caption": "南面", "marks": [
+      {"bbox": [0.1, 0.4, 0.3, 0.6], "label": "掃出し窓 W≈1.69m", "basis": "寸法の基準"}
+    ]}
+  ],
+  "building": {
+    "structure": "wood",
+    "_structure": "wood / light_steel / heavy_steel / rc",
+    "use": "戸建住宅",
+    "floors": 2,
+    "built_year_est": 1985,
+    "footprint": {"width_m": 9.1, "depth_m": 7.28},
+    "_footprint": "L字などは {\"polygon\": [[x,y],...]}",
+    "floor_areas_m2": null,
+    "eave_h": 5.8,
+    "units": {"count": 1, "layout": "house_4LDK", "area_each_m2": 105},
+    "annexes": [
+      {"name": "カーポート", "price_key": "carport", "qty": 1, "unit": "台", "basis": "写真"}
+    ],
+    "measure_basis": [
+      {"item": "間口", "value": "約9.1m", "basis": "掃出し窓W1.69m×比例"}
+    ],
+    "elevations": [
+      {"name": "南立面図", "width_m": 9.1, "eave_h": 5.8, "floors": [0.45, 3.3],
+       "roof": {"type": "gable_side", "ridge_h": 7.4, "overhang": 0.6, "label": "切妻 5寸 化粧スレート"},
+       "elements": [
+         {"type": "window", "x": 1.0, "z": 0.45, "w": 1.69, "h": 2.0, "label": "auto"},
+         {"type": "door", "x": 6.5, "z": 0.45, "w": 0.9, "h": 2.0, "label": "玄関"}
+       ]}
+    ]
+  },
+  "leftover": {"layout": "house_4LDK", "occupied_units": 1, "extra_m3": 0, "aircon_units": 3},
+  "_leftover": "occupied_units＝家財が残っている戸数。空き家で一部片付け済みなら extra_m3 で調整",
+  "exterior": [
+    {"key": "block_wall_m2", "label": "CB塀 H≈1.2 L≈10m", "qty": 12, "unit": "㎡", "basis": "写真3：6段", "geom": [[0, 0.1], [10, 0.1]], "short": "CB塀"}
+  ],
+  "_exterior": "key は demolition_unit_prices.json の items（block_wall_m2, fence_m, gate, concrete_slab_m2, carport, storage_shed, tree_small/medium/large, tree_stump, bamboo_m2, garden_stone_t, septic_tank, well, ...）",
+  "next_checks": ["アスベスト事前調査", "境界杭の有無"],
+  "site": {
+    "boundary": [[0, 0], [15, 0], [15, 18], [0, 18]],
+    "road": {"edge": [[0, 0], [15, 0]], "width_m": 4.0, "name": "市道（南側）"},
+    "north_rot_deg": 0,
+    "anchor": null,
+    "anchor_latlon": null,
+    "_anchor": "fetch は住所の代表点を敷地中心とみなす。航空写真で敷地中心の緯度経度が分かれば anchor_latlon に入れて再 fetch",
+    "existing": {
+      "points": [
+        {"x": 7.5, "y": -2.0, "z": 20.0, "label": "道路中心", "basis": "写真"},
+        {"x": 0.5, "y": 0.5, "z": 20.6, "label": "南西角", "basis": "CB3段＝道路+0.6m"}
+      ]
+    },
+    "neighbors": [],
+    "existing_buildings": [{"polygon": [[3, 5], [12.1, 5], [12.1, 12.28], [3, 12.28]], "label": "既存住宅（解体）"}],
+    "existing_walls": [],
+    "plan": {"fh_mode": "optimize", "slab_slope_pct": 1.0, "basins": 2},
+    "_plan": "fh_mode: optimize（概算最小）/ road_plus（road_plus_m）/ balance（切盛バランス）/ fixed（fh_m）",
+    "soil": "default"
+  }
+}

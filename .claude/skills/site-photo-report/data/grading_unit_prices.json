@@ -1,0 +1,1160 @@
+{
+ "version": "2026-10",
+ "currency": "JPY",
+ "tax": "税抜（出典が税込/税抜不明のものを含む。概算用）",
+ "disclaimer": "概算（事業性判断・見積前の当たり）用。公共積算単価・国税庁財産評価基準・民間相場記事を組み合わせた目安で、実勢は現地条件（搬入路幅・重機可否・土質・数量）で大きく変わる。note に『出典弱・一般的目安』とある項目は裏付けが弱い。",
+ "sources": [
+  {
+   "id": "G1",
+   "title": "宅地造成及び特定盛土等規制法施行令（e-Gov法令検索）",
+   "url": "https://laws.e-gov.go.jp/law/337CO0000000016",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G2",
+   "title": "国土交通省 盛土規制法（宅地造成及び特定盛土等規制法）",
+   "url": "https://www.mlit.go.jp/toshi/web/morido.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G3",
+   "title": "国土交通省・農林水産省・林野庁 盛土等防災マニュアル",
+   "url": "https://www.mlit.go.jp/toshi/web/content/001611436.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G4",
+   "title": "松山市 盛土規制法に基づく許可等の技術的基準",
+   "url": "https://www.city.matsuyama.ehime.jp/kurashi/kurashi/jutaku/tochi/moridokisei/kyokaseido.files/gijutsukijun_red.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G5",
+   "title": "福岡市 造成計画平面図の作成方法",
+   "url": "https://www.city.fukuoka.lg.jp/jutaku-toshi/morido/netdetetsuduki/Drawings_03.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G6",
+   "title": "福岡市 造成計画断面図の作成方法",
+   "url": "https://www.city.fukuoka.lg.jp/jutaku-toshi/morido/netdetetsuduki/Drawings_04.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G7",
+   "title": "福岡市 擁壁の断面図の作成方法",
+   "url": "https://www.city.fukuoka.lg.jp/jutaku-toshi/morido/netdetetsuduki/Drawings_08.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G8",
+   "title": "三重県 設計図書等の作成要領（4-2-2）",
+   "url": "https://www.pref.mie.lg.jp/JUTAKU/HP/35626031181.htm",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G9",
+   "title": "都市計画法施行令 第19条（e-Gov法令検索）",
+   "url": "https://laws.e-gov.go.jp/law/344CO0000000158",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G10",
+   "title": "沖縄県 開発許可 区画形質の変更の判断基準",
+   "url": "https://www.pref.okinawa.jp/machizukuri/doboku/1013689/1023889/1013712/1013729/1013735.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G11",
+   "title": "横浜市 開発行為の概要（形の変更の目安）",
+   "url": "https://es.city.yokohama.lg.jp/business/bunyabetsu/kenchiku/takuchi/kaihatsu/gaiyou.files/gaiyo-kaihatsukoi.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G12",
+   "title": "静岡市 開発行為の判断基準資料",
+   "url": "https://www.city.shizuoka.lg.jp/documents/7602/000814233.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G13",
+   "title": "熊本県 盛土規制法 説明資料（開発許可のみなし・定期報告）",
+   "url": "https://www.pref.kumamoto.jp/uploaded/attachment/267382.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G14",
+   "title": "大田区 がけ地に建築する場合（東京都建築安全条例第6条）",
+   "url": "https://www.city.ota.tokyo.jp/seikatsu/sumaimachinami/kenchiku/tatemono_tyuuikisei/gaketi.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G15",
+   "title": "新宿区 東京都建築安全条例第6条（がけ）資料",
+   "url": "https://www.city.shinjuku.lg.jp/content/000393483.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G16",
+   "title": "千葉県 がけ条例（建築基準法施行条例第4条）",
+   "url": "https://www.pref.chiba.lg.jp/kenchiku/houritsu/gake.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G17",
+   "title": "宮崎県 敷地内外に高低差がある場合の補強CB造の塀について",
+   "url": "https://www.pref.miyazaki.lg.jp/documents/6789/6789_20160527114120-1.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G18",
+   "title": "北九州市 盛土規制法 手数料",
+   "url": "https://www.city.kitakyushu.lg.jp/contents/924_01529.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G19",
+   "title": "東京都 開発許可・盛土規制法 手数料一覧（改定後）",
+   "url": "https://www.toshiseibi.metro.tokyo.lg.jp/documents/d/toshiseibi/pdf_bosai_kaihatsu_kaihatsu_tesuuryou",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G20",
+   "title": "国税庁 令和8年分 宅地造成費の金額表（東京都）",
+   "url": "https://www.rosenka.nta.go.jp/main_r08/tokyo/tokyo/others/pdf/d210300.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G21",
+   "title": "国税庁 令和8年分 宅地造成費の金額表（三重県）",
+   "url": "https://www.rosenka.nta.go.jp/main_r08/nagoya/mie/others/pdf/f410300.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G22",
+   "title": "マイナビ不動産 造成工事の費用相場（2026年）",
+   "url": "https://realestate.news.mynavi.jp/kaitai-osusume/zosei-koji-hiyo/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G23",
+   "title": "計算ツールズ 残土処分費・運搬費 計算ツール（首都圏相場・ダンプ積載量・L/C）",
+   "url": "https://ta5k.com/tools/industry/soil-transport-cost",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G24",
+   "title": "竹山美装 現場打ちL型擁壁の施工単価と相場",
+   "url": "https://takebi.net/column/uncategorized/l-shaped-retaining-wall-construction-cost-explanation/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G25",
+   "title": "家づくりナビ 土地の擁壁工事の費用相場（L型・CB・撤去）",
+   "url": "https://kurashi-pro.jp/content/articles/tochi-youheki-hiyou/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G26",
+   "title": "擁壁・土留めの費用単価（2026年）",
+   "url": "https://onayami000.com/youheki/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G27",
+   "title": "大分県 地域資材単価 令和4年4月（L型擁壁製品価格）",
+   "url": "https://www.pref.oita.jp/uploaded/attachment/2145906.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G28",
+   "title": "北陸地方整備局 積算資料（コンクリートブロック積 練積 2025年3月単価）",
+   "url": "https://www.hrr.mlit.go.jp/hsikou/data/kensetu/543/10971san.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G29",
+   "title": "関東地方整備局 単価合意書（法面整形 切土部 869.1円/㎡ 等, 2026）",
+   "url": "https://www.ktr.mlit.go.jp/ktr_content/content/000953554.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G30",
+   "title": "関東地方整備局 単価合意書（張芝工500㎡以上 1,778円/㎡, 2026）",
+   "url": "https://www.ktr.mlit.go.jp/ktr_content/content/000957031.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G31",
+   "title": "比較ビズ 盛土工事の費用相場",
+   "url": "https://www.biz.ne.jp/matome/2003351/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G32",
+   "title": "比較ビズ 地盤改良・地盤調査の費用相場",
+   "url": "https://www.biz.ne.jp/matome/2002793/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G33",
+   "title": "アットホーム 測量費用の相場",
+   "url": "https://www.athome.co.jp/contents/for-sellers/sellers-kiso/surveying-cost/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G34",
+   "title": "アガルート 境界確定測量の費用",
+   "url": "https://www.agaroot.jp/chousashi/column/kyoukaikakuteisokuryo/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G35",
+   "title": "CREX 新築の水道工事費用（引込み・下水接続）2025-11更新",
+   "url": "https://crexgroup.com/ja/home-building/cost/new-construction-plumbing-cost/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G36",
+   "title": "竹山美装 側溝の据付単価の適正相場",
+   "url": "https://takebi.net/column/uncategorized/13656/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G37",
+   "title": "千葉市 雨水浸透ます等設置補助",
+   "url": "https://www.city.chiba.jp/kensetsu/gesuidokikaku/eigyo/usui_subsidy.html",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G38",
+   "title": "墨田区 雨水浸透施設 助成制度",
+   "url": "https://www.city.sumida.lg.jp/kurashi/kankyou_hozen/amamizu/zititai/kakuzititai_zyosei_seido.files/josei.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G39",
+   "title": "農林水産省 土地改良事業等請負工事の積算基準 R7（土量の変化率 表2.1/2.2）",
+   "url": "https://www.maff.go.jp/j/nousin/sekkei/sekisan_kijun/sekisan_kijun_old/attach/pdf/sekisan_kijun_R7-5.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G40",
+   "title": "環境省 最終処分場 容量算定（平均断面法・メッシュ法）",
+   "url": "https://www.env.go.jp/content/900534369.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G41",
+   "title": "近畿地方整備局 土量算出（平均断面法とメッシュ法の比較）",
+   "url": "https://www.kkr.mlit.go.jp/plan/ippan/kensetsugijutsuten/ol9a8v000001uby2-att/a1572394549858.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G42",
+   "title": "すっきり解体 残土の処分費用",
+   "url": "https://sukkiri-kaitai.com/kaitai-hiyou/zandoshobun/",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G43",
+   "title": "Yahoo!知恵袋 私有地U字溝の工事費（施工量別・諸経費15〜25%）",
+   "url": "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1233374517",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G44",
+   "title": "西尾市 給水装置 布設費分担金（φ20 100,000円）",
+   "url": "https://www.city.nishio.aichi.jp/_res/projects/default_project/_page_/001/012/019/futaikoujifutankin0810.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G45",
+   "title": "建築基準法施行令（令62条の8 塀、令138条 工作物：高さ2m超の擁壁）",
+   "url": "https://laws.e-gov.go.jp/law/325CO0000000338",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G46",
+   "title": "宇都宮市 ブロック塀等撤去補助（標準単価1万円/㎡）",
+   "url": "https://www.city.utsunomiya.lg.jp/_res/projects/default_project/_page_/001/016/599/burokku_panfu_2023.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G47",
+   "title": "横浜市 がけ・擁壁Q&A（空積み・増積み擁壁）",
+   "url": "https://ko.city.yokohama.lg.jp/business/bunyabetsu/kenchiku/bosai/gake/qa.files/0006_20230403.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G48",
+   "title": "上尾市 開発行為 排水施設基準（雨水桝20m以内 等）",
+   "url": "https://www.city.ageo.lg.jp/uploaded/attachment/100687.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G49",
+   "title": "国総研 宅地擁壁（プレキャスト擁壁）認定に係る高さ区分資料（3.5m超5.0m以下 区分）",
+   "url": "https://www.nilim.go.jp/lab/pbg/theme/theme2/sr/yoryo0804/s-0804-1-06.pdf",
+   "accessed": "2026-10-22"
+  },
+  {
+   "id": "G50",
+   "title": "国土交通省 大臣認定擁壁について",
+   "url": "https://www.mlit.go.jp/toshi/content/001911844.pdf",
+   "accessed": "2026-10-22"
+  }
+ ],
+ "items": {
+  "cut_m3": {
+   "name": "切土（掘削・場内小運搬）",
+   "unit": "m3",
+   "low": 3000,
+   "mid": 5000,
+   "high": 7000,
+   "src": [
+    "G22",
+    "G29"
+   ],
+   "note": "住宅規模の民間相場 5,000〜7,000円/㎥（G22）。岩盤は割増。公共大規模（ICT掘削）は数百円/㎥レベルなので low は中規模造成で効率が良い場合の目安。地山㎥。"
+  },
+  "fill_purchased_m3": {
+   "name": "盛土（購入土搬入・敷均し・締固め）",
+   "unit": "m3",
+   "low": 6500,
+   "mid": 8000,
+   "high": 10000,
+   "src": [
+    "G20",
+    "G21",
+    "G22",
+    "G31"
+   ],
+   "note": "国税庁R8土盛費 東京8,000/三重8,100円/㎥（G20,G21）、民間7,000〜8,000円/㎥（G22）、東京見積例 約8,755円/㎥（G31）。締固め後㎥。"
+  },
+  "fill_reuse_m3": {
+   "name": "盛土（場内発生土流用・敷均し・締固め）",
+   "unit": "m3",
+   "low": 1500,
+   "mid": 2500,
+   "high": 4000,
+   "src": [
+    "G22"
+   ],
+   "note": "出典弱・一般的目安。購入土単価から土代・搬入運搬を除いた想定。切土単価（G22）とは別計上。"
+  },
+  "soil_disposal_m3": {
+   "name": "残土処分（積込・運搬・受入費込み）",
+   "unit": "m3",
+   "low": 4000,
+   "mid": 7000,
+   "high": 13000,
+   "src": [
+    "G22",
+    "G42",
+    "G23"
+   ],
+   "note": "運搬込み相場 6,000〜10,000円/㎥（G22）、4,000〜13,000円/㎥（G42）。受入費のみは首都圏 第1種1,000〜2,000/第2種2,000〜3,500/第3種3,500〜5,500円/㎥（G23）。地方は受入地が近く low 側、首都圏・狭小地は high 側。地山㎥×L で台数算定。"
+  },
+  "soil_disposal_tipping_only_m3": {
+   "name": "残土受入費のみ（首都圏・建設発生土）",
+   "unit": "m3",
+   "low": 1000,
+   "mid": 2500,
+   "high": 5500,
+   "src": [
+    "G23"
+   ],
+   "note": "第1種〜第3種建設発生土の首都圏相場。第4種5,000〜8,000、建設汚泥12,000〜20,000円/㎥（G23）。"
+  },
+  "soil_transport_m3": {
+   "name": "土砂運搬（10tダンプ、片道約20km想定）",
+   "unit": "m3",
+   "low": 600,
+   "mid": 1200,
+   "high": 2500,
+   "src": [
+    "G23"
+   ],
+   "note": "10tダンプ 300〜500円/km・台、ほぐし6㎥/台（地山約5㎥）（G23）。式: 台数=地山㎥×L/6、費用=台数×片道km×単価。長距離・山間部500〜800円/km・台。"
+  },
+  "compaction_m2": {
+   "name": "整地・敷均し・転圧",
+   "unit": "m2",
+   "low": 500,
+   "mid": 800,
+   "high": 1500,
+   "src": [
+    "G20",
+    "G22",
+    "G31"
+   ],
+   "note": "国税庁R8整地費800円/㎡（G20）、民間粗整地600〜700円/㎡（G22）、砕石敷き＋転圧1,300〜1,500円/㎡（G31）。"
+  },
+  "clearing_m2": {
+   "name": "伐採・抜根",
+   "unit": "m2",
+   "low": 600,
+   "mid": 1100,
+   "high": 1500,
+   "src": [
+    "G20",
+    "G22"
+   ],
+   "note": "国税庁R8 伐採・抜根費1,100円/㎡（G20,G21）、民間1,000〜1,500円/㎡（G22）。大径木・処分費は別途。"
+  },
+  "topsoil_strip_m2": {
+   "name": "表土剥ぎ（t=20〜30cm、場内仮置き）",
+   "unit": "m2",
+   "low": 300,
+   "mid": 600,
+   "high": 1000,
+   "src": [],
+   "note": "出典弱・一般的目安。処分する場合は剥ぎ取り体積×soil_disposal_m3 を加算。"
+  },
+  "cb_retaining_m": {
+   "name": "CB（補強コンクリートブロック）土留め 新設",
+   "unit": "m",
+   "low": 15000,
+   "mid": 25000,
+   "high": 45000,
+   "src": [
+    "G25",
+    "G17"
+   ],
+   "note": "出典弱・一般的目安：高低差0.3〜0.6m用の化粧CB土留め（2〜3段・RC基礎・鉄筋込み）。G25の5〜12万円/mは高さのある『CB擁壁』の価格帯で、本ツールでは0.6m超はL型RCに切り替えるため採用していない。CBは擁壁として扱われない（G17）。"
+  },
+  "rc_retaining_m2": {
+   "name": "RC擁壁 本体（壁面積あたり）",
+   "unit": "m2",
+   "low": 30000,
+   "mid": 55000,
+   "high": 110000,
+   "src": [
+    "G22",
+    "G24",
+    "G20"
+   ],
+   "note": "RC擁壁3〜11万円/㎡（G22）、現場打ちL型本体3〜5万円/㎡（G24）、国税庁R8 土止費 東京91,800円/㎡（G20）。高さ別m単価は retaining_wall_l_type_per_m を優先。"
+  },
+  "existing_wall_removal_m2": {
+   "name": "既存擁壁・ブロック・大谷石 撤去処分",
+   "unit": "m2",
+   "low": 10000,
+   "mid": 25000,
+   "high": 50000,
+   "src": [
+    "G25",
+    "G46"
+   ],
+   "note": "撤去費 RC 5〜15万円/m、ブロック積 3〜8万円/m（G25、高さ約2m前提なら約1.5〜7.5万円/㎡）。塀撤去の補助標準単価1万円/㎡（G46）。大谷石は重く高め。やり替え総額は新設の1.3〜1.5倍（G25）。"
+  },
+  "slope_finish_m2": {
+   "name": "法面整形",
+   "unit": "m2",
+   "low": 500,
+   "mid": 900,
+   "high": 1500,
+   "src": [
+    "G29"
+   ],
+   "note": "関東地整2026 単価合意 切土部869.1円/㎡、盛土部(ICT,締固め無)約520円/㎡（G29）。小規模宅地は割高のため high を広めに設定（出典弱）。"
+  },
+  "sod_m2": {
+   "name": "張芝（法面保護）",
+   "unit": "m2",
+   "low": 1500,
+   "mid": 1800,
+   "high": 3000,
+   "src": [
+    "G30"
+   ],
+   "note": "関東地整2026 張芝工500㎡以上 1,778円/㎡（G30）。100㎡未満の小規模は割高（high は出典弱）。"
+  },
+  "u_ditch_m": {
+   "name": "U字溝（U-240〜300程度）設置 材工",
+   "unit": "m",
+   "low": 6000,
+   "mid": 12000,
+   "high": 18000,
+   "src": [
+    "G36"
+   ],
+   "note": "材工 6,000〜12,000円/m（G36）、新設 15,000〜18,000円/m 等の記事あり。蓋・グレーチング別。施工量10m未満は1万円/m以上（G43）。"
+  },
+  "l_gutter_m": {
+   "name": "L型側溝（道路境界）",
+   "unit": "m",
+   "low": 8000,
+   "mid": 15000,
+   "high": 25000,
+   "src": [],
+   "note": "出典弱・一般的目安。道路管理者協議・切下げ工事の場合は別途。"
+  },
+  "catch_basin": {
+   "name": "雨水桝（集水桝）設置",
+   "unit": "箇所",
+   "low": 15000,
+   "mid": 30000,
+   "high": 60000,
+   "src": [],
+   "note": "出典弱・一般的目安。泥溜め15cm以上（G1令16条）。配置は管渠延長・屈曲点ごと、開発行為で20m以内に1基の例（G48）。"
+  },
+  "infiltration_basin": {
+   "name": "雨水浸透桝 設置",
+   "unit": "箇所",
+   "low": 20000,
+   "mid": 40000,
+   "high": 70000,
+   "src": [
+    "G37",
+    "G38"
+   ],
+   "note": "出典弱。補助額から逆算：千葉市1個11,000円（口径150）、墨田区 上限2.5万円かつ工事費の2/3（G37,G38）→工事費3〜4万円前後と推定。"
+  },
+  "water_service": {
+   "name": "給水引込（道路本管〜メーター）",
+   "unit": "件",
+   "low": 200000,
+   "mid": 400000,
+   "high": 800000,
+   "src": [
+    "G35",
+    "G44"
+   ],
+   "note": "工事全体30〜50万円、道路掘削復旧15〜30万円、追加1.5〜2万円/m（G35）。加入金・分担金は自治体別で別途（例: 西尾市 φ20 布設費分担金100,000円 G44）。"
+  },
+  "sewer_connection": {
+   "name": "下水道引込（公共桝・本管接続）",
+   "unit": "件",
+   "low": 200000,
+   "mid": 450000,
+   "high": 800000,
+   "src": [
+    "G35"
+   ],
+   "note": "公共下水道接続30〜80万円（G35）。公共桝未設置で自治体施工の場合は負担金制度あり（自治体により異なる）。"
+  },
+  "ground_improvement_surface_m2": {
+   "name": "地盤改良 表層改良（〜2m）",
+   "unit": "m2",
+   "low": 3000,
+   "mid": 6000,
+   "high": 9000,
+   "src": [
+    "G32",
+    "G22"
+   ],
+   "note": "1〜3万円/坪（G32,G22）を㎡換算（÷3.3）。建物直下の面積で計上。国税庁の地盤改良費2,300円/㎡は湿田等の宅地化用で建物用改良とは別物。"
+  },
+  "ground_improvement_column_m2": {
+   "name": "地盤改良 柱状改良",
+   "unit": "m2",
+   "low": 9000,
+   "mid": 12000,
+   "high": 15000,
+   "src": [
+    "G32",
+    "G22"
+   ],
+   "note": "3〜5万円/坪（G32）、4〜5万円/坪（G22）を㎡換算。鋼管杭は5〜7万円/坪。建築面積で計上。"
+  },
+  "survey_current": {
+   "name": "現況測量（高低測量含む）",
+   "unit": "件",
+   "low": 100000,
+   "mid": 150000,
+   "high": 250000,
+   "src": [
+    "G33"
+   ],
+   "note": "一般住宅用地（約30坪）で10〜20万円（G33）。造成設計用の詳細な高低測量・広い敷地は high 側。"
+  },
+  "survey_boundary": {
+   "name": "境界確定測量",
+   "unit": "件",
+   "low": 300000,
+   "mid": 450000,
+   "high": 800000,
+   "src": [
+    "G33",
+    "G34"
+   ],
+   "note": "民民立会い30〜50万円、官民立会い60〜80万円（G34）。"
+  },
+  "design_and_permit": {
+   "name": "造成計画図・構造計算・許可申請 設計費（申請手数料別）",
+   "unit": "件",
+   "low": 300000,
+   "mid": 600000,
+   "high": 1500000,
+   "src": [],
+   "note": "出典弱・一般的目安。擁壁構造計算・開発/盛土規制法許可の有無で大きく変動。許可手数料は permit_fee_morido_500m2 等を別計上。高さ5m超擁壁・1,500㎡超の排水施設は有資格者設計（G1令21条）。"
+  },
+  "permit_fee_morido_500m2": {
+   "name": "盛土規制法 宅地造成等許可手数料（500㎡以内）",
+   "unit": "件",
+   "low": 16000,
+   "mid": 16000,
+   "high": 20000,
+   "src": [
+    "G18",
+    "G19"
+   ],
+   "note": "自治体により異なる。北九州市16,000円（500㎡超1,000㎡以内28,000円）（G18）、東京都 改定後20,000円（同34,000円）（G19）。"
+  },
+  "permit_fee_morido_1000m2": {
+   "name": "盛土規制法 宅地造成等許可手数料（500㎡超1,000㎡以内）",
+   "unit": "件",
+   "low": 28000,
+   "mid": 28000,
+   "high": 34000,
+   "src": [
+    "G18",
+    "G19"
+   ],
+   "note": "自治体により異なる。"
+  },
+  "soil_test_sws": {
+   "name": "地盤調査 SWS試験（5点程度）",
+   "unit": "件",
+   "low": 50000,
+   "mid": 70000,
+   "high": 100000,
+   "src": [
+    "G32"
+   ],
+   "note": "5〜10万円/回（G32）、通常は建物四隅＋中央の5箇所。"
+  },
+  "heavy_machine_transport": {
+   "name": "重機回送",
+   "unit": "回",
+   "low": 12000,
+   "mid": 40000,
+   "high": 60000,
+   "src": [
+    "G26",
+    "G31"
+   ],
+   "note": "12,000〜18,000円（G26）、見積例 40,000円/台（G31）。往復で2回計上。"
+  },
+  "overhead_rate": {
+   "name": "諸経費（現場管理費・一般管理費）",
+   "unit": "%",
+   "low": 10,
+   "mid": 15,
+   "high": 25,
+   "src": [
+    "G43"
+   ],
+   "note": "出典弱・一般的目安。小規模U字溝工事で諸経費15〜25%を加える例（G43）。直接工事費合計に乗じる。"
+  }
+ },
+ "retaining_wall_l_type_per_m": [
+  {
+   "height_m": 1.0,
+   "low": 60000,
+   "mid": 100000,
+   "high": 150000,
+   "src": [
+    "G24",
+    "G26"
+   ],
+   "note": "現場打ちL型 1m×10m 約100〜150万円（G24）、1m×8m 約40万円の事例（G26）。"
+  },
+  {
+   "height_m": 1.5,
+   "low": 100000,
+   "mid": 130000,
+   "high": 180000,
+   "src": [
+    "G25"
+   ],
+   "note": "L型1.5m×10m 約100〜140万円（G25）。"
+  },
+  {
+   "height_m": 2.0,
+   "low": 150000,
+   "mid": 220000,
+   "high": 300000,
+   "src": [
+    "G24",
+    "G25"
+   ],
+   "note": "2m×10m 約150〜200万円（G25）、約220〜300万円（G24）。2m超は工作物確認（G45）。"
+  },
+  {
+   "height_m": 2.5,
+   "low": 200000,
+   "mid": 300000,
+   "high": 420000,
+   "src": [
+    "G24",
+    "G25"
+   ],
+   "note": "2.0mと3.0mの補間（出典弱）。"
+  },
+  {
+   "height_m": 3.0,
+   "low": 250000,
+   "mid": 400000,
+   "high": 600000,
+   "src": [
+    "G24",
+    "G25",
+    "G26"
+   ],
+   "note": "3m×10m 約250〜400万円（G25）、約400〜600万円（G24）、約400万円事例（G26）。"
+  },
+  {
+   "height_m": 4.0,
+   "low": 400000,
+   "mid": 600000,
+   "high": 900000,
+   "src": [],
+   "note": "出典弱・外挿。製品価格のみで H4000 L1000 120,000円/個（大分県R4, G27）。構造計算・地盤改良・山留め次第で大きく増。"
+  }
+ ],
+ "retaining_wall_l_type_notes": "総額目安（本体＋掘削・埋戻し・残土・基礎・小運搬込み、仮設山留め・地盤改良・設計申請は別）。プレキャスト製品価格のみの参考（大分県R4, G27）: H1000=15,850円/m, H2000=40,500円/m, H3000=79,000円/m, H4000=120,000円/m。",
+ "kenchi_block_per_m2": {
+  "name": "間知ブロック練積み擁壁（正面積）",
+  "unit": "m2",
+  "low": 28000,
+  "mid": 40000,
+  "high": 70000,
+  "src": [
+   "G22",
+   "G26",
+   "G28"
+  ],
+  "note": "民間 2.8〜7万円/㎡（G22）、2.5〜5万円/㎡（G26）、公共積算 JIS滑面150kg/個未満 練積 29,460円/㎡（北陸地整2025.3, G28）。練積み造は地上高さ5mまで（G3）、別表第四の勾配・高さ・厚さ・根入れに従う（G1）。"
+ },
+ "soil_change_rate": {
+  "gravel": {
+   "L": 1.2,
+   "C": 0.9,
+   "src": [
+    "G39"
+   ],
+   "note": "礫質土（農水省積算基準 表2.2）"
+  },
+  "sandy": {
+   "L": 1.2,
+   "C": 0.9,
+   "src": [
+    "G39"
+   ],
+   "note": "砂質土及び砂"
+  },
+  "clay": {
+   "L": 1.25,
+   "C": 0.9,
+   "src": [
+    "G39"
+   ],
+   "note": "粘性土（表2.1の細分では粘性土1.30/0.90、高含水比粘性土1.25/0.90）"
+  },
+  "soft_rock": {
+   "L": 1.4,
+   "C": 1.2,
+   "src": [
+    "G23"
+   ],
+   "note": "軟岩 L1.30〜1.50 / C1.10〜1.30 の中央値（G23、出典弱）"
+  },
+  "default": {
+   "L": 1.2,
+   "C": 0.9,
+   "src": [
+    "G39"
+   ],
+   "note": "土質不明時。ほぐし土量=地山×L、締固め後=地山×C、盛土に必要な地山=盛土量/C"
+  }
+ },
+ "dump_truck_capacity_m3_loose": {
+  "2t": 1.5,
+  "4t": 2.5,
+  "10t": 6.0,
+  "src": [
+   "G23"
+  ],
+  "note": "ほぐし土量。10t=地山約5㎥"
+ },
+ "slope_gradient": {
+  "cut": {
+   "no_wall_required_deg": {
+    "soft_rock": {
+     "h_le_5m": 80,
+     "h_gt_5m": 60,
+     "note": "風化の著しいものを除く"
+    },
+    "weathered_rock": {
+     "h_le_5m": 50,
+     "h_gt_5m": 40
+    },
+    "gravel_masado_loam_hardclay": {
+     "h_le_5m": 45,
+     "h_gt_5m": 35
+    },
+    "other_soil": {
+     "h_le_5m": 30,
+     "h_gt_5m": 30,
+     "note": "上記以外の土質は30度超で崖→擁壁等が原則"
+    },
+    "src": [
+     "G1",
+     "G4"
+    ],
+    "note": "令8条・別表第一。h_le_5m=崖上端から垂直5m以内の部分は『中欄超・下欄以下』でも擁壁不要、5m超部分は中欄以下でないと擁壁要"
+   },
+   "standard_slope_ratio": {
+    "hard_rock": "1:0.3〜1:0.8",
+    "soft_rock": "1:0.5〜1:1.2",
+    "sandy_dense_le5m": "1:0.8〜1:1.0",
+    "sandy_dense_5_10m": "1:1.0〜1:1.2",
+    "sandy_loose_le5m": "1:1.0〜1:1.2",
+    "sandy_loose_5_10m": "1:1.2〜1:1.5",
+    "clay_le10m": "1:0.8〜1:1.2",
+    "src": [
+     "G4"
+    ],
+    "note": "道路土工 切土工・斜面安定工指針の標準のり面勾配（松山市基準表2-4に転載）"
+   },
+   "berm": {
+    "every_m": 5,
+    "width_m": [
+     1.0,
+     2.0
+    ],
+    "src": [
+     "G3"
+    ]
+   }
+  },
+  "fill": {
+   "max_deg": 30,
+   "max_ratio": "1:1.8",
+   "src": [
+    "G3",
+    "G4"
+   ],
+   "standard_slope_ratio": {
+    "sand_gravel_le5m": "1:1.5〜1:1.8",
+    "sand_gravel_5_15m": "1:1.8〜1:2.0",
+    "volcanic_clay_le5m": "1:1.8〜1:2.0"
+   },
+   "berm": {
+    "every_m": 5,
+    "width_m": [
+     1.0,
+     2.0
+    ],
+    "berm_cross_slope_pct": [
+     2,
+     5
+    ],
+    "wide_berm_every_m": 15,
+    "wide_berm_width_m": [
+     3,
+     5
+    ],
+    "src": [
+     "G3",
+     "G4"
+    ]
+   },
+   "layer_thickness_m": 0.3,
+   "benching_if_ground_slope_deg_ge": 15,
+   "benching_step": {
+    "height_m": 0.5,
+    "width_m_min": 1.0
+   },
+   "src_layer": [
+    "G1",
+    "G3",
+    "G4"
+   ]
+  }
+ },
+ "retaining_wall_rules": {
+  "weep_hole": {
+   "area_m2_per_hole": 3,
+   "min_inner_diameter_mm": 75,
+   "src": [
+    "G1",
+    "G7"
+   ]
+  },
+  "masonry_embedment": {
+   "type1_2_ratio": 0.15,
+   "type1_2_min_m": 0.35,
+   "type3_ratio": 0.2,
+   "type3_min_m": 0.45,
+   "src": [
+    "G1"
+   ],
+   "note": "令10条四号。第一種=岩・岩屑・砂利・砂利混じり砂、第二種=真砂土・関東ローム・硬質粘土等、第三種=その他"
+  },
+  "masonry_top_thickness_m": {
+   "type1_2": 0.4,
+   "other": 0.7,
+   "src": [
+    "G1"
+   ]
+  },
+  "masonry_max_height_m": 5.0,
+  "expansion_joint_every_m": 20,
+  "slope_top_setback": {
+   "ratio_of_H": 0.4,
+   "min_m": 1.5,
+   "src": [
+    "G4"
+   ],
+   "note": "斜面上・二段擁壁判定"
+  },
+  "qualified_designer_required": {
+   "wall_height_gt_m": 5.0,
+   "drainage_area_gt_m2": 1500,
+   "src": [
+    "G1"
+   ]
+  },
+  "structure_permit_wall_height_gt_m": 2.0
+ },
+ "region_factor": {
+  "tokyo23": 1.15,
+  "tokyo_metro_suburb": 1.1,
+  "osaka_nagoya_city": 1.05,
+  "default": 1.0,
+  "rural": 0.95,
+  "src": [
+   "G20",
+   "G21"
+  ],
+  "note": "出典弱・一般的目安。国税庁R8の造成費は東京と三重でほぼ同水準（土止費 91,800 vs 89,200円/㎡、+3%）だが、首都圏は残土受入費・狭小地の小運搬・交通誘導で上がるため係数で補正。残土処分は soil_disposal_m3 の low/high で別に振る。"
+ },
+ "regulation": {
+  "morido_permit": [
+   {
+    "zone": "宅地造成等工事規制区域",
+    "type": "許可",
+    "condition": "盛土で高さ1m超の崖を生ずる",
+    "threshold_m": 1.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "宅地造成等工事規制区域",
+    "type": "許可",
+    "condition": "切土で高さ2m超の崖を生ずる",
+    "threshold_m": 2.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "宅地造成等工事規制区域",
+    "type": "許可",
+    "condition": "盛土と切土を同時に行い高さ2m超の崖を生ずる",
+    "threshold_m": 2.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "宅地造成等工事規制区域",
+    "type": "許可",
+    "condition": "崖を生じない盛土で高さ2m超",
+    "threshold_m": 2.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "宅地造成等工事規制区域",
+    "type": "許可",
+    "condition": "上記以外で盛土又は切土の面積500㎡超",
+    "threshold_m2": 500,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "宅地造成等工事規制区域",
+    "type": "許可",
+    "condition": "土石の堆積 高さ2m超 又は 面積500㎡超",
+    "threshold_m": 2.0,
+    "threshold_m2": 500,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "届出（着手30日前）",
+    "condition": "宅造区域の許可規模と同じ（令3条・令4条）",
+    "threshold_m": 1.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "許可",
+    "condition": "盛土で高さ2m超の崖を生ずる",
+    "threshold_m": 2.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "許可",
+    "condition": "切土で高さ5m超の崖を生ずる",
+    "threshold_m": 5.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "許可",
+    "condition": "盛切同時で高さ5m超の崖を生ずる",
+    "threshold_m": 5.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "許可",
+    "condition": "崖を生じない盛土で高さ5m超",
+    "threshold_m": 5.0,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "許可",
+    "condition": "上記以外で盛土又は切土の面積3,000㎡超",
+    "threshold_m2": 3000,
+    "src": [
+     "G1"
+    ]
+   },
+   {
+    "zone": "特定盛土等規制区域",
+    "type": "許可",
+    "condition": "土石の堆積 高さ5m超かつ面積1,500㎡超、又は面積3,000㎡超",
+    "threshold_m": 5.0,
+    "threshold_m2": 1500,
+    "src": [
+     "G1"
+    ]
+   }
+  ],
+  "morido_inspection": {
+   "interim_inspection_scale": "盛土で2m超の崖／切土で5m超の崖／盛切5m超の崖／盛土高5m超／面積3,000㎡超（令23条、両区域共通）",
+   "interim_inspection_process": "盛土前の地盤面又は切土後の地盤面に排水施設を設置する工程（令24条）",
+   "periodic_report_scale": "中間検査と同じ規模（令25条・令33条）。報告は3か月ごと（自治体資料, G13）",
+   "removal_notice": "宅造区域内で高さ2m超の擁壁・崖面崩壊防止施設、排水施設、地滑り抑止ぐい等の除却工事は届出（令26条）",
+   "src": [
+    "G1",
+    "G13"
+   ],
+   "note": "特定盛土等規制区域の許可規模は都道府県が条例で宅造区域の規模まで引下げ可能（自治体により異なる）。開発許可を受ければ盛土規制法の許可はみなされるが、中間検査・定期報告等は必要（G13）。"
+  },
+  "cliff_ordinance_example": {
+   "tokyo": {
+    "cliff_height_gt_m": 2.0,
+    "cliff_angle_gt_deg": 30,
+    "restricted_distance_ratio": 2.0,
+    "required": "がけ下端から水平距離がけ高の2倍以内に建築・造成する場合、高さ2m超の擁壁（東京都建築安全条例6条2項）。がけ高は下端を通る1/2勾配線を超える部分で測る。勾配30度以下等は緩和",
+    "src": [
+     "G14",
+     "G15"
+    ]
+   },
+   "chiba": {
+    "cliff_height_gt_m": 2.0,
+    "cliff_angle_gt_deg": 30,
+    "restricted_distance_ratio_above": 1.5,
+    "restricted_distance_ratio_below": 2.0,
+    "required": "がけ上は下端から高さの1.5倍、がけ下は上端から2倍以内に居室を有する建築物不可（擁壁設置等で緩和）",
+    "src": [
+     "G16"
+    ]
+   },
+   "note": "自治体により異なる。必ず所在地の条例で確認。"
+  },
+  "development_permit_area_m2": {
+   "urbanization_area": 1000,
+   "urbanization_area_metro": 500,
+   "urbanization_area_min_by_ordinance": 300,
+   "urbanization_control_area": 0,
+   "non_designated_city_planning_area": 3000,
+   "outside_city_planning_area": 10000,
+   "src": [
+    "G9"
+   ],
+   "note": "市街化区域1,000㎡（都の特別区・首都圏既成市街地/近郊整備地帯・近畿圏既成都市区域/近郊整備区域・中部圏都市整備区域は500㎡）。条例で300㎡まで引下げ可。調整区域は面積要件なし。"
+  },
+  "kukaku_keishitsu_examples": [
+   {
+    "pref_city": "沖縄県",
+    "rule": "盛土最大1m超／切土最大2m超／切盛高低差2m超／切盛の平均が 1,000㎡未満で50cm以上・1,000㎡以上で30cm以上 → 形の変更",
+    "src": [
+     "G10"
+    ]
+   },
+   {
+    "pref_city": "横浜市",
+    "rule": "切土2m超／盛土1m超／一体の切盛2m超／切盛面積計500㎡超 → 形の変更の目安",
+    "src": [
+     "G11"
+    ]
+   },
+   {
+    "pref_city": "静岡市",
+    "rule": "盛土50cm超／切土1m超／盛切同時で合計1m超",
+    "src": [
+     "G12"
+    ]
+   }
+  ],
+  "cb_as_retaining_example": {
+   "rule": "CBは擁壁として扱われない。宮崎県は令62条の8適合・高低差1m以下・建物荷重が伝わらない配置なら支障なしと扱う。開発許可では30cmまでの例",
+   "src": [
+    "G17"
+   ]
+  }
+ },
+ "wall_selection": [
+  {
+   "max_h": 0.3,
+   "type": "none",
+   "name": "構造物なし（法面・縁石・境界ブロック程度）",
+   "note": "開発許可では土留めとしてCB使用を高低差30cmまで認める例（宮崎県, G17）。宅地内で緩勾配すり付け（30度以下＝崖でない, G1令1条）も可。"
+  },
+  {
+   "max_h": 0.6,
+   "type": "cb",
+   "name": "化粧CB土留め（補強CB 2〜3段＋RC基礎）",
+   "note": "CBは擁壁として扱われない（G17）。宮崎県は令62条の8適合・高低差1m以下・建物荷重が伝わらない配置なら支障なしとする例があるが、余裕をみて0.6mで打切り（一般的実務目安・出典弱）。0.6〜1.0mは自治体取扱いを確認しL型RCを推奨。"
+  },
+  {
+   "max_h": 5.0,
+   "type": "l_rc",
+   "name": "L型RC擁壁（現場打ち又は大臣認定プレキャスト）",
+   "note": "盛土1m超・切土2m超の崖は擁壁で覆う（G1令8条）。2m超は工作物確認（G45令138条）。大臣認定プレキャストL型はH=1.0〜3.0m規格品が多く、宅造認定H=3〜5m品・国総研の3.5m超5.0m以下区分あり（G49,G50）。練積み造も地上5mが限度（G3）。"
+  },
+  {
+   "max_h": 99,
+   "type": "special",
+   "name": "特殊擁壁・多段擁壁・法面＋小段（個別構造設計）",
+   "note": "高さ5m超の擁壁は有資格者の設計が必要（G1令21条）。認定品の範囲外となるため現場打ち逆T型・控え壁式・グラウンドアンカー等を個別設計。小段は高さ5mごと幅1〜2m（G3）。"
+  }
+ ]
+}

@@ -1,0 +1,1630 @@
+{
+  "version": "2026-10",
+  "currency": "JPY",
+  "notes": "外観写真からの概算用単価表（税抜目安）。building の単価は市場の『坪単価』慣行に合わせ、足場・養生、通常基礎（布/ベタ）撤去、廃材の運搬・処分、簡易整地を含む前提。付帯工事・残置物・アスベスト・諸経費(届出/登記/ガードマン等)は別積み。足場・処分を別積みする場合は building_bare_public（公費解体の標準単価）を使う。region_factor / condition_factor は building に掛ける係数（付帯にも準用可）。『出典弱』と書いた値は公開ソースで裏付けが取れず、業界の一般的な目安または他の数値からの換算である。詳細と根拠は references/demolition_costs.md。",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "すっきり解体 解体工事の単価表（あんしん解体業者認定協会の見積データ等）",
+      "url": "https://sukkiri-kaitai.com/kaitai-hiyou/kaitaikoji-tankahyo/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S2",
+      "title": "解体工事ガイド 費用相場（坪数別平均坪単価・全国）",
+      "url": "https://www.kaitai-guide.net/costprice/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S3",
+      "title": "解体工事ガイド 東京都の解体費用相場（実勢価格）",
+      "url": "https://www.kaitai-guide.net/costprice/areacp/tokyo/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S4",
+      "title": "解体工事ガイド 大阪府の解体費用相場",
+      "url": "https://www.kaitai-guide.net/costprice/areacp/osaka/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S5",
+      "title": "解体工事ガイド 愛知県の解体費用相場",
+      "url": "https://www.kaitai-guide.net/costprice/areacp/aichi/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S6",
+      "title": "解体工事ガイド 神奈川県の解体費用相場",
+      "url": "https://www.kaitai-guide.net/costprice/areacp/kanagawa/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S7",
+      "title": "解体工事ガイド 福岡県の解体費用相場",
+      "url": "https://www.kaitai-guide.net/costprice/areacp/fukuoka/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S8",
+      "title": "解体工事ガイド 新潟県の解体費用相場",
+      "url": "https://www.kaitai-guide.net/costprice/areacp/niigata/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S9",
+      "title": "大東（dai-tou）全国坪単価・費用・相場（都道府県別）",
+      "url": "https://www.dai-tou.com/marketprice",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S10",
+      "title": "HOME4Uオーナーズ 家の解体費用の相場を地域別に解説（2025-06-24更新）",
+      "url": "https://home4u-owners.jp/contents/rebuilding-others-3-14679",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S11",
+      "title": "家じまいくん 空き家の解体費用 2026年版",
+      "url": "https://iejimaikun.jp/research/akiya-kaitai-souba-2026",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S12",
+      "title": "三井のリハウス 解体費用コラム（2025-05）",
+      "url": "https://www.rehouse.co.jp/relifemode/column/at/at_0059/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S13",
+      "title": "野村の仲介+ 解体費用コラム（2024-06-10）",
+      "url": "https://www.nomu.com/seller/column/20240610.html",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S14",
+      "title": "ミツモア 家屋解体の費用相場（2024-06-28更新）",
+      "url": "https://meetsmore.com/services/house-demolition/media/92772",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S15",
+      "title": "カイタック 解体工事料金表",
+      "url": "https://kaitac.co.jp/works/ch_hyou/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S16",
+      "title": "解体サポート 外構の解体費用（2022-12）",
+      "url": "https://www.kaitai-support.com/gaikouhiyou.html",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S17",
+      "title": "DRAFT 解体見積もりの付帯工事費（2026-03）",
+      "url": "https://draft-inc.com/ancillary-work-costs/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S18",
+      "title": "解体太郎(note) 解体工事の単価表（2025-10-26）",
+      "url": "https://note.com/demolin/n/n518d2253abbe",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S19",
+      "title": "石川県 損壊建物の解体費標準単価について（資循第4833号 2024-02-26）",
+      "url": "https://www.pref.ishikawa.lg.jp/haitai/documents/kaitaihi.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S20",
+      "title": "現場窓口 解体費用の相場（石川県R7.3標準単価・国交省R8標準建設費の転載）",
+      "url": "https://genba-mado.com/kaitai/market-price",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S21",
+      "title": "厚生労働省 石綿含有建材の基礎知識（調査者講習テキスト 表2.7 製造時期）",
+      "url": "https://www.mhlw.go.jp/content/001098608.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S22",
+      "title": "食環境衛生研究所 アスベスト解体費用相場（2025-03）",
+      "url": "https://www.shokukanken.com/asbestos/asbestos-demolition-cost/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S23",
+      "title": "オオノ開發 アスベスト処分費用（2025-09更新）",
+      "url": "https://www.oono-as.jp/articles/archives/446",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S24",
+      "title": "パナソニック 石綿分析の流れ（定性分析 1検体25,000円税抜）",
+      "url": "https://phio.panasonic.co.jp/kagaku/ishiwata_bunseki/pdf/bunseki_nagare.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S25",
+      "title": "兵庫労働局 石綿事前調査結果の報告制度（2022-04施行）",
+      "url": "https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/001018736.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S26",
+      "title": "北海道労働局 有資格者による事前調査（2023-10施行）",
+      "url": "https://jsite.mhlw.go.jp/hokkaido-roudoukyoku/content/contents/001474222.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S27",
+      "title": "国立環境研究所 災害廃棄物の発生原単位",
+      "url": "https://web2.nies.go.jp/shinsai/enpdf/genntanni_no1_110628.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S28",
+      "title": "上田市 環境影響評価 第4章 廃棄物等（国交省H30建設副産物実態調査の非木造解体原単位）",
+      "url": "https://www.area.ueda.nagano.jp/wpukr/wp-content/uploads/2025/01/04第4章16廃棄物等.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S29",
+      "title": "千葉県 環境影響評価書 資料編（換算係数 建設発生木材0.55 t/m3）",
+      "url": "https://www.pref.chiba.lg.jp/doukei/kitachiba/documents/02_hyoukasyosiryouhen_11.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S30",
+      "title": "北九州市 埋立処分料金と受入基準（2025-04-01）",
+      "url": "https://www.city.kitakyushu.lg.jp/contents/924_11379.html",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S31",
+      "title": "ミツモア 不用品回収の費用相場（2026-05成約1,467件 q1-q3）",
+      "url": "https://meetsmore.com/services/unwanted-item-pick-up/media/272763",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S32",
+      "title": "くらしのマーケット 遺品整理 掲載業者（間取り別2tトラック台数表・積載立米）",
+      "url": "https://curama.jp/rip/SER375250374/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S33",
+      "title": "CREX 引越し4tトラックの積載量（2025-12-10更新）",
+      "url": "https://crexgroup.com/ja/hikkoshi/cost-estimate/moving-truck-capacity-price/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S34",
+      "title": "日本郵便 遺品整理の費用相場（間取り別）",
+      "url": "https://www.post.japanpost.jp/life/inheriting/column7/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S35",
+      "title": "アシスト 伐採・抜根費用（2025-06-27）",
+      "url": "https://lifestyle.assist-all.co.jp/?p=11600",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S36",
+      "title": "群馬県 竹林整備の単価資料",
+      "url": "https://www.pref.gunma.jp/uploaded/attachment/18262.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S37",
+      "title": "名古屋市 家電リサイクル料金（主要メーカー）",
+      "url": "https://www.city.nagoya.jp/kurashi/gomi/1012183/1035059/1012216/1012222.html",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S38",
+      "title": "BCN 東芝エアコンのリサイクル料金を2026-02-01から550円に改定",
+      "url": "https://www.bcnretail.com/market/detail/20251229_582787.html",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S39",
+      "title": "サンリフレ エアコン取り外し・処分費用",
+      "url": "https://www.sunrefre.jp/sumutano/?p=9785",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S40",
+      "title": "日本土地家屋調査士会連合会 報酬に関する実態調査（令和4年度 建物滅失登記）",
+      "url": "https://www.chosashi.or.jp/media/hoshuguide_single_r04.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S41",
+      "title": "神奈川県 県土整備局建築工事設計労務単価表（交通誘導警備員単価）",
+      "url": "https://www.pref.kanagawa.jp/docs/m2t/cnt/f4317/p1064069.html",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S42",
+      "title": "国交省北陸地方整備局 積算資料（手摺先行型枠組足場 5,593円/掛㎡ 2024-12）",
+      "url": "https://www.hrr.mlit.go.jp/hsikou/data/kensetu/779/15843san.pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S43",
+      "title": "ビズ用語/比較ビズ 整地費用（300〜600円/㎡）",
+      "url": "https://www.biz.ne.jp/matome/2003351/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S44",
+      "title": "マネーフォワード 見積書の諸経費（相場5〜10%）",
+      "url": "https://biz.moneyforward.com/construction/basic/67264/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S45",
+      "title": "日本サッシ協会 住宅サッシ・出入口の標準規格寸法（2021-04-26）",
+      "url": "https://www.jsma.or.jp/Portals/0/images/useful/houreikijun/kikakusunpo(20210426).pdf",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S46",
+      "title": "建築基準法施行令（第21条 天井高2.1m、第22条 床高45cm、第62条の8 塀2.2m、第126条 手すり1.1m）",
+      "url": "https://laws.e-gov.go.jp/law/325CO0000000338",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S47",
+      "title": "CREX ハウスメーカー天井高比較（標準2,400mm）",
+      "url": "https://crexgroup.com/ja/home-building/builder/house-maker-ceiling-height-compare/",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S48",
+      "title": "modernlivingjapan 1K/1DK/1LDK/2LDK の広さ目安",
+      "url": "https://modernlivingjapan.com/en/blog/japanese-apartment-floor-plans-decoded-1k-vs-1dk-vs-1ldk-vs-2ldk",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S49",
+      "title": "e-estate 古家の解体費用（都道府県別坪単価の幅）",
+      "url": "https://e-estate.jp/media/?p=4404",
+      "accessed": "2026-10-22"
+    },
+    {
+      "id": "S50",
+      "title": "imitsu 解体工事の費用相場",
+      "url": "https://imitsu.jp/cost/demolition_work/article",
+      "accessed": "2026-10-22"
+    }
+  ],
+  "building": {
+    "wood": {
+      "name": "木造",
+      "unit": "円/㎡",
+      "low": 9100,
+      "mid": 11500,
+      "high": 15100,
+      "tsubo": {
+        "low": 30000,
+        "mid": 38000,
+        "high": 50000
+      },
+      "src": [
+        "S1",
+        "S2",
+        "S3",
+        "S11",
+        "S12",
+        "S13",
+        "S14"
+      ],
+      "note": "実勢データ(S2 木造2F30坪 35,191円/坪、S1 2F 36,080円/坪、S3 東京 39,355円/坪)と記事の4〜5万円/坪の中間で mid=3.8万円/坪"
+    },
+    "light_steel": {
+      "name": "軽量鉄骨造",
+      "unit": "円/㎡",
+      "low": 10600,
+      "mid": 13600,
+      "high": 19700,
+      "tsubo": {
+        "low": 35000,
+        "mid": 45000,
+        "high": 65000
+      },
+      "src": [
+        "S1",
+        "S2",
+        "S11",
+        "S13",
+        "S14"
+      ],
+      "note": "S1 軽量鉄骨住宅・アパート 38,917円/坪、S2 鉄骨30坪 48,736円/坪、S13 6〜6.5万。mid=4.5万円/坪"
+    },
+    "heavy_steel": {
+      "name": "重量鉄骨造",
+      "unit": "円/㎡",
+      "low": 13600,
+      "mid": 16600,
+      "high": 22700,
+      "tsubo": {
+        "low": 45000,
+        "mid": 55000,
+        "high": 75000
+      },
+      "src": [
+        "S1",
+        "S11",
+        "S13",
+        "S14"
+      ],
+      "note": "S1 49,102円/坪、S13 6.5〜7万、S11 6〜8万。mid=5.5万円/坪"
+    },
+    "rc": {
+      "name": "RC造（SRC含む目安）",
+      "unit": "円/㎡",
+      "low": 16600,
+      "mid": 21200,
+      "high": 30200,
+      "tsubo": {
+        "low": 55000,
+        "mid": 70000,
+        "high": 100000
+      },
+      "src": [
+        "S1",
+        "S2",
+        "S3",
+        "S11",
+        "S13"
+      ],
+      "note": "S1 RC住宅59,024/RCマンション68,798円/坪、S2 40坪以上 約7万、S3 東京84,966。mid=7万円/坪"
+    }
+  },
+  "building_bare_public": {
+    "note": "公費解体の標準単価（仮設・積込・諸経費含む／基礎撤去・運搬・処分・消費税は別）。足場や処分を別積みする積算の下限参考。",
+    "wood_m2": {
+      "unit": "円/延㎡",
+      "value_2024": 9143,
+      "value_2025": 8835,
+      "src": [
+        "S19",
+        "S20"
+      ]
+    },
+    "non_wood_m2": {
+      "unit": "円/延㎡",
+      "value_2024": 12423,
+      "value_2025": 13541,
+      "src": [
+        "S19",
+        "S20"
+      ]
+    },
+    "foundation_wood_m2": {
+      "unit": "円/㎡(建築面積)",
+      "value": 4002,
+      "src": [
+        "S19"
+      ]
+    },
+    "foundation_non_wood_m2": {
+      "unit": "円/㎡(建築面積)",
+      "value": 4991,
+      "src": [
+        "S19"
+      ]
+    },
+    "transport_wood_4t_10km_m2": {
+      "unit": "円/延㎡ (片道10km 4tダンプ)",
+      "value": 3211,
+      "src": [
+        "S19"
+      ]
+    },
+    "mlit_r8_subsidy_cap_wood_m2": {
+      "unit": "円/㎡（補助対象上限・相場ではない）",
+      "value": 36000,
+      "src": [
+        "S20"
+      ]
+    },
+    "mlit_r8_subsidy_cap_non_wood_m2": {
+      "unit": "円/㎡（補助対象上限・相場ではない）",
+      "value": 51000,
+      "src": [
+        "S20"
+      ]
+    }
+  },
+  "scale_factor": {
+    "note": "延床規模による補正（S2 木造2F: 20坪37,351→100坪30,414円/坪）",
+    "under_20tsubo": 1.08,
+    "20_50tsubo": 1.0,
+    "50_100tsubo": 0.92,
+    "over_100tsubo": 0.88,
+    "src": [
+      "S2",
+      "S15"
+    ]
+  },
+  "story_factor": {
+    "note": "S1: 木造平屋36,464 / 2F 36,080 / 3F 42,759円/坪",
+    "1F": 1.0,
+    "2F": 1.0,
+    "3F": 1.18,
+    "src": [
+      "S1"
+    ]
+  },
+  "items": {
+    "interior_stripping": {
+      "name": "内装解体（住宅・スケルトン）",
+      "unit": "円/㎡",
+      "low": 3000,
+      "mid": 5000,
+      "high": 8000,
+      "src": [
+        "S18"
+      ],
+      "note": "木造住宅内装 4,000〜9,000円/㎡。建物ごと解体する場合は不要"
+    },
+    "block_wall_m2": {
+      "name": "ブロック塀撤去・処分",
+      "unit": "円/㎡(見付面積)",
+      "low": 2500,
+      "mid": 4000,
+      "high": 10000,
+      "src": [
+        "S1",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S14"
+      ],
+      "note": "S1平均3,687。建物と同時なら2,000〜3,000、単独・鉄筋入り・控壁付は6,000〜10,000。長さ換算は高さ(段数×0.2m)を掛ける"
+    },
+    "block_wall_m": {
+      "name": "ブロック塀撤去（長さ当たり・高さ1.2m程度）",
+      "unit": "円/m",
+      "low": 5000,
+      "mid": 7500,
+      "high": 10000,
+      "src": [
+        "S11"
+      ],
+      "note": "S11 1mあたり5,000〜1万円。コンクリート塀は1〜2万円/m"
+    },
+    "concrete_slab_m2": {
+      "name": "土間コンクリート撤去（厚10cm程度・ワイヤーメッシュ）",
+      "unit": "円/㎡",
+      "low": 1000,
+      "mid": 3000,
+      "high": 5000,
+      "src": [
+        "S1",
+        "S15",
+        "S16",
+        "S14"
+      ],
+      "note": "S1平均3,047、S16 2,000〜4,000。厚15cm・鉄筋入りは×1.3〜1.5（出典弱）"
+    },
+    "asphalt_m2": {
+      "name": "アスファルト舗装撤去",
+      "unit": "円/㎡",
+      "low": 600,
+      "mid": 1500,
+      "high": 3000,
+      "src": [
+        "S15"
+      ],
+      "note": "S15 600円〜のみ確認。mid/high は出典弱（路盤砕石の撤去有無で変動）"
+    },
+    "fence_m": {
+      "name": "フェンス撤去（アルミ・メッシュ）",
+      "unit": "円/m",
+      "low": 800,
+      "mid": 1500,
+      "high": 3000,
+      "src": [
+        "S14",
+        "S1"
+      ],
+      "note": "S14 800〜1,000円/m、S1 約2,500円/㎡(高1.2mで約3,000円/m)。ブロック上フェンスはブロックと別計上"
+    },
+    "gate": {
+      "name": "門扉撤去（門柱含まず）",
+      "unit": "円/基",
+      "low": 10000,
+      "mid": 20000,
+      "high": 50000,
+      "src": [],
+      "note": "出典弱。業界の一般的な目安。門柱（ブロック・タイル張り）は別途ブロック単価で"
+    },
+    "carport": {
+      "name": "カーポート撤去（1台用・アルミ）",
+      "unit": "円/台",
+      "low": 15000,
+      "mid": 50000,
+      "high": 125000,
+      "src": [
+        "S15",
+        "S16",
+        "S17",
+        "S14",
+        "S1",
+        "S11"
+      ],
+      "note": "建物と同時で1〜3万、単独5〜8万、S1平均12.5万/基。2台用は×1.5、土間撤去は別"
+    },
+    "storage_shed": {
+      "name": "物置撤去（スチール製・小〜中型）",
+      "unit": "円/基",
+      "low": 15000,
+      "mid": 30000,
+      "high": 80000,
+      "src": [
+        "S14",
+        "S17",
+        "S11",
+        "S1"
+      ],
+      "note": "S14 1.5〜2.6万、S17 2〜5万、S11 5〜10万。大型・基礎付は坪2.5万(S1)"
+    },
+    "steel_stair": {
+      "name": "鉄骨外階段撤去（アパート2階用・1基）",
+      "unit": "円/基",
+      "low": 50000,
+      "mid": 100000,
+      "high": 200000,
+      "src": [],
+      "note": "出典弱。撤去単独の公開相場は見つからず。建物と同時解体なら構造本体単価に含めるのが一般的。鉄くずは有価になる場合あり"
+    },
+    "tree_small": {
+      "name": "樹木伐採 低木（〜3m）",
+      "unit": "円/本",
+      "low": 3000,
+      "mid": 5000,
+      "high": 10000,
+      "src": [
+        "S17",
+        "S35"
+      ],
+      "note": "伐採・処分。抜根は tree_stump を加算"
+    },
+    "tree_medium": {
+      "name": "樹木伐採 中木（3〜5m）",
+      "unit": "円/本",
+      "low": 8000,
+      "mid": 15000,
+      "high": 25000,
+      "src": [
+        "S17",
+        "S14",
+        "S35"
+      ],
+      "note": "S14 幹径20cm・高さ4〜5mで1.5〜2万"
+    },
+    "tree_large": {
+      "name": "樹木伐採 高木（5m以上）",
+      "unit": "円/本",
+      "low": 20000,
+      "mid": 40000,
+      "high": 100000,
+      "src": [
+        "S17",
+        "S11",
+        "S35"
+      ],
+      "note": "10m超・電線近接・高所作業車要は10万円以上"
+    },
+    "tree_stump": {
+      "name": "抜根（1本・加算）",
+      "unit": "円/本",
+      "low": 5000,
+      "mid": 20000,
+      "high": 45000,
+      "src": [
+        "S1",
+        "S35",
+        "S11"
+      ],
+      "note": "S1 庭木抜根 平均約2万/本、S35 全国平均1.4〜4.5万"
+    },
+    "bamboo_m2": {
+      "name": "竹林 伐採・抜根・処分",
+      "unit": "円/㎡",
+      "low": 600,
+      "mid": 1500,
+      "high": 3000,
+      "src": [
+        "S36",
+        "S35"
+      ],
+      "note": "出典弱。S36 公共の全伐（処理費別）約594円/㎡が下限。地下茎の抜根・処分込みのmid/highは業界目安。竹1本単位では5,000〜25,000円(S35)"
+    },
+    "garden_stone_t": {
+      "name": "庭石撤去・処分",
+      "unit": "円/t",
+      "low": 5000,
+      "mid": 25000,
+      "high": 40000,
+      "src": [
+        "S17",
+        "S15",
+        "S16",
+        "S1"
+      ],
+      "note": "S17 30〜40円/kg、S16 1.2〜1.5万円/㎥、S1 約2.5万/個。クレーン要は別途8〜15万/日(S1)。石の比重≒2.6t/㎥"
+    },
+    "septic_tank": {
+      "name": "浄化槽撤去（5人槽・単独/合併）",
+      "unit": "円/基",
+      "low": 50000,
+      "mid": 100000,
+      "high": 300000,
+      "src": [
+        "S1",
+        "S14",
+        "S11"
+      ],
+      "note": "S1 5人槽 平均約10.5万。7人槽は×1.2、8〜10人槽は×1.5（出典弱）。汲み取り・清掃費込み目安。自治体補助上限は9〜15万円"
+    },
+    "septic_tank_7": {
+      "name": "浄化槽撤去（7人槽）",
+      "unit": "円/基",
+      "low": 60000,
+      "mid": 120000,
+      "high": 350000,
+      "src": [
+        "S1"
+      ],
+      "note": "出典弱（5人槽×1.2で換算）"
+    },
+    "septic_tank_10": {
+      "name": "浄化槽撤去（8〜10人槽）",
+      "unit": "円/基",
+      "low": 75000,
+      "mid": 150000,
+      "high": 400000,
+      "src": [
+        "S1"
+      ],
+      "note": "出典弱（5人槽×1.5で換算）"
+    },
+    "well": {
+      "name": "井戸 埋め戻し（息抜き管設置）",
+      "unit": "円/箇所",
+      "low": 50000,
+      "mid": 150000,
+      "high": 300000,
+      "src": [
+        "S1",
+        "S11"
+      ],
+      "note": "S1 井戸撤去 約15万、S11 10〜30万。お祓いは別（出典なし）。lowは出典弱"
+    },
+    "deep_foundation_m3": {
+      "name": "深基礎・地中梁・地下躯体撤去（RC）",
+      "unit": "円/㎥(躯体体積)",
+      "low": 15000,
+      "mid": 25000,
+      "high": 40000,
+      "src": [
+        "S1",
+        "S19"
+      ],
+      "note": "出典弱（換算値）。コンガラ2.3t/㎥×処分7,000円/t(S1)≒1.6万円＋はつり・積込で算出。通常の布/ベタ基礎は building 単価に含む。公費単価は基礎撤去4,002〜4,991円/㎡(S19,処分別)"
+    },
+    "underground_obstacle": {
+      "name": "地中埋設物（ガラ・旧基礎など、参考）",
+      "unit": "円/式",
+      "low": 100000,
+      "mid": 300000,
+      "high": 1000000,
+      "src": [
+        "S14",
+        "S11"
+      ],
+      "note": "S14 ガラ10〜30万・古い基礎20〜40万、S11 30〜100万超。写真では判定不可のため注記扱い"
+    },
+    "grading_m2": {
+      "name": "整地（粗整地・転圧）",
+      "unit": "円/㎡",
+      "low": 300,
+      "mid": 500,
+      "high": 1000,
+      "src": [
+        "S43"
+      ],
+      "note": "S43 300〜600円/㎡（坪1,500円前後）。砕石敷き・真砂土入替は別途"
+    },
+    "scaffold_m2": {
+      "name": "足場＋養生シート（防音・防塵）",
+      "unit": "円/㎡(架面積)",
+      "low": 800,
+      "mid": 1200,
+      "high": 2500,
+      "src": [
+        "S1",
+        "S42"
+      ],
+      "note": "S1 足場700〜8,000・養生300〜5,000円/㎡と幅大。住宅解体の単管/くさび足場＋シートで mid=1,200（出典やや弱）。公共積算の手摺先行枠組足場は5,593円/掛㎡(S42)。building単価に含むので別積み時のみ使用"
+    },
+    "heavy_machine_transport": {
+      "name": "重機回送費（1台往復）",
+      "unit": "円/往復",
+      "low": 30000,
+      "mid": 40000,
+      "high": 60000,
+      "src": [
+        "S1",
+        "S14"
+      ],
+      "note": "S1 約4万/往復、S14 木造戸建で3〜5万"
+    },
+    "guard_person_day": {
+      "name": "交通誘導警備員（ガードマン）",
+      "unit": "円/人日",
+      "low": 15000,
+      "mid": 20000,
+      "high": 28000,
+      "src": [
+        "S41",
+        "S1"
+      ],
+      "note": "公共工事の交通誘導警備員B労務単価は約1.5万円/人日（北陸地整2025-03積算資料14,770円を検索で確認、URL不安定のため出典はS41の県単価表）。請求単価は会社経費込みで約1.3〜1.5倍。S1 約2万/式。都市部は高め"
+    },
+    "road_use_permit": {
+      "name": "道路使用許可（申請代行含む）",
+      "unit": "円/件",
+      "low": 3000,
+      "mid": 10000,
+      "high": 20000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約1万/式。警察手数料のみなら数千円"
+    },
+    "neighbor_greeting": {
+      "name": "近隣挨拶（粗品含む）",
+      "unit": "円/式",
+      "low": 5000,
+      "mid": 8000,
+      "high": 15000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 5,000〜1万/式"
+    },
+    "aircon_unit": {
+      "name": "エアコン撤去・リサイクル（室内機+室外機1セット）",
+      "unit": "円/台",
+      "low": 8000,
+      "mid": 12000,
+      "high": 20000,
+      "src": [
+        "S39",
+        "S1",
+        "S37",
+        "S38"
+      ],
+      "note": "取外し5,000〜12,000＋リサイクル料550〜990＋運搬3,000〜4,000。家電リサイクルで出せばフロン回収はリサイクル側で実施。屋根置き・2段置きは1〜3万"
+    },
+    "appliance_recycle_aircon": {
+      "name": "家電リサイクル料金 エアコン",
+      "unit": "円/台",
+      "low": 550,
+      "mid": 990,
+      "high": 990,
+      "src": [
+        "S37",
+        "S38"
+      ],
+      "note": "主要メーカー990円、東芝は2026-02から550円。収集運搬料は別(2,000〜4,000)"
+    },
+    "appliance_recycle_tv_large": {
+      "name": "家電リサイクル料金 テレビ16型以上",
+      "unit": "円/台",
+      "low": 2970,
+      "mid": 2970,
+      "high": 3700,
+      "src": [
+        "S37"
+      ],
+      "note": "主要メーカー。メーカーにより差。収集運搬料は別"
+    },
+    "appliance_recycle_tv_small": {
+      "name": "家電リサイクル料金 テレビ15型以下",
+      "unit": "円/台",
+      "low": 1870,
+      "mid": 1870,
+      "high": 2700,
+      "src": [
+        "S37"
+      ],
+      "note": "収集運搬料は別"
+    },
+    "appliance_recycle_fridge_large": {
+      "name": "家電リサイクル料金 冷蔵庫171L以上",
+      "unit": "円/台",
+      "low": 4730,
+      "mid": 4730,
+      "high": 5700,
+      "src": [
+        "S37"
+      ],
+      "note": "収集運搬料は別(約3,300)"
+    },
+    "appliance_recycle_fridge_small": {
+      "name": "家電リサイクル料金 冷蔵庫170L以下",
+      "unit": "円/台",
+      "low": 3740,
+      "mid": 3740,
+      "high": 4500,
+      "src": [
+        "S37"
+      ],
+      "note": "収集運搬料は別"
+    },
+    "appliance_recycle_washer": {
+      "name": "家電リサイクル料金 洗濯機・衣類乾燥機",
+      "unit": "円/台",
+      "low": 2530,
+      "mid": 2530,
+      "high": 3300,
+      "src": [
+        "S37"
+      ],
+      "note": "収集運搬料は別(約2,750)"
+    },
+    "appliance_collection_fee": {
+      "name": "家電 収集運搬料（小売店等）",
+      "unit": "円/台",
+      "low": 2000,
+      "mid": 3000,
+      "high": 4000,
+      "src": [
+        "S39"
+      ],
+      "note": "指定引取場所へ持込なら不要"
+    },
+    "leftover_m3": {
+      "name": "残置物（家財）撤去・処分",
+      "unit": "円/㎥",
+      "low": 5000,
+      "mid": 10000,
+      "high": 15000,
+      "src": [
+        "S1",
+        "S31",
+        "S32"
+      ],
+      "note": "S1 約1.2万/㎥、業者の超過料金8,800〜10,000円/㎥、S31 2t1台分2〜2.8万(q1-q3)。分別・搬出が大変な空き家はhigh。家電リサイクル料は別"
+    },
+    "waste_disposal_mixed_m3": {
+      "name": "混合廃棄物 処分（運搬別）",
+      "unit": "円/㎥",
+      "low": 8000,
+      "mid": 12000,
+      "high": 20000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 混合廃棄物 約3万円/t。見かけ比重0.3〜0.5t/㎥で換算（出典弱）"
+    },
+    "waste_wood_t": {
+      "name": "木くず処分",
+      "unit": "円/t",
+      "low": 8000,
+      "mid": 10000,
+      "high": 15000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約1万/t"
+    },
+    "waste_concrete_t": {
+      "name": "コンクリートがら処分",
+      "unit": "円/t",
+      "low": 5500,
+      "mid": 7000,
+      "high": 10000,
+      "src": [
+        "S1",
+        "S30"
+      ],
+      "note": "S1 約7,000/t、北九州市処分場5,500/t(税込)"
+    },
+    "waste_mixed_t": {
+      "name": "混合廃棄物処分",
+      "unit": "円/t",
+      "low": 20000,
+      "mid": 30000,
+      "high": 40000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約3万/t"
+    },
+    "waste_gypsum_t": {
+      "name": "石膏ボード処分",
+      "unit": "円/t",
+      "low": 15000,
+      "mid": 20000,
+      "high": 30000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約2万/t"
+    },
+    "waste_roof_tile_t": {
+      "name": "瓦・スレート(非石綿)処分",
+      "unit": "円/t",
+      "low": 15000,
+      "mid": 20000,
+      "high": 25000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約2万/t"
+    },
+    "waste_asbestos_t": {
+      "name": "石綿含有産業廃棄物処分",
+      "unit": "円/t",
+      "low": 40000,
+      "mid": 50000,
+      "high": 80000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約5万/t"
+    },
+    "tatami": {
+      "name": "畳処分",
+      "unit": "円/枚",
+      "low": 3000,
+      "mid": 4000,
+      "high": 5000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 3,000〜5,000/枚"
+    },
+    "recycling_notification": {
+      "name": "建設リサイクル法 届出（延床80㎡以上・代行）",
+      "unit": "円/件",
+      "low": 0,
+      "mid": 10000,
+      "high": 30000,
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約1万/式。施主本人提出なら手数料0。highは出典弱"
+    },
+    "asbestos_report": {
+      "name": "石綿事前調査結果報告（電子・代行）",
+      "unit": "円/件",
+      "low": 0,
+      "mid": 5000,
+      "high": 20000,
+      "src": [],
+      "note": "出典弱。元請の義務（解体床面積80㎡以上）。調査費に含める業者が多い"
+    },
+    "demolition_registration": {
+      "name": "建物滅失登記（土地家屋調査士報酬）",
+      "unit": "円/件",
+      "low": 30000,
+      "mid": 48000,
+      "high": 80000,
+      "src": [
+        "S40",
+        "S14"
+      ],
+      "note": "連合会R4調査 全国平均48,098円（最低4,500・最高109,700）。本人申請なら登録免許税なし"
+    },
+    "overhead_rate": {
+      "name": "諸経費（現場管理費・一般管理費）",
+      "unit": "%",
+      "low": 5,
+      "mid": 8,
+      "high": 10,
+      "src": [
+        "S14",
+        "S44",
+        "S1"
+      ],
+      "note": "直接工事費に対する率。S14/S44とも5〜10%"
+    },
+    "recycle_fridge": {
+      "name": "家電リサイクル 冷蔵庫・冷凍庫（リサイクル料＋収集運搬）",
+      "unit": "円/台",
+      "low": 3740,
+      "mid": 8000,
+      "high": 10000,
+      "src": [
+        "S37",
+        "S39"
+      ],
+      "note": "171L以上4,730円/170L以下3,740円＋運搬約3,300円。lowは持込・小型"
+    },
+    "recycle_washer": {
+      "name": "家電リサイクル 洗濯機・衣類乾燥機（リサイクル料＋収集運搬）",
+      "unit": "円/台",
+      "low": 2530,
+      "mid": 5300,
+      "high": 6500,
+      "src": [
+        "S37",
+        "S39"
+      ],
+      "note": "2,530円＋運搬約2,750円"
+    },
+    "recycle_tv": {
+      "name": "家電リサイクル テレビ（リサイクル料＋収集運搬）",
+      "unit": "円/台",
+      "low": 1870,
+      "mid": 5500,
+      "high": 7000,
+      "src": [
+        "S37",
+        "S39"
+      ],
+      "note": "16型以上2,970円/15型以下1,870円＋運搬約2,500〜3,000円"
+    },
+    "recycle_aircon": {
+      "name": "家電リサイクル エアコン（リサイクル料＋収集運搬、取外し別）",
+      "unit": "円/台",
+      "low": 550,
+      "mid": 4000,
+      "high": 6000,
+      "src": [
+        "S37",
+        "S38",
+        "S39"
+      ],
+      "note": "990円（東芝は2026-02から550円）＋運搬3,000〜4,000円。取外し込みは aircon_unit"
+    }
+  },
+  "region_factor": {
+    "note": "木造の実勢坪単価(S2〜S8,あんしん解体業者認定協会)を全国平均≒35,000円/坪(S2 木造2F30坪)で割って算出し丸めた値。tokyo23 は狭小・前面道路条件を加味して東京都平均(1.12)より上乗せ。",
+    "tokyo23": 1.15,
+    "tokyo_tama": 1.08,
+    "kanagawa": 1.05,
+    "saitama": 1.0,
+    "chiba": 1.0,
+    "shutoken": 1.05,
+    "osaka": 1.05,
+    "kinki_other": 1.0,
+    "nagoya": 0.92,
+    "aichi_other": 0.88,
+    "fukuoka": 0.9,
+    "niigata": 1.0,
+    "hokkaido": 0.85,
+    "rural": 0.9,
+    "default": 1.0,
+    "src": [
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9",
+      "S10",
+      "S11"
+    ]
+  },
+  "condition_factor": {
+    "narrow_road_small_machine": {
+      "name": "前面道路4m未満・小型重機/2t車搬出",
+      "factor": 1.15,
+      "range": [
+        1.1,
+        1.3
+      ],
+      "src": [
+        "S15",
+        "S14"
+      ],
+      "note": "出典弱（率の明示なし）。S15 道路幅2.5m以下で4t車不可なら割増、S14 ミニユンボ可なら大幅増額なし"
+    },
+    "narrow_road_handwork": {
+      "name": "重機進入不可・手壊し中心",
+      "factor": 1.6,
+      "range": [
+        1.5,
+        2.0
+      ],
+      "src": [
+        "S14",
+        "S11",
+        "S18"
+      ],
+      "note": "S14 手壊しは重機の約2倍、S11 人件費1.5〜2倍、S18 ブロック手作業1.5〜2倍。一部手壊しなら1.2〜1.3"
+    },
+    "adjacent_close": {
+      "name": "隣家近接（離隔50cm未満・養生強化）",
+      "factor": 1.1,
+      "range": [
+        1.05,
+        1.2
+      ],
+      "src": [
+        "S11"
+      ],
+      "note": "S11 隣地接近で10〜30万円増（木造30坪150万円に対し+7〜20%）"
+    },
+    "no_parking_road_use": {
+      "name": "車両待機困難・道路使用/ガードマン常駐",
+      "factor": 1.08,
+      "range": [
+        1.05,
+        1.15
+      ],
+      "src": [
+        "S11"
+      ],
+      "note": "S11 10〜20万円増。ガードマンを別積みする場合は適用しない"
+    },
+    "three_story": {
+      "name": "3階建て",
+      "factor": 1.18,
+      "range": [
+        1.1,
+        1.25
+      ],
+      "src": [
+        "S1"
+      ],
+      "note": "S1 木造3F 42,759 / 2F 36,080円/坪"
+    },
+    "basement": {
+      "name": "地下室あり（地下部分）",
+      "factor": 2.0,
+      "range": [
+        1.5,
+        2.5
+      ],
+      "src": [
+        "S14"
+      ],
+      "note": "S14 相場の倍以上になることも"
+    },
+    "fire_damaged": {
+      "name": "火災建物",
+      "factor": 1.35,
+      "range": [
+        1.2,
+        1.5
+      ],
+      "src": [
+        "S1"
+      ],
+      "note": "S1 約5万円/坪（通常木造約3.6万）"
+    },
+    "mortar_wall_or_tile_roof": {
+      "name": "モルタル外壁・土葺き瓦屋根（古家）",
+      "factor": 1.05,
+      "range": [
+        1.0,
+        1.15
+      ],
+      "src": [
+        "S14"
+      ],
+      "note": "出典弱（率）。S14 モルタル壁は費用がかかりやすい"
+    },
+    "slope_site": {
+      "name": "傾斜地・道路との高低差（擁壁上など）",
+      "factor": 1.15,
+      "range": [
+        1.1,
+        1.3
+      ],
+      "src": [],
+      "note": "出典弱。業界の一般的な目安。擁壁撤去は別途 約2万円/㎡(S1)"
+    },
+    "long_carry": {
+      "name": "搬出距離が長い（車両から20m超・旗竿地・階段）",
+      "factor": 1.1,
+      "range": [
+        1.05,
+        1.2
+      ],
+      "src": [],
+      "note": "出典弱。小運搬の人工増"
+    }
+  },
+  "waste_generation": {
+    "wood": {
+      "unit": "t/㎡(延床)",
+      "low": 0.31,
+      "mid": 0.5,
+      "high": 0.71,
+      "breakdown_mid": {
+        "wood_t_m2": 0.1,
+        "concrete_t_m2": 0.3,
+        "mixed_t_m2": 0.05,
+        "other_t_m2": 0.05
+      },
+      "src": [
+        "S27"
+      ],
+      "note": "総量はS27（東京都0.31・兵庫県0.571・文献0.27〜0.71、基礎の有無で変動）。内訳は出典弱（基礎込み想定の業界目安）。木くず比重0.55t/㎥(S29)"
+    },
+    "light_steel": {
+      "unit": "t/㎡(延床)",
+      "low": 0.5,
+      "mid": 0.7,
+      "high": 0.9,
+      "src": [
+        "S27"
+      ],
+      "note": "出典弱。S造0.80(東京都)を基準に軽量化を見込んだ目安"
+    },
+    "heavy_steel": {
+      "unit": "t/㎡(延床)",
+      "low": 0.8,
+      "mid": 1.0,
+      "high": 1.27,
+      "src": [
+        "S27"
+      ],
+      "note": "東京都S造0.80、兵庫県鉄骨1.27"
+    },
+    "rc": {
+      "unit": "t/㎡(延床)",
+      "low": 1.04,
+      "mid": 1.1,
+      "high": 1.47,
+      "breakdown_mid": {
+        "concrete_t_m2": 1.04,
+        "wood_t_m2": 0.021,
+        "mixed_t_m2": 0.01
+      },
+      "src": [
+        "S27",
+        "S28"
+      ],
+      "note": "非木造解体 国交省H30実態調査: コンガラ1.04・木くず0.021・混合0.010 t/㎡(S28)、東京都RC1.09、兵庫県1.47"
+    },
+    "density_t_per_m3": {
+      "wood_waste": 0.55,
+      "concrete_debris": 1.4,
+      "mixed": 0.4,
+      "note": "木くず0.55はS29。コンガラ(ほぐし)1.4・混合0.4は出典弱の業界目安",
+      "src": [
+        "S29"
+      ]
+    }
+  },
+  "leftover_volume_m3": {
+    "1R": 4,
+    "1K": 5,
+    "2DK": 15,
+    "3LDK": 25,
+    "house_4LDK": 30,
+    "apartment_after_moveout": 0.5,
+    "note": "生活中そのままの量（遺品整理想定）。S32の間取り別2tトラック台数（1K=1台,2DK=3台,3LDK=5台,4LDK=6台）×2t平ボディ囲い約5㎥/台で換算。アパート退去後は通常ほぼ0〜1㎥。空き家で一部片付け済みなら×0.3〜0.6（出典弱）",
+    "range": {
+      "1R": [
+        2,
+        5
+      ],
+      "1K": [
+        3,
+        6
+      ],
+      "2DK": [
+        10,
+        18
+      ],
+      "3LDK": [
+        18,
+        30
+      ],
+      "house_4LDK": [
+        25,
+        45
+      ]
+    },
+    "src": [
+      "S32",
+      "S34"
+    ]
+  },
+  "leftover_price_by_layout": {
+    "unit": "円/戸（家電リサイクル料は業者により込み/別）",
+    "1R_1K": {
+      "low": 30000,
+      "mid": 80000,
+      "high": 150000
+    },
+    "1DK_2K": {
+      "low": 50000,
+      "mid": 150000,
+      "high": 300000
+    },
+    "2DK_1LDK": {
+      "low": 100000,
+      "mid": 250000,
+      "high": 500000
+    },
+    "3LDK": {
+      "low": 185000,
+      "mid": 400000,
+      "high": 1000000
+    },
+    "house_4LDK": {
+      "low": 300000,
+      "mid": 600000,
+      "high": 1000000
+    },
+    "src": [
+      "S32",
+      "S34"
+    ],
+    "note": "S34(日本郵便) 1R/1K 10〜15万、2DK 30〜50万、3LDK以上50〜100万。S32掲載業者 1K 3.1万〜、2DK 10.5万〜、3LDK 18.5万〜。mid は両者の中間"
+  },
+  "truck": {
+    "2t": {
+      "m3": 8,
+      "m3_range": [
+        5,
+        10
+      ],
+      "payload_t": 2.0,
+      "yen_low": 20000,
+      "yen_high": 55000,
+      "src": [
+        "S31",
+        "S32",
+        "S33"
+      ],
+      "note": "平ボディ囲い約5㎥、箱/ロング約10〜15㎥。料金は不用品回収の積み込み・処分込み(S31 q1-q3 2〜2.8万、業者例2.2〜5.5万)"
+    },
+    "4t": {
+      "m3": 20,
+      "m3_range": [
+        15,
+        28
+      ],
+      "payload_t": 3.5,
+      "yen_low": 50000,
+      "yen_high": 120000,
+      "src": [
+        "S33"
+      ],
+      "note": "容積はS33。料金は出典弱（2t料金の約2〜2.5倍の業界目安）"
+    },
+    "kei": {
+      "m3": 2,
+      "m3_range": [
+        1.5,
+        3
+      ],
+      "payload_t": 0.35,
+      "yen_low": 9000,
+      "yen_high": 14000,
+      "src": [
+        "S31"
+      ]
+    }
+  },
+  "asbestos": {
+    "survey": {
+      "name": "事前調査（書面＋目視・戸建）",
+      "unit": "円/棟",
+      "low": 20000,
+      "mid": 50000,
+      "high": 100000,
+      "src": [
+        "S22",
+        "S1",
+        "S11"
+      ],
+      "note": "S22 書面2〜3万＋現地2〜6万、S1 約6万/式"
+    },
+    "survey_with_analysis": {
+      "name": "事前調査＋分析（数検体）",
+      "unit": "円/棟",
+      "low": 50000,
+      "mid": 100000,
+      "high": 200000,
+      "src": [
+        "S22",
+        "S24"
+      ],
+      "note": "S22 分析3〜6万（定性＋定量4〜10万）を加算"
+    },
+    "analysis_per_sample": {
+      "name": "分析（定性 JIS A 1481-1）",
+      "unit": "円/検体",
+      "low": 15000,
+      "mid": 25000,
+      "high": 40000,
+      "src": [
+        "S24"
+      ],
+      "note": "S24 25,000円税抜。low/highは出典弱"
+    },
+    "level1": {
+      "name": "レベル1（吹付け材）除去",
+      "unit": "円/㎡",
+      "low": 15000,
+      "mid": 50000,
+      "high": 85000,
+      "src": [
+        "S22",
+        "S23"
+      ],
+      "note": "S22 1.5〜8.5万、S23 4.5〜8.5万。国交省(2007)面積別: 300㎡以下2.0〜8.5万/㎡・300〜1000㎡1.5〜4.5万・1000㎡以上1.0〜3.0万"
+    },
+    "level2": {
+      "name": "レベル2（保温材・耐火被覆・断熱材）除去",
+      "unit": "円/㎡",
+      "low": 10000,
+      "mid": 30000,
+      "high": 60000,
+      "src": [
+        "S22",
+        "S23"
+      ]
+    },
+    "level3": {
+      "name": "レベル3（成形板：スレート・ケイカル板・サイディング・Pタイル等）撤去",
+      "unit": "円/㎡",
+      "low": 3000,
+      "mid": 6000,
+      "high": 10000,
+      "src": [
+        "S22",
+        "S23"
+      ],
+      "note": "S22 約3,000、S23 3,000〜1万。手ばらし＋湿潤化＋石綿含有産廃処分込み。仕上塗材の除去（剥離剤・集じん）はレベル1/2並みの養生が要りhigh寄り（出典弱）"
+    },
+    "regulations": [
+      {
+        "date": "2021-04",
+        "item": "大気汚染防止法改正施行：レベル3建材も作業基準の対象"
+      },
+      {
+        "date": "2022-04",
+        "item": "事前調査結果の電子報告義務（解体部分の床面積80㎡以上の建築物解体、請負100万円以上（税込）の改修・工作物工事）。元請が報告",
+        "src": [
+          "S25"
+        ]
+      },
+      {
+        "date": "2023-10",
+        "item": "建築物の事前調査は建築物石綿含有建材調査者（一戸建て等調査者含む）等の有資格者が実施",
+        "src": [
+          "S26"
+        ]
+      },
+      {
+        "date": "2026-01",
+        "item": "工作物の事前調査も工作物石綿事前調査者が実施（要確認：公的資料で未検証）"
+      }
+    ],
+    "suspect_by_year": [
+      {
+        "until_year": 1975,
+        "level": 1,
+        "parts": [
+          "吹付け石綿（鉄骨耐火被覆・機械室天井など）"
+        ],
+        "note": "1975年に5%超の吹付け原則禁止"
+      },
+      {
+        "until_year": 1990,
+        "level": 1,
+        "parts": [
+          "石綿含有吹付けロックウール（乾式は1980頃まで、湿式は1990頃まで）",
+          "柱・EV周りの吹付け（〜1988頃）",
+          "RC集合住宅の天井吹付けパーライト/バーミキュライト"
+        ]
+      },
+      {
+        "until_year": 1987,
+        "level": 3,
+        "parts": [
+          "ビニル床タイル（Pタイル）",
+          "ロックウール吸音天井板",
+          "石綿含有ルーフィング",
+          "石綿含有せっこうボード（〜1986）"
+        ]
+      },
+      {
+        "until_year": 1991,
+        "level": 3,
+        "parts": [
+          "ビニル床シート（〜1990）",
+          "建材複合金属系サイディング（〜1990）",
+          "石綿含有壁紙（〜1991）"
+        ]
+      },
+      {
+        "until_year": 2004,
+        "level": 3,
+        "parts": [
+          "住宅屋根用化粧スレート（コロニアル等）",
+          "スレート波板（大波・小波：倉庫・車庫・物置屋根）",
+          "窯業系サイディング",
+          "けい酸カルシウム板第1種（軒天・内装・耐火間仕切り）",
+          "フレキシブル板（軒天・浴室・台所）",
+          "押出成形セメント板",
+          "パルプセメント板",
+          "石綿セメント円筒（煙突）"
+        ],
+        "note": "製造終期の多くは2004年。これ以前竣工は含有ありとみなすことが多い"
+      },
+      {
+        "until_year": 2006,
+        "level": "仕上塗材",
+        "parts": [
+          "外壁仕上塗材（吹付けタイル・リシン・スタッコ等）",
+          "下地調整塗材"
+        ],
+        "note": "2006年9月に0.1%超の全面禁止。2006年8月以前着工は可能性あり"
+      }
+    ],
+    "src": [
+      "S21",
+      "S25",
+      "S26"
+    ]
+  },
+  "standard_dimensions_m": {
+    "wood_floor_height": 2.9,
+    "wood_floor_height_range": [
+      2.7,
+      3.0
+    ],
+    "ceiling_height": 2.4,
+    "first_floor_level_above_ground": 0.5,
+    "wood_2story_eave_height": 6.0,
+    "door_height": 2.03,
+    "door_height_tall": 2.33,
+    "door_width": 0.88,
+    "sliding_window_full_h": 2.03,
+    "sliding_window_full_w_2panel": 1.69,
+    "waist_window_h": 0.97,
+    "waist_window_h_alt": 1.17,
+    "waist_window_w": 1.69,
+    "waist_window_w_small": 1.235,
+    "window_sill_height_waist": 0.9,
+    "handrail": 1.1,
+    "block_course": 0.2,
+    "block_length": 0.39,
+    "block_module": 0.4,
+    "block_wall_max_height": 2.2,
+    "shaku_module": 0.91,
+    "ken_module": 1.82,
+    "tatami_m2": 1.65,
+    "apartment_unit_area_m2": {
+      "1R": 18,
+      "1K": 22,
+      "1DK": 30,
+      "2DK": 40,
+      "2LDK": 50
+    },
+    "apartment_common_area_ratio": 0.15,
+    "note": "サッシ/ドアは日本サッシ協会の標準規格（外法）: 掃き出し16520=W1690×H2030、腰窓16509=1690×970・16511=1690×1170・11909=1235×970、玄関ドア 外法H2030/2330×W880(S45)。天井高2.4m(S47)、床高45cm以上(S46 令22条)、手すり1.1m(S46 令126条)、ブロック塀2.2m以下(S46 令62条の8)。ブロックは基本形390×190（目地込み400×200）。階高2.9m・軒高6.0m・腰窓下端0.9m・アパート専有面積(S48)と共用部比率0.15は出典弱の一般目安（共用外廊下・外階段は延床の10〜20%）。",
+    "src": [
+      "S45",
+      "S46",
+      "S47",
+      "S48"
+    ]
+  }
+}
