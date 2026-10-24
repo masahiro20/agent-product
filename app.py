@@ -14,6 +14,7 @@ import shutil
 import tempfile
 import traceback
 
+import anthropic
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 
@@ -78,10 +79,25 @@ async def api_analyze(request: Request):
         import json
         with open(mock, encoding="utf-8") as f:
             return {"reading": json.load(f)["reading"], "usage": {"mock": True}}
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return JSONResponse({"error": "AI の読み取りに必要な Claude API キーが未設定です。管理者が Vercel の環境変数 "
+                                      "ANTHROPIC_API_KEY を設定してください。"}, status_code=503)
     try:
         r, usage = reading.read_site(photos, body.get("address"), body.get("notes"), body.get("land_info"),
                                      body.get("aerial_b64"))
         return {"reading": r, "usage": usage}
+    except anthropic.AuthenticationError as e:
+        return _err(RuntimeError("Claude API キーが無効です。設定されているキーを確認してください。"), 503)
+    except anthropic.RateLimitError:
+        return _err(RuntimeError("AI の利用が混み合っています。1分ほど待ってからもう一度お試しください。"), 429)
+    except anthropic.APIStatusError as e:
+        if e.status_code == 413:
+            return _err(RuntimeError("写真の容量が大きすぎます。枚数を減らしてください。"), 413)
+        if e.status_code in (500, 502, 503, 529):
+            return _err(RuntimeError("AI 側が一時的に混み合っています。少し待ってからもう一度お試しください。"), 503)
+        return _err(RuntimeError(f"AI の呼び出しでエラーになりました（{e.status_code}）: {e.message}"), 502)
+    except anthropic.APIConnectionError:
+        return _err(RuntimeError("AI に接続できませんでした。少し待ってからもう一度お試しください。"), 502)
     except Exception as e:
         return _err(e)
 

@@ -97,17 +97,62 @@
   };
 
   // ---------------- STEP 1: 写真 ----------------
-  async function resize(file) {
-    let bmp;
-    try { bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); }
-    catch { bmp = await createImageBitmap(file); }
-    const k = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+  function loadImageEl(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode")); };
+      img.src = url;
+    });
+  }
+
+  async function decode(file) {
+    // 1) createImageBitmap（向き補正つき）→ 2) 向き補正なし → 3) <img>（Safari は HEIC もここで読める）
+    try { return await createImageBitmap(file, { imageOrientation: "from-image" }); } catch { /* 次へ */ }
+    try { return await createImageBitmap(file); } catch { /* 次へ */ }
+    return await loadImageEl(file);
+  }
+
+  function encode(src, maxSide, quality) {
+    const w = src.naturalWidth || src.width, h = src.naturalHeight || src.height;
+    const k = Math.min(1, maxSide / Math.max(w, h));
     const cv = document.createElement("canvas");
-    cv.width = Math.round(bmp.width * k);
-    cv.height = Math.round(bmp.height * k);
-    cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
-    const dataUrl = cv.toDataURL("image/jpeg", 0.82);
+    cv.width = Math.max(1, Math.round(w * k));
+    cv.height = Math.max(1, Math.round(h * k));
+    cv.getContext("2d").drawImage(src, 0, 0, cv.width, cv.height);
+    return cv.toDataURL("image/jpeg", quality);
+  }
+
+  async function resize(file) {
+    const src = await decode(file);
+    const dataUrl = encode(src, MAX_SIDE, 0.82);
+    if (src.close) src.close();
     return { name: file.name, data: dataUrl.split(",")[1], url: dataUrl };
+  }
+
+  // サーバーへの送信は 1 回 4.5MB まで（Vercel の制限）。写真の合計がこれに収まるよう、必要なら縮めて送る
+  const PAYLOAD_BUDGET = 3.2 * 1024 * 1024;
+  async function payloadPhotos() {
+    const n = state.photos.length;
+    if (!n) return [];
+    const per = Math.floor(PAYLOAD_BUDGET / n);
+    const out = [];
+    for (const p of state.photos) {
+      if (p.data.length <= per) { out.push({ name: p.name, data: p.data }); continue; }
+      if (p.small && p.smallBudget === per) { out.push({ name: p.name, data: p.small }); continue; }
+      const img = await new Promise((resolve, reject) => {
+        const im = new Image(); im.onload = () => resolve(im); im.onerror = reject; im.src = p.url;
+      });
+      let data = "";
+      for (const [side, q] of [[1568, 0.72], [1280, 0.72], [1100, 0.68], [960, 0.65], [800, 0.6]]) {
+        data = encode(img, side, q).split(",")[1];
+        if (data.length <= per) break;
+      }
+      p.small = data; p.smallBudget = per;
+      out.push({ name: p.name, data });
+    }
+    return out;
   }
 
   async function addFiles(files) {
@@ -116,25 +161,34 @@
     const room = MAX_PHOTOS - state.photos.length;
     if (room <= 0) { toast(`写真は${MAX_PHOTOS}枚までです`, true); return; }
     if (list.length > room) toast(`${MAX_PHOTOS}枚を超えた分は追加していません`);
+    const failed = [];
+    state.loading = list.slice(0, room).length;
+    renderThumbs();
     for (const f of list.slice(0, room)) {
       try { state.photos.push(await resize(f)); }
-      catch { toast(`${f.name} を読み込めませんでした（JPEG・PNG で撮り直してください）`, true); }
+      catch { failed.push(f.name); }
+      state.loading -= 1;
       renderThumbs();
+    }
+    if (failed.length) {
+      toast(`${failed.length}枚を読み込めませんでした（${failed.slice(0, 2).join("、")}）。` +
+        "iPhone の場合は「設定 > カメラ > フォーマット > 互換性優先」にするか、スクリーンショットにしてお試しください。", true);
     }
   }
 
   function renderThumbs() {
     $("#thumbs").innerHTML = state.photos.map((p, i) =>
       `<div class="thumb"><img src="${p.url}" alt="写真${i + 1}"><span class="thumb__no">${i + 1}</span>` +
-      `<button class="thumb__del" data-i="${i}" aria-label="写真${i + 1}を外す">×</button></div>`).join("");
+      `<button class="thumb__del" data-i="${i}" aria-label="写真${i + 1}を外す">×</button></div>`).join("") +
+      Array.from({ length: state.loading || 0 }, () => '<div class="thumb thumb--loading">読み込み中…</div>').join("");
     $("#count").textContent = state.photos.length ? `${state.photos.length} / ${MAX_PHOTOS} 枚` : "";
-    $("#btnAnalyze").disabled = !state.photos.length;
+    $("#btnAnalyze").disabled = !state.photos.length || state.loading > 0;
   }
 
   function initStep1() {
     const drop = $("#drop");
     const input = $("#fileInput");
-    drop.addEventListener("click", (e) => { if (e.target !== input) input.click(); });
+    drop.addEventListener("click", () => input.click());
     drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
     input.addEventListener("change", () => { addFiles(input.files); input.value = ""; });
     ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("is-over"); }));
@@ -167,7 +221,7 @@
       progress.step(1);
       const r = await api("/api/analyze", {
         address, notes: $("#notes").value.trim(),
-        photos: state.photos.map(({ name, data }) => ({ name, data })),
+        photos: await payloadPhotos(),
         land_info: state.land?.land_info || [], aerial_b64: state.land?.aerial_b64 || null,
       });
       progress.step(2);
@@ -417,11 +471,11 @@
     return r;
   }
 
-  function buildBody(format) {
+  async function buildBody(format) {
     const land = state.land ? { ...state.land } : null;
     return {
       format, reading: collectReading(), land,
-      photos: state.photos.map(({ name, data }) => ({ name, data })),
+      photos: await payloadPhotos(),
       options: {
         address: $("#address").value.trim(), project_name: $("#projectName").value.trim(),
         region: $("#region").value, fh_mode: $("#fhMode").value,
@@ -436,9 +490,9 @@
     progress.start("資料を作成中", ["概算を計算", "図面と PDF を作成"], "30秒ほどかかります");
     try {
       progress.step(0);
-      state.summary = await api("/api/build", buildBody("summary"));
+      state.summary = await api("/api/build", await buildBody("summary"));
       progress.step(1);
-      const pdf = await api("/api/build", buildBody("pdf"), { raw: true });
+      const pdf = await api("/api/build", await buildBody("pdf"), { raw: true });
       if (state.pdfUrl) URL.revokeObjectURL(state.pdfUrl);
       state.pdfUrl = URL.createObjectURL(pdf);
       state.files = { pdf };
@@ -502,7 +556,7 @@
       let blob = state.files?.[fmt];
       if (!blob) {
         toast(`${fmt.toUpperCase()} を作成中…`);
-        blob = await api("/api/build", buildBody(fmt), { raw: true });
+        blob = await api("/api/build", await buildBody(fmt), { raw: true });
         state.files[fmt] = blob;
       }
       const name = ($("#projectName").value.trim() || "現地写真レポート").replace(/[\\/:*?"<>|]/g, "_");
@@ -530,6 +584,14 @@
   // ---------------- 起動 ----------------
   async function init() {
     initStep1(); initStep2(); initStep3();
+    try {
+      const h = await (await fetch("/api/health")).json();
+      if (!h.has_api_key) {
+        const b = $("#banner");
+        b.textContent = "AI の読み取りに必要な Claude API キーがサーバーに設定されていません。管理者が Vercel の環境変数 ANTHROPIC_API_KEY を設定するまで、写真の読み取りはできません。";
+        b.hidden = false;
+      }
+    } catch { /* 確認できなくても続ける */ }
     try {
       state.catalog = await api("/api/catalog", null, { method: "GET" });
     } catch (e) { toast(e.message, true); state.catalog = { exterior: {}, conditions: {}, regions: { default: 1 }, layouts: [] }; }
