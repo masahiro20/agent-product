@@ -469,7 +469,7 @@ def plan_and_estimate(spec):
             best = (fh, r, e)
         k += 1
     fh, r, e = best
-    r["fh_basis"] = f"概算費用が最小（道路境界最高点+{fh - res['road']['edge_max']:.2f}m）"
+    r["fh_basis"] = f"道路より高く保つ条件で概算最小（道路境界最高点+{fh - res['road']['edge_max']:.2f}m）"
     r["fh_search"] = tried
     r["alternatives"] = alternatives(spec, r, e)
     return r, e

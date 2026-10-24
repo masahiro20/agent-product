@@ -513,8 +513,20 @@ def build(spec, out_dir, base_dir):
     if demo:
         summary["demolition_total"] = {k: round(v) for k, v in demo["total"].items()}
         summary["floor_area_m2"] = round(demo["quantities"]["floor_area_m2"], 1)
+        summary["floor_area_tsubo"] = round(demo["quantities"]["floor_area_tsubo"], 1)
+        summary["per_tsubo_mid"] = round(demo["per_tsubo_mid"] or 0)
+        summary["asbestos_extra"] = [{k: (round(v) if isinstance(v, float) else v) for k, v in a.items() if k in ("name", "low", "mid", "high")}
+                                     for a in demo["asbestos_extra"]]
+        summary["demolition_lines"] = [{"cat": l["cat"], "name": l["name"], "qty": l["qty"], "unit": l["unit"],
+                                        "mid": round(l["mid"]) if l["mid"] is not None else None} for l in demo["lines"]]
     if grad:
         summary["grading_total"] = {k: round(v) for k, v in gest["total"].items()}
         summary["grading"] = {k: grad[k] for k in ("area_m2", "fh_m", "fh_basis", "cut_m3", "fill_m3", "existing_diff", "flags")}
+        kbm = grad["road"]["center_avg"] if grad.get("road") else 0.0
+        summary["kbm_tp"] = round(kbm, 2)
+        summary["alternatives"] = [{**a, "fh_rel": round(a["fh_m"] - kbm, 2), "total_mid": round(a["total_mid"])}
+                                   for a in grad.get("alternatives", [])]
+        summary["grading_lines"] = [{"cat": l["cat"], "name": l["name"], "qty": l["qty"], "unit": l["unit"],
+                                     "mid": round(l["mid"]) if l["mid"] is not None else None} for l in gest["lines"]]
         summary["walls"] = [{k: w[k] for k in ("index", "length_m", "h_max", "type_name", "side")} for w in grad["walls"]]
     return summary

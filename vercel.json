@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app.py": {
+      "maxDuration": 300,
+      "includeFiles": "{.claude/skills/site-photo-report/scripts/**,.claude/skills/site-photo-report/data/**,fonts/ipag.ttf}",
+      "excludeFiles": "{public/**,**/__pycache__/**}"
+    }
+  }
+}

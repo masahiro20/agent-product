@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>現地写真レポート｜ホームランディック</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/img/logo-black.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header__inner">
+    <a class="brand" href="/" aria-label="ホームランディック 現地写真レポート">
+      <img class="brand__mark" src="/img/logo-black.svg" alt="">
+      <img class="brand__text" src="/img/logo-text.svg" alt="HOMELANDICK">
+    </a>
+    <span class="header__title">現地写真レポート</span>
+    <span class="header__tag">社内ツール</span>
+  </div>
+</header>
+
+<nav class="steps" aria-label="進み具合">
+  <div class="step is-active" data-step="1"><div class="step__no">01</div><div class="step__label">写真と住所</div></div>
+  <div class="step" data-step="2"><div class="step__no">02</div><div class="step__label">読み取りの確認</div></div>
+  <div class="step" data-step="3"><div class="step__no">03</div><div class="step__label">資料</div></div>
+</nav>
+
+<main class="main">
+
+  <!-- ===== STEP 1 ===== -->
+  <section class="view is-active" id="view1">
+    <h1 class="sec-title"><span class="sec-title__en">SITE PHOTOS</span><span class="sec-title__ja">現地写真と住所</span></h1>
+    <p class="lead">現地の写真と住所を入れると、AI が寸法・数量・高低差を読み取り、立面図・解体概算・造成計画図をまとめた資料を作ります。</p>
+
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <div class="card__head"><h2 class="card__title">写真</h2><span class="card__note">最大12枚・建物4面＋敷地の四隅＋道路</span></div>
+          <label class="drop" id="drop" tabindex="0">
+            <svg class="drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="1"/><circle cx="12" cy="13" r="3.6"/><path d="M8 6l1.6-2.2h4.8L16 6"/></svg>
+            <div class="drop__main">写真を選ぶ・撮る</div>
+            <div class="drop__sub">ここにドラッグ、またはタップ（スマホはその場で撮影もできます）</div>
+            <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          </label>
+          <div class="thumbs" id="thumbs"></div>
+          <div class="count" id="count"></div>
+
+          <details class="guide">
+            <summary>撮影のコツ（精度が上がる撮り方）</summary>
+            <ol>
+              <li>建物の4面を、それぞれ正面から全体が入るように</li>
+              <li>敷地の四隅から対角方向に（境界杭・ブロックの端が写るように）</li>
+              <li>前面道路を左右両方向に（側溝・縁石が入るように）</li>
+              <li>道路と敷地の段差、隣地との段差を真横から。<strong>メジャーを縦に当てる</strong>と高さの精度が大きく上がります</li>
+              <li>ブロック塀・ドア・掃出し窓など、寸法の分かるものが写っていると寸法の基準になります</li>
+              <li>室内の写真があれば、残置物（家財）の量が正確になります</li>
+            </ol>
+          </details>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card__head"><h2 class="card__title">物件</h2></div>
+          <label class="field"><span class="field__label">住所（地番でも可）</span>
+            <input class="input" id="address" placeholder="例）愛知県小牧市小牧4丁目213" autocomplete="off"></label>
+          <label class="field"><span class="field__label">物件名（資料の表紙に入ります）</span>
+            <input class="input" id="projectName" placeholder="例）○○様 解体・造成 検討"></label>
+          <label class="field"><span class="field__label">分かっていること（任意）</span>
+            <textarea class="textarea" id="notes" placeholder="例）築45年・木造2階建てアパート8戸、入居者なし、浄化槽あり、前面道路は市道4m など"></textarea></label>
+          <div class="field"><span class="field__label">依頼内容</span>
+            <div class="checks">
+              <label class="chip-check"><input type="checkbox" id="optDemo" checked><span>解体の概算</span></label>
+              <label class="chip-check"><input type="checkbox" id="optGrade" checked><span>造成計画・概算</span></label>
+            </div>
+          </div>
+          <label class="field"><span class="field__label">単価の地域</span>
+            <select class="select" id="region"></select></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions actions--center">
+      <button class="btn" id="btnAnalyze" disabled>AI で読み取る <span class="btn__arrow">➤</span></button>
+    </div>
+  </section>
+
+  <!-- ===== STEP 2 ===== -->
+  <section class="view" id="view2">
+    <h1 class="sec-title"><span class="sec-title__en">CHECK</span><span class="sec-title__ja">AI の読み取りを確認</span></h1>
+    <p class="lead">写真の赤枠が、寸法や数量の根拠にした箇所です。数字は直接書き換えられます。違うところだけ直して、資料を作ってください。</p>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="grid2">
+      <div>
+        <div class="viewer card">
+          <div class="viewer__stage" id="stage"><img id="stageImg" alt="選択中の写真"><svg class="viewer__svg" id="stageSvg"></svg></div>
+          <div class="viewer__thumbs" id="viewerThumbs"></div>
+          <label class="toggle-marks"><input type="checkbox" id="showMarks" checked> 読み取り箇所を表示</label>
+          <ul class="marks" id="marks"></ul>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" id="cardBuilding">
+          <div class="card__head"><h2 class="card__title">建物</h2><span class="card__note" id="nobe"></span></div>
+          <div class="fields" id="buildingFields"></div>
+          <details class="guide"><summary>寸法の根拠（AI のメモ）</summary><ul class="marks" id="basisList"></ul></details>
+        </div>
+
+        <div class="card" id="cardExterior">
+          <div class="card__head"><h2 class="card__title">外構・付帯</h2><span class="card__note">解体で撤去するもの</span></div>
+          <table class="table"><thead><tr><th>項目</th><th class="num">数量</th><th>単位</th><th></th></tr></thead><tbody id="extRows"></tbody></table>
+          <div class="add-row"><select class="select" id="extAdd"></select><button class="btn btn--ghost btn--small" id="btnExtAdd">追加</button></div>
+        </div>
+
+        <div class="card" id="cardSite">
+          <div class="card__head"><h2 class="card__title">敷地と高低差</h2><span class="card__note">道路側から見た図</span></div>
+          <svg class="plan-svg" id="planSvg" viewBox="0 0 400 300"></svg>
+          <div class="fields" id="siteFields" style="margin-top:14px"></div>
+          <table class="table table--stack"><thead><tr><th>高さを読んだ場所</th><th class="num">左から(m)</th><th class="num">道路から奥(m)</th><th class="num">道路中心との差(m)</th><th></th></tr></thead><tbody id="lvlRows"></tbody></table>
+          <div class="add-row"><button class="btn btn--ghost btn--small" id="btnLvlAdd">高さの点を追加</button></div>
+          <label class="field" style="margin-top:14px"><span class="field__label">計画地盤の高さの決め方</span>
+            <select class="select" id="fhMode">
+              <option value="optimize">道路より高く、費用が最小になる高さ（おすすめ）</option>
+              <option value="balance">切土と盛土の量を釣り合わせる（残土が最少）</option>
+              <option value="road_plus">道路より 0.3m 高く</option>
+            </select></label>
+        </div>
+
+        <div class="card" id="cardCond">
+          <div class="card__head"><h2 class="card__title">施工条件</h2><span class="card__note">費用の割増に反映</span></div>
+          <div class="checks" id="condChecks"></div>
+        </div>
+
+        <div class="card" id="cardLand">
+          <div class="card__head"><h2 class="card__title">土地の情報</h2><span class="card__note">公開データ（代表点）</span></div>
+          <img class="aerial" id="aerial" alt="航空写真" hidden>
+          <table class="table" style="margin-top:12px"><tbody id="landRows"></tbody></table>
+        </div>
+
+        <div class="card">
+          <div class="card__head"><h2 class="card__title">要点と確認事項</h2><span class="card__note">1行に1項目</span></div>
+          <label class="field"><span class="field__label">表紙に載せる要点</span><textarea class="textarea" id="summaryText"></textarea></label>
+          <label class="field"><span class="field__label">次に確認すること</span><textarea class="textarea" id="checksText"></textarea></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions actions--center">
+      <button class="link link--muted" id="btnBack1">写真を選び直す</button>
+      <button class="btn" id="btnBuild">この内容で資料を作る <span class="btn__arrow">➤</span></button>
+    </div>
+  </section>
+
+  <!-- ===== STEP 3 ===== -->
+  <section class="view" id="view3">
+    <h1 class="sec-title"><span class="sec-title__en">REPORT</span><span class="sec-title__ja">概算と資料</span></h1>
+    <div class="results" id="results"></div>
+
+    <div class="grid2" style="margin-top:24px">
+      <div class="card" id="cardAlt">
+        <div class="card__head"><h2 class="card__title">造成の計画高の比較</h2></div>
+        <table class="table"><thead><tr><th>案</th><th class="num">計画高</th><th class="num">擁壁</th><th class="num">概算</th></tr></thead><tbody id="altRows"></tbody></table>
+        <p class="hint" id="altHint" hidden></p>
+      </div>
+      <div class="card">
+        <div class="card__head"><h2 class="card__title">法規・注意点</h2></div>
+        <ul class="flags" id="flags"></ul>
+      </div>
+    </div>
+
+    <h2 class="sec-title"><span class="sec-title__en">DOWNLOAD</span><span class="sec-title__ja">資料のダウンロード</span></h2>
+    <div class="downloads">
+      <button class="dl" data-fmt="pdf"><span class="dl__type">PDF 一式</span><span class="dl__desc">表紙・土地概況・写真台帳・立面図・解体範囲図・概算見積・造成計画図・断面図</span><span class="dl__go">ダウンロード ➤</span></button>
+      <button class="dl" data-fmt="xlsx"><span class="dl__type">Excel 見積</span><span class="dl__desc">単価を自社単価に書き換えると金額が再計算されます</span><span class="dl__go">ダウンロード ➤</span></button>
+      <button class="dl" data-fmt="dxf"><span class="dl__type">DXF 図面</span><span class="dl__desc">立面図・造成計画平面（CADで開けます）</span><span class="dl__go">ダウンロード ➤</span></button>
+    </div>
+
+    <h2 class="sec-title"><span class="sec-title__en">PREVIEW</span><span class="sec-title__ja">PDF のプレビュー</span></h2>
+    <iframe class="pdf-frame" id="pdfFrame" title="PDF プレビュー"></iframe>
+
+    <div class="actions actions--center">
+      <button class="link link--muted" id="btnBack2">読み取り内容を直して作り直す</button>
+      <button class="btn btn--ghost" id="btnNew">新しい物件を始める</button>
+    </div>
+    <p class="disclaimer">本資料は現地写真と公開データ（国土地理院の標高・航空写真、国交省の都市計画データ等）からの推定による参考資料です。寸法・数量は±10〜20%、高さは±0.2〜0.5m 程度の誤差を含みます。正式な見積・設計には現地調査・測量・地盤調査・アスベスト事前調査が必要です。</p>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" role="status" aria-live="polite">
+  <div class="progress">
+    <div class="progress__title" id="progTitle">読み取り中</div>
+    <div class="progress__time" id="progTime"></div>
+    <ul class="progress__list" id="progList"></ul>
+    <div class="progress__hint" id="progHint">画面を閉じずにお待ちください</div>
+  </div>
+</div>
+
+<div class="modal" id="keyModal">
+  <form class="modal__box" id="keyForm">
+    <h2 class="modal__title">社内アクセスキー</h2>
+    <p class="lead">社内で共有しているアクセスキーを入れてください（この端末に保存されます）。</p>
+    <input class="input" id="keyInput" type="password" autocomplete="current-password">
+    <div class="actions"><button class="btn btn--small" type="submit">保存して続ける</button></div>
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>

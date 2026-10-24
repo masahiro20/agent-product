@@ -10,7 +10,10 @@ SKILL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DATA_DIR = os.path.join(SKILL_DIR, "data")
 
 FONT = "JP"
+REPO_DIR = os.path.abspath(os.path.join(SKILL_DIR, "..", "..", ".."))
 _FONT_CANDIDATES = [
+    os.environ.get("SITEKIT_FONT", ""),
+    os.path.join(REPO_DIR, "fonts", "ipag.ttf"),
     "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",
     "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
@@ -22,7 +25,7 @@ _font_ready = False
 
 def font_path():
     for p in _FONT_CANDIDATES:
-        if os.path.exists(p):
+        if p and os.path.exists(p):
             return p
     raise RuntimeError("日本語フォントが見つかりません（IPAゴシック等をインストールしてください）")
 

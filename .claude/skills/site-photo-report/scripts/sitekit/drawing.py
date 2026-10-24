@@ -285,7 +285,7 @@ def north_arrow(c, x_mm, y_mm, rot_deg=0.0, r=6.0):
     """方位記号。rot_deg: 図の上方向に対する真北の角度（時計回り正）。"""
     c.saveState()
     c.translate(x_mm * MM, y_mm * MM)
-    c.rotate(-rot_deg)
+    c.rotate(rot_deg)  # 図の上方向が北から時計回りに rot_deg → 北は上から反時計回りに rot_deg
     c.setLineWidth(0.3)
     c.circle(0, 0, r * MM)
     p = c.beginPath()

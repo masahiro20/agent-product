@@ -50,6 +50,37 @@ def _ensure_ascending(grid):
     return {"xs": xs, "ys": ys, "z": z}
 
 
+def apply_dem(spec):
+    """terrain.dem_world（住所の代表点を原点とする東西・南北m格子）を敷地ローカル格子に変換して
+    site.existing.dem に入れる。敷地の形・アンカー・方位を変えたら呼び直す。標高の範囲を返す。"""
+    site = spec.get("site")
+    g = (spec.get("terrain") or {}).get("dem_world")
+    if not site or not g:
+        return None
+    pts = site["boundary"]
+    cx = sum(p[0] for p in pts) / len(pts)
+    cy = sum(p[1] for p in pts) / len(pts)
+    anc = site.get("anchor") or {"x": cx, "y": cy}
+    rot = site.get("north_rot_deg", 0.0)
+    xs_b = [p[0] for p in pts]
+    ys_b = [p[1] for p in pts]
+    margin = (site.get("road", {}).get("width_m", 4.0)) + 5
+    lx = [min(xs_b) - margin + k for k in range(int(max(xs_b) - min(xs_b) + 2 * margin) + 1)]
+    ly = [min(ys_b) - margin + k for k in range(int(max(ys_b) - min(ys_b) + 2 * margin) + 1)]
+    z = []
+    for y in ly:
+        row = []
+        for x in lx:
+            e, n = _local_to_world(x, y, anc["x"], anc["y"], rot)
+            row.append(_bilinear(g, e, n))
+        z.append(row)
+    ex = site.setdefault("existing", {})
+    ex["dem"] = {"xs": lx, "ys": ly, "z": z}
+    ex["source"] = "dem+points" if ex.get("points") else "dem"
+    vals = [v for r_ in z for v in r_ if v is not None]
+    return [round(min(vals), 2), round(max(vals), 2)] if vals else None
+
+
 def fetch(spec, base_dir, half_size_m=30.0, step_m=1.0):
     info = {}
     proj = spec.setdefault("project", {})
@@ -77,37 +108,17 @@ def fetch(spec, base_dir, half_size_m=30.0, step_m=1.0):
         terr["aerial_photo"] = ap
         info["aerial_photo"] = ap
 
-    # 標高（世界座標の格子 → 敷地ローカル格子へ再サンプリング）
-    if site:
-        grid = public_data.elevation_grid(lat, lon, half_size_m=half_size_m, step_m=step_m)
-        if isinstance(grid, dict) and grid.get("error"):
-            info["dem_error"] = grid["error"]
-        else:
-            g = _ensure_ascending(grid)
-            pts = site["boundary"]
-            cx = sum(p[0] for p in pts) / len(pts)
-            cy = sum(p[1] for p in pts) / len(pts)
-            anc = site.get("anchor") or {"x": cx, "y": cy}
-            rot = site.get("north_rot_deg", 0.0)
-            xs_b = [p[0] for p in pts]
-            ys_b = [p[1] for p in pts]
-            margin = (site.get("road", {}).get("width_m", 4.0)) + 5
-            lx = [min(xs_b) - margin + k for k in range(int(max(xs_b) - min(xs_b) + 2 * margin) + 1)]
-            ly = [min(ys_b) - margin + k for k in range(int(max(ys_b) - min(ys_b) + 2 * margin) + 1)]
-            z = []
-            for y in ly:
-                row = []
-                for x in lx:
-                    e, n = _local_to_world(x, y, anc["x"], anc["y"], rot)
-                    row.append(_bilinear(g, e, n))
-                z.append(row)
-            ex = site.setdefault("existing", {})
-            ex["dem"] = {"xs": lx, "ys": ly, "z": z}
-            ex["source"] = "dem+points" if ex.get("points") else "dem"
-            vals = [v for r_ in z for v in r_ if v is not None]
-            info["dem_source"] = grid.get("source")
-            info["dem_range"] = [round(min(vals), 2), round(max(vals), 2)] if vals else None
-            terr["dem_source"] = grid.get("source")
+    # 標高（世界座標の格子を保存し、敷地ローカル格子へ再サンプリング）
+    grid = public_data.elevation_grid(lat, lon, half_size_m=half_size_m, step_m=step_m)
+    if isinstance(grid, dict) and grid.get("error"):
+        info["dem_error"] = grid["error"]
+    else:
+        g = _ensure_ascending(grid)
+        terr["dem_world"] = {"xs": g["xs"], "ys": g["ys"], "z": g["z"]}
+        terr["dem_source"] = grid.get("source")
+        info["dem_source"] = grid.get("source")
+        if site:
+            info["dem_range"] = apply_dem(spec)
 
     # 土地情報（取れたものだけ。確実性: 公的データの代表点読取り＝要確認／推測）
     li = spec.setdefault("land_info", [])
