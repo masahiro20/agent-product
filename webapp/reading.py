@@ -2,6 +2,7 @@
 
 出力は「読み取り結果（reading）」という平たい形にし、図面・見積用の site.json への変換は convert.py が行う。
 """
+import json
 import os
 
 import anthropic
@@ -36,56 +37,149 @@ def condition_catalog():
     return {k: v.get("name", k) for k, v in cf.items() if isinstance(v, dict)}
 
 
-def _obj(props, required=None):
-    return {"type": "object", "properties": props, "required": required or list(props), "additionalProperties": False}
+# 出力の形（構造化出力のスキーマは大きすぎて API が受け付けないため、形はプロンプトで示し、受け取った後に normalize で点検・補完する）
+TEMPLATE = """{
+  "project_name": "物件名の案",
+  "building": {
+    "exists": true, "structure": "wood|light_steel|heavy_steel|rc", "use": "用途", "floors": 2, "built_year_est": 1980,
+    "frontage_m": 14.5, "depth_m": 4.6, "eave_h": 5.8, "ridge_h": 6.7, "roof_overhang_m": 0.45, "roof_label": "切妻 4寸 カラー鉄板",
+    "floor_levels": [0.45, 3.2],
+    "units_count": 8, "unit_layout": "1R|1K|1DK|2DK|3LDK|house_4LDK", "unit_area_m2": 16.6,
+    "occupied_units": 0, "aircon_units": 4, "outdoor_leftover_m3": 1.0,
+    "annexes": [{"name": "鉄骨外階段", "price_key": "steel_stair|carport|storage_shed|none", "qty": 1, "unit": "基", "basis": "写真2"}],
+    "measure_basis": [{"item": "桁行", "value": "約14.5m", "basis": "根拠"}],
+    "faces": [{"name": "南立面図（道路側）", "width_m": 14.5, "roof_type": "gable_side|gable_end|hip_side|shed|flat",
+               "elements": [{"type": "window|door|railing|slab|post|pipe|stair|stair_front|box|block_wall|fence|tree|canopy",
+                             "x": 1.0, "z": 0.45, "w": 1.69, "h": 1.8, "label": "", "courses": 0, "grille": false}]}]
+  },
+  "exterior": [{"key": "単価キー", "label": "CB塀 南側 H≈0.8 L≈15m", "qty": 12.0, "unit": "㎡", "basis": "写真3：4段", "x0": 0, "y0": 0, "x1": 0, "y1": 0}],
+  "site": {
+    "frontage_m": 19.5, "depth_m": 12.5, "road_side": "N|E|S|W|unknown", "road_width_m": 4.0, "road_name": "市道",
+    "building_offset_left_m": 1.2, "building_setback_m": 3.0,
+    "extra_footprints": [{"label": "外階段", "x": 15.8, "y": 3.0, "w": 1.0, "d": 3.0}],
+    "level_points": [{"label": "敷地左手前", "x": 0.5, "y": 0.5, "dz_from_road_center_m": 0.4, "basis": "CB2段"}]
+  },
+  "conditions": ["施工条件のキー"],
+  "photos": [{"photo_index": 1, "caption": "南面（道路側）", "marks": [{"x0": 0.1, "y0": 0.3, "x1": 0.3, "y1": 0.5, "label": "掃出し窓 W≈1.69m", "basis": "寸法の基準"}]}],
+  "summary": ["表紙に載せる要点"],
+  "next_checks": ["次に確認すること"]
+}"""
 
 
-S, N, I, B = {"type": "string"}, {"type": "number"}, {"type": "integer"}, {"type": "boolean"}
+def _num(v, default=0.0):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
 
 
-def _enum(vals):
-    return {"type": "string", "enum": vals}
+def _int(v, default=0):
+    try:
+        return int(round(float(v)))
+    except (TypeError, ValueError):
+        return default
 
 
-def schema():
-    element = _obj({"type": _enum(ELEMENT_TYPES), "x": N, "z": N, "w": N, "h": N, "label": S,
-                    "courses": I, "grille": B})
-    face = _obj({"name": S, "width_m": N, "roof_type": _enum(ROOF_TYPES), "elements": {"type": "array", "items": element}})
-    basis = _obj({"item": S, "value": S, "basis": S})
-    rect = _obj({"label": S, "x": N, "y": N, "w": N, "d": N})
-    annex = _obj({"name": S, "price_key": _enum(["steel_stair", "carport", "storage_shed", "none"]), "qty": N, "unit": S,
-                  "basis": S})
-    exterior = _obj({"key": _enum(sorted(exterior_catalog())), "label": S, "qty": N, "unit": S, "basis": S,
-                     "x0": N, "y0": N, "x1": N, "y1": N})
-    mark = _obj({"x0": N, "y0": N, "x1": N, "y1": N, "label": S, "basis": S})
-    photo = _obj({"photo_index": I, "caption": S, "marks": {"type": "array", "items": mark}})
-    level = _obj({"label": S, "x": N, "y": N, "dz_from_road_center_m": N, "basis": S})
-    building = _obj({
-        "exists": B, "structure": _enum(STRUCTURES), "use": S, "floors": I, "built_year_est": I,
-        "frontage_m": N, "depth_m": N, "eave_h": N, "ridge_h": N, "roof_overhang_m": N, "roof_label": S,
-        "floor_levels": {"type": "array", "items": N},
-        "units_count": I, "unit_layout": _enum(LAYOUTS), "unit_area_m2": N,
-        "occupied_units": I, "aircon_units": I, "outdoor_leftover_m3": N,
-        "annexes": {"type": "array", "items": annex},
-        "measure_basis": {"type": "array", "items": basis},
-        "faces": {"type": "array", "items": face},
-    })
-    site = _obj({
-        "frontage_m": N, "depth_m": N, "road_side": _enum(SIDES), "road_width_m": N, "road_name": S,
-        "building_offset_left_m": N, "building_setback_m": N,
-        "extra_footprints": {"type": "array", "items": rect},
-        "level_points": {"type": "array", "items": level},
-    })
-    return _obj({
-        "project_name": S,
-        "building": building,
-        "exterior": {"type": "array", "items": exterior},
-        "site": site,
-        "conditions": {"type": "array", "items": _enum(sorted(condition_catalog()))},
-        "photos": {"type": "array", "items": photo},
-        "summary": {"type": "array", "items": S},
-        "next_checks": {"type": "array", "items": S},
-    })
+def _pick(v, allowed, default):
+    return v if v in allowed else default
+
+
+def normalize(r):
+    """AI の出力を点検し、欠けた項目を既定値で補い、型をそろえる（変換・作図が落ちないように）。"""
+    r = r if isinstance(r, dict) else {}
+    b = r.get("building") or {}
+    out_b = {
+        "exists": bool(b.get("exists", True)),
+        "structure": _pick(b.get("structure"), STRUCTURES, "wood"),
+        "use": str(b.get("use") or ""),
+        "floors": max(1, _int(b.get("floors"), 2)),
+        "built_year_est": _int(b.get("built_year_est"), 1985) or 1985,
+        "frontage_m": max(1.0, _num(b.get("frontage_m"), 9.1)),
+        "depth_m": max(1.0, _num(b.get("depth_m"), 7.3)),
+        "eave_h": max(2.0, _num(b.get("eave_h"), 5.8)),
+        "roof_overhang_m": _num(b.get("roof_overhang_m"), 0.45),
+        "roof_label": str(b.get("roof_label") or ""),
+        "units_count": max(1, _int(b.get("units_count"), 1)),
+        "unit_layout": _pick(b.get("unit_layout"), LAYOUTS, "house_4LDK"),
+        "unit_area_m2": _num(b.get("unit_area_m2"), 0) or None,
+        "occupied_units": max(0, _int(b.get("occupied_units"), 0)),
+        "aircon_units": max(0, _int(b.get("aircon_units"), 0)),
+        "outdoor_leftover_m3": max(0.0, _num(b.get("outdoor_leftover_m3"), 0)),
+    }
+    out_b["ridge_h"] = max(out_b["eave_h"], _num(b.get("ridge_h"), out_b["eave_h"] + 1.0))
+    fl = [_num(v) for v in (b.get("floor_levels") or []) if v is not None]
+    out_b["floor_levels"] = fl or [0.45] + [0.45 + 2.8 * i for i in range(1, out_b["floors"])]
+    out_b["annexes"] = [{"name": str(a.get("name") or "付属物"),
+                         "price_key": _pick(a.get("price_key"), ["steel_stair", "carport", "storage_shed", "none"], "none"),
+                         "qty": _num(a.get("qty"), 1) or 1, "unit": str(a.get("unit") or "基"), "basis": str(a.get("basis") or "")}
+                        for a in (b.get("annexes") or []) if isinstance(a, dict)]
+    out_b["measure_basis"] = [{"item": str(m.get("item", "")), "value": str(m.get("value", "")), "basis": str(m.get("basis", ""))}
+                              for m in (b.get("measure_basis") or []) if isinstance(m, dict)]
+    faces = []
+    for f in b.get("faces") or []:
+        if not isinstance(f, dict):
+            continue
+        els = []
+        for e in f.get("elements") or []:
+            if not isinstance(e, dict) or e.get("type") not in ELEMENT_TYPES:
+                continue
+            els.append({"type": e["type"], "x": _num(e.get("x")), "z": _num(e.get("z")), "w": _num(e.get("w")), "h": _num(e.get("h")),
+                        "label": str(e.get("label") or ""), "courses": _int(e.get("courses"), 0), "grille": bool(e.get("grille"))})
+        faces.append({"name": str(f.get("name") or f"立面図{len(faces) + 1}"),
+                      "width_m": max(1.0, _num(f.get("width_m"), out_b["frontage_m"])),
+                      "roof_type": _pick(f.get("roof_type"), ROOF_TYPES, "gable_side"), "elements": els})
+    out_b["faces"] = faces
+    cat = exterior_catalog()
+    ext = []
+    for e in r.get("exterior") or []:
+        if not isinstance(e, dict) or e.get("key") not in cat or _num(e.get("qty")) <= 0:
+            continue
+        ext.append({"key": e["key"], "label": str(e.get("label") or cat[e["key"]]["name"]), "qty": _num(e.get("qty")),
+                    "unit": str(e.get("unit") or cat[e["key"]]["unit"]), "basis": str(e.get("basis") or ""),
+                    **{k: _num(e.get(k)) for k in ("x0", "y0", "x1", "y1")}})
+    s = r.get("site") or {}
+    site = {
+        "frontage_m": max(3.0, _num(s.get("frontage_m"), out_b["frontage_m"] + 4)),
+        "depth_m": max(3.0, _num(s.get("depth_m"), out_b["depth_m"] + 6)),
+        "road_side": _pick(s.get("road_side"), SIDES, "unknown"),
+        "road_width_m": max(1.8, _num(s.get("road_width_m"), 4.0)),
+        "road_name": str(s.get("road_name") or "前面道路"),
+        "building_offset_left_m": max(0.0, _num(s.get("building_offset_left_m"), 1.0)),
+        "building_setback_m": max(0.0, _num(s.get("building_setback_m"), 1.5)),
+        "extra_footprints": [{"label": str(x.get("label") or ""), **{k: _num(x.get(k)) for k in ("x", "y", "w", "d")}}
+                             for x in (s.get("extra_footprints") or []) if isinstance(x, dict) and _num(x.get("w")) > 0 and _num(x.get("d")) > 0],
+        "level_points": [{"label": str(p.get("label") or ""), "x": _num(p.get("x")), "y": _num(p.get("y")),
+                          "dz_from_road_center_m": _num(p.get("dz_from_road_center_m")), "basis": str(p.get("basis") or "")}
+                         for p in (s.get("level_points") or []) if isinstance(p, dict)],
+    }
+    conds = [c for c in (r.get("conditions") or []) if c in condition_catalog()]
+    photos = []
+    for ph in r.get("photos") or []:
+        if not isinstance(ph, dict):
+            continue
+        marks = []
+        for m in ph.get("marks") or []:
+            if not isinstance(m, dict):
+                continue
+            x0, y0, x1, y1 = (min(1.0, max(0.0, _num(m.get(k)))) for k in ("x0", "y0", "x1", "y1"))
+            if x1 > x0 and y1 > y0:
+                marks.append({"x0": x0, "y0": y0, "x1": x1, "y1": y1, "label": str(m.get("label") or ""), "basis": str(m.get("basis") or "")})
+        photos.append({"photo_index": _int(ph.get("photo_index"), len(photos) + 1), "caption": str(ph.get("caption") or ""), "marks": marks})
+    return {"project_name": str(r.get("project_name") or ""), "building": out_b, "exterior": ext, "site": site,
+            "conditions": conds, "photos": photos,
+            "summary": [str(x) for x in (r.get("summary") or [])][:8],
+            "next_checks": [str(x) for x in (r.get("next_checks") or [])][:12]}
+
+
+def _extract_json(text):
+    t = text.strip()
+    if t.startswith("```"):
+        t = t.split("\n", 1)[1] if "\n" in t else t
+        t = t.rsplit("```", 1)[0]
+    i, j = t.find("{"), t.rfind("}")
+    if i < 0 or j < 0:
+        raise ValueError("JSON が見つかりません")
+    return json.loads(t[i:j + 1])
 
 
 SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築士です。現地写真（と航空写真）から、解体業者・造成業者がそのまま概算に使える数量と寸法を読み取ります。
@@ -140,16 +234,32 @@ def read_site(photos_b64, address, notes, land_info, aerial_b64=None):
              "公開データからの土地情報: " + ("; ".join(f"{x['item']}={x['value']}" for x in (land_info or [])[:12]) or "（なし）"),
              "外構・付帯の単価キー: " + "、".join(f"{k}（{v['name']}／{v['unit']}）" for k, v in cat.items()),
              "施工条件のキー: " + "、".join(f"{k}（{v}）" for k, v in condition_catalog().items()),
-             "上の写真から、指定のJSON形式で読み取り結果を出してください。"]
+             "上の写真から、次の形の JSON で読み取り結果を出してください。値の例は形を示すためのもので、写真から読み取った値に置き換えること。"
+             "「a|b|c」は選択肢（どれか1つ）。説明文やコードブロック（```）は付けず、JSON だけを出力すること。",
+             TEMPLATE]
     content.append({"type": "text", "text": "\n".join(lines)})
 
     client = anthropic.Anthropic()
+    msg = _call(client, [{"role": "user", "content": content}])
+    text = "".join(b.text for b in msg.content if b.type == "text")
+    usage = {"input_tokens": msg.usage.input_tokens, "output_tokens": msg.usage.output_tokens, "model": msg.model}
+    try:
+        data = _extract_json(text)
+    except (ValueError, json.JSONDecodeError):
+        # JSON が崩れていたら1回だけ直させる
+        fix = _call(client, [{"role": "user", "content": content}, {"role": "assistant", "content": text},
+                             {"role": "user", "content": "出力が JSON として読めませんでした。同じ内容を、正しい JSON だけで出し直してください。"}])
+        data = _extract_json("".join(b.text for b in fix.content if b.type == "text"))
+    return normalize(data), usage
+
+
+def _call(client, messages):
     with client.beta.messages.stream(
         model=MODEL,
         max_tokens=64000,
         system=SYSTEM,
-        messages=[{"role": "user", "content": content}],
-        output_config={"effort": EFFORT, "format": {"type": "json_schema", "schema": schema()}},
+        messages=messages,
+        output_config={"effort": EFFORT},
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
     ) as stream:
@@ -158,7 +268,4 @@ def read_site(photos_b64, address, notes, land_info, aerial_b64=None):
         raise RuntimeError("AIが読み取りを辞退しました。写真を変えて再度お試しください。")
     if msg.stop_reason == "max_tokens":
         raise RuntimeError("読み取り結果が長すぎて途中で切れました。写真の枚数を減らして再度お試しください。")
-    import json
-    text = next(b.text for b in msg.content if b.type == "text")
-    usage = {"input_tokens": msg.usage.input_tokens, "output_tokens": msg.usage.output_tokens, "model": msg.model}
-    return json.loads(text), usage
+    return msg
