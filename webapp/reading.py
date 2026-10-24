@@ -22,7 +22,8 @@ SIDES = ["N", "E", "S", "W", "unknown"]
 # 建物本体・手続きなど、外構として選ばせない単価キー
 _NOT_EXTERIOR = {"interior_stripping", "scaffold_m2", "heavy_machine_transport", "guard_person_day", "road_use_permit",
                  "neighbor_greeting", "leftover_m3", "waste_disposal_mixed_m3", "recycling_notification",
-                 "asbestos_report", "demolition_registration", "overhead_rate", "aircon_unit"}
+                 "asbestos_report", "demolition_registration", "overhead_rate", "aircon_unit",
+                 "grading_m2"}  # 整地は建物本体の単価に含む（二重計上を防ぐ）
 
 
 def exterior_catalog():
@@ -129,6 +130,12 @@ def normalize(r):
                       "width_m": max(1.0, _num(f.get("width_m"), out_b["frontage_m"])),
                       "roof_type": _pick(f.get("roof_type"), ROOF_TYPES, "gable_side"), "elements": els})
     out_b["faces"] = faces
+    # 敷地座標の x は道路沿い。道路側の立面（1面目）の幅が建物の奥行に近ければ、幅と奥行が入れ替わっているので直す
+    # （立面の幅は外廊下などを含むことがあるので、面積には AI が出した外壁の寸法をそのまま使う）
+    if faces:
+        f0 = faces[0]["width_m"]
+        if abs(f0 - out_b["depth_m"]) < abs(f0 - out_b["frontage_m"]):
+            out_b["frontage_m"], out_b["depth_m"] = out_b["depth_m"], out_b["frontage_m"]
     cat = exterior_catalog()
     ext = []
     for e in r.get("exterior") or []:
@@ -152,6 +159,13 @@ def normalize(r):
                           "dz_from_road_center_m": _num(p.get("dz_from_road_center_m")), "basis": str(p.get("basis") or "")}
                          for p in (s.get("level_points") or []) if isinstance(p, dict)],
     }
+    # 建物が敷地からはみ出していたら敷地を広げる（読み取りの食い違い対策）
+    need_f = site["building_offset_left_m"] + out_b["frontage_m"] + 0.5
+    need_d = site["building_setback_m"] + out_b["depth_m"] + 0.5
+    if out_b["exists"] and site["frontage_m"] < need_f:
+        site["frontage_m"] = round(need_f, 2)
+    if out_b["exists"] and site["depth_m"] < need_d:
+        site["depth_m"] = round(need_d, 2)
     conds = [c for c in (r.get("conditions") or []) if c in condition_catalog()]
     photos = []
     for ph in r.get("photos") or []:
