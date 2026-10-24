@@ -1,0 +1,1161 @@
+{
+ "address": "愛知県小牧市城山2丁目",
+ "project_name": "【サンプル】木造2階建てアパート 解体・造成",
+ "notes": "サンプル物件です。木造2階建て・1K×8戸のアパート。入居者はほぼ退去済み。",
+ "photos": [
+  "/demo/photo1.jpg",
+  "/demo/photo2.jpg",
+  "/demo/photo3.jpg",
+  "/demo/photo4.jpg"
+ ],
+ "reading": {
+  "project_name": "【サンプル】木造2階建てアパート 解体・造成",
+  "building": {
+   "exists": true,
+   "structure": "wood",
+   "use": "共同住宅（アパート）",
+   "floors": 2,
+   "built_year_est": 1977,
+   "frontage_m": 14.56,
+   "depth_m": 4.55,
+   "eave_h": 5.75,
+   "ridge_h": 6.65,
+   "roof_overhang_m": 0.45,
+   "roof_label": "切妻 約4寸",
+   "floor_levels": [
+    0.45,
+    3.2
+   ],
+   "units_count": 8,
+   "unit_layout": "1K",
+   "unit_area_m2": 16.6,
+   "occupied_units": 2,
+   "aircon_units": 8,
+   "outdoor_leftover_m3": 2,
+   "annexes": [
+    {
+     "name": "鉄骨外階段",
+     "price_key": "steel_stair",
+     "qty": 1,
+     "unit": "基",
+     "basis": "写真1"
+    }
+   ],
+   "measure_basis": [
+    {
+     "item": "桁行（長辺）",
+     "value": "約14.56m",
+     "basis": "1K×4戸、1戸の間口≈3.64m（2間）。北面の玄関・面格子窓の繰り返しから4戸と判定"
+    },
+    {
+     "item": "梁間（短辺）",
+     "value": "約4.55m＋外廊下1.25m",
+     "basis": "東面の2F窓 W1.69m を基準に外壁幅を比例計算（4.6m前後）"
+    },
+    {
+     "item": "1FL／2FL",
+     "value": "GL+0.45m／GL+3.20m",
+     "basis": "外階段の段数（約16段×0.2m）と窓高さ"
+    },
+    {
+     "item": "軒高／最高高さ",
+     "value": "約5.75m／約6.65m",
+     "basis": "2F窓上〜軒の比率、屋根勾配≈4寸"
+    },
+    {
+     "item": "戸数・間取り",
+     "value": "8戸（1K 約16.6㎡）",
+     "basis": "玄関ドア4枚×2層、室外機台数"
+    },
+    {
+     "item": "構造・築年",
+     "value": "木造在来・築1975〜80年頃",
+     "basis": "モルタル外壁、鉄骨外階段、アルミサッシ＋面格子の仕様"
+    }
+   ],
+   "faces": [
+    {
+     "name": "南立面図（道路側・居室）",
+     "width_m": 14.56,
+     "roof_type": "gable_side",
+     "elements": [
+      {
+       "type": "window",
+       "x": 0.95,
+       "z": 0.45,
+       "w": 1.69,
+       "h": 1.8,
+       "label": "掃出し窓 W1690×H1800",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "canopy",
+       "x": 0.75,
+       "z": 2.4,
+       "w": 2.1,
+       "h": 0.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 0.95,
+       "z": 4.0,
+       "w": 1.69,
+       "h": 1.17,
+       "label": "腰窓 W1690×H1170",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 0.9,
+       "z": 4.0,
+       "w": 1.79,
+       "h": 0.45,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 0.1,
+       "z": 0,
+       "w": 0.75,
+       "h": 0.55,
+       "label": "室外機",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 4.59,
+       "z": 0.45,
+       "w": 1.69,
+       "h": 1.8,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "canopy",
+       "x": 4.390000000000001,
+       "z": 2.4,
+       "w": 2.1,
+       "h": 0.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 4.59,
+       "z": 4.0,
+       "w": 1.69,
+       "h": 1.17,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 4.54,
+       "z": 4.0,
+       "w": 1.79,
+       "h": 0.45,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 3.74,
+       "z": 0,
+       "w": 0.75,
+       "h": 0.55,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 8.23,
+       "z": 0.45,
+       "w": 1.69,
+       "h": 1.8,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "canopy",
+       "x": 8.030000000000001,
+       "z": 2.4,
+       "w": 2.1,
+       "h": 0.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 8.23,
+       "z": 4.0,
+       "w": 1.69,
+       "h": 1.17,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 8.18,
+       "z": 4.0,
+       "w": 1.79,
+       "h": 0.45,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 7.38,
+       "z": 0,
+       "w": 0.75,
+       "h": 0.55,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 11.87,
+       "z": 0.45,
+       "w": 1.69,
+       "h": 1.8,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "canopy",
+       "x": 11.67,
+       "z": 2.4,
+       "w": 2.1,
+       "h": 0.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 11.87,
+       "z": 4.0,
+       "w": 1.69,
+       "h": 1.17,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 11.82,
+       "z": 4.0,
+       "w": 1.79,
+       "h": 0.45,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 11.02,
+       "z": 0,
+       "w": 0.75,
+       "h": 0.55,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "pipe",
+       "x": 0.1,
+       "z": 0,
+       "w": 0,
+       "h": 5.75,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "pipe",
+       "x": 7.28,
+       "z": 0,
+       "w": 0,
+       "h": 5.75,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "stair_front",
+       "x": 14.71,
+       "z": 0,
+       "w": 0.9,
+       "h": 3.2,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "tree",
+       "x": -2.2,
+       "z": 0,
+       "w": 6.0,
+       "h": 8.0,
+       "label": "柿の木 H≈8m",
+       "courses": 0,
+       "grille": false
+      }
+     ]
+    },
+    {
+     "name": "東立面図（外階段）",
+     "width_m": 4.55,
+     "roof_type": "gable_end",
+     "elements": [
+      {
+       "type": "window",
+       "x": 0.3,
+       "z": 0.9,
+       "w": 1.69,
+       "h": 1.4,
+       "label": "W1690×H1400",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 0.3,
+       "z": 4.05,
+       "w": 1.69,
+       "h": 1.17,
+       "label": "W1690×H1170（基準）",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 0.25,
+       "z": 4.05,
+       "w": 1.79,
+       "h": 0.45,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "stair",
+       "x": 1.3,
+       "z": 0.0,
+       "w": 3.25,
+       "h": 3.2,
+       "label": "鉄骨外階段（波板屋根付）",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "slab",
+       "x": 4.55,
+       "z": 3.02,
+       "w": 1.3,
+       "h": 0.18,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 4.55,
+       "z": 3.2,
+       "w": 1.3,
+       "h": 1.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "post",
+       "x": 5.8,
+       "z": 0,
+       "w": 0.1,
+       "h": 5.4,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "canopy",
+       "x": 4.55,
+       "z": 5.4,
+       "w": 1.5,
+       "h": 0.12,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 2.05,
+       "z": 6.0,
+       "w": 0.45,
+       "h": 0.2,
+       "label": "妻換気口",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "block_wall",
+       "x": -0.6,
+       "z": 0,
+       "w": 6.65,
+       "h": 0,
+       "label": "",
+       "courses": 2,
+       "grille": false
+      },
+      {
+       "type": "fence",
+       "x": -0.6,
+       "z": 0.4,
+       "w": 6.65,
+       "h": 0.9,
+       "label": "木製フェンス H≈0.9（CB2段上）",
+       "courses": 0,
+       "grille": false
+      }
+     ]
+    },
+    {
+     "name": "北立面図（共用廊下・玄関）",
+     "width_m": 14.56,
+     "roof_type": "gable_side",
+     "elements": [
+      {
+       "type": "window",
+       "x": 11.27,
+       "z": 1.45,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 13.27,
+       "z": 0.45,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "玄関 W780×H1900",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 11.27,
+       "z": 4.2,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 13.27,
+       "z": 3.2,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 7.63,
+       "z": 1.45,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 9.63,
+       "z": 0.45,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 7.63,
+       "z": 4.2,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 9.63,
+       "z": 3.2,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 3.9900000000000007,
+       "z": 1.45,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 5.99,
+       "z": 0.45,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 3.9900000000000007,
+       "z": 4.2,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 5.99,
+       "z": 3.2,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 0.35,
+       "z": 1.45,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 2.35,
+       "z": 0.45,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 0.35,
+       "z": 4.2,
+       "w": 1.2,
+       "h": 0.9,
+       "label": "",
+       "courses": 0,
+       "grille": true
+      },
+      {
+       "type": "door",
+       "x": 2.35,
+       "z": 3.2,
+       "w": 0.78,
+       "h": 1.9,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "slab",
+       "x": -0.1,
+       "z": 3.02,
+       "w": 14.76,
+       "h": 0.18,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": -0.1,
+       "z": 3.2,
+       "w": 14.76,
+       "h": 1.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "post",
+       "x": 0.0,
+       "z": 0,
+       "w": 0.1,
+       "h": 3.02,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "post",
+       "x": 4.8533333333333335,
+       "z": 0,
+       "w": 0.1,
+       "h": 3.02,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "post",
+       "x": 9.706666666666667,
+       "z": 0,
+       "w": 0.1,
+       "h": 3.02,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "post",
+       "x": 14.56,
+       "z": 0,
+       "w": 0.1,
+       "h": 3.02,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "pipe",
+       "x": 0.25,
+       "z": 0,
+       "w": 0,
+       "h": 5.75,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "pipe",
+       "x": 14.31,
+       "z": 0,
+       "w": 0,
+       "h": 5.75,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "stair_front",
+       "x": -1.05,
+       "z": 0,
+       "w": 0.9,
+       "h": 3.2,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 2.2,
+       "z": 3.2,
+       "w": 0.75,
+       "h": 0.55,
+       "label": "室外機",
+       "courses": 0,
+       "grille": false
+      }
+     ]
+    },
+    {
+     "name": "西立面図（側面通路）",
+     "width_m": 4.55,
+     "roof_type": "gable_end",
+     "elements": [
+      {
+       "type": "window",
+       "x": 2.55,
+       "z": 0.9,
+       "w": 1.69,
+       "h": 1.4,
+       "label": "W1690×H1400",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "window",
+       "x": 2.55,
+       "z": 4.05,
+       "w": 1.69,
+       "h": 1.17,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": 2.5,
+       "z": 4.05,
+       "w": 1.79,
+       "h": 0.45,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "slab",
+       "x": -1.3,
+       "z": 3.02,
+       "w": 1.3,
+       "h": 0.18,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "railing",
+       "x": -1.3,
+       "z": 3.2,
+       "w": 1.3,
+       "h": 1.1,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "post",
+       "x": -1.25,
+       "z": 0,
+       "w": 0.1,
+       "h": 5.4,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "canopy",
+       "x": -1.5,
+       "z": 5.4,
+       "w": 1.5,
+       "h": 0.12,
+       "label": "",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "box",
+       "x": 2.05,
+       "z": 6.0,
+       "w": 0.45,
+       "h": 0.2,
+       "label": "妻換気口",
+       "courses": 0,
+       "grille": false
+      },
+      {
+       "type": "tree",
+       "x": 6.05,
+       "z": 0,
+       "w": 2.5,
+       "h": 5.0,
+       "label": "竹・植栽 H≈5m",
+       "courses": 0,
+       "grille": false
+      }
+     ]
+    }
+   ]
+  },
+  "exterior": [
+   {
+    "key": "block_wall_m2",
+    "label": "CB塀 南側 H≈0.8 L≈15.5m",
+    "qty": 12.4,
+    "unit": "㎡",
+    "basis": "写真3：4段＋笠木",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "block_wall_m2",
+    "label": "CB基礎 東側 H≈0.4 L≈12m",
+    "qty": 4.8,
+    "unit": "㎡",
+    "basis": "写真1：2段",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "fence_m",
+    "label": "木製フェンス 東側 H≈0.9",
+    "qty": 12,
+    "unit": "m",
+    "basis": "写真1",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "fence_m",
+    "label": "メッシュフェンス 北側 H≈0.9",
+    "qty": 13,
+    "unit": "m",
+    "basis": "写真2",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "gate",
+    "label": "CB門柱＋アイアン門扉",
+    "qty": 2,
+    "unit": "基",
+    "basis": "写真2",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "concrete_slab_m2",
+    "label": "土間コンクリート（北側通路）",
+    "qty": 32,
+    "unit": "㎡",
+    "basis": "写真2：通路幅≈2.2m×14.6m",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "tree_large",
+    "label": "高木（柿の木 H≈8m）伐採・抜根",
+    "qty": 1,
+    "unit": "本",
+    "basis": "写真3",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "tree_stump",
+    "label": "抜根（柿の木）",
+    "qty": 1,
+    "unit": "本",
+    "basis": "写真3",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "tree_medium",
+    "label": "中木（西側）伐採・抜根",
+    "qty": 3,
+    "unit": "本",
+    "basis": "写真4",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "tree_stump",
+    "label": "抜根（中木）",
+    "qty": 3,
+    "unit": "本",
+    "basis": "写真4",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   },
+   {
+    "key": "bamboo_m2",
+    "label": "竹・笹の伐採抜根（西側通路）",
+    "qty": 8,
+    "unit": "㎡",
+    "basis": "写真4",
+    "x0": 0,
+    "y0": 0,
+    "x1": 0,
+    "y1": 0
+   }
+  ],
+  "site": {
+   "frontage_m": 19.5,
+   "depth_m": 12.5,
+   "road_side": "S",
+   "road_width_m": 4.0,
+   "road_name": "市道",
+   "building_offset_left_m": 1.2,
+   "building_setback_m": 3.2,
+   "extra_footprints": [
+    {
+     "label": "外階段",
+     "x": 15.76,
+     "y": 3.2,
+     "w": 0.94,
+     "d": 3.0
+    }
+   ],
+   "level_points": [
+    {
+     "label": "敷地左手前",
+     "x": 0.6,
+     "y": 0.6,
+     "dz_from_road_center_m": 0.4,
+     "basis": "CB2段"
+    },
+    {
+     "label": "敷地右奥",
+     "x": 18.9,
+     "y": 11.9,
+     "dz_from_road_center_m": 0.9,
+     "basis": "推定"
+    }
+   ]
+  },
+  "conditions": [
+   "adjacent_close"
+  ],
+  "photos": [
+   {
+    "photo_index": 1,
+    "caption": "南面（道路側・居室）",
+    "marks": [
+     {
+      "x0": 0.204,
+      "y0": 0.727,
+      "x1": 0.308,
+      "y1": 0.866,
+      "label": "掃出し窓 W1690×H1800",
+      "basis": "アルミサッシの標準寸法を寸法の基準に使用"
+     },
+     {
+      "x0": 0.201,
+      "y0": 0.581,
+      "x1": 0.31,
+      "y1": 0.63,
+      "label": "手すり",
+      "basis": "手すり高さ≒1.1m"
+     },
+     {
+      "x0": 0.162,
+      "y0": 0.839,
+      "x1": 0.219,
+      "y1": 0.896,
+      "label": "室外機",
+      "basis": ""
+     },
+     {
+      "x0": 0.888,
+      "y0": 0.664,
+      "x1": 0.953,
+      "y1": 0.896,
+      "label": "外階段",
+      "basis": ""
+     },
+     {
+      "x0": 0,
+      "y0": 0.345,
+      "x1": 0.216,
+      "y1": 0.896,
+      "label": "柿の木 H≈8m",
+      "basis": ""
+     }
+    ]
+   },
+   {
+    "photo_index": 2,
+    "caption": "東面（外階段）",
+    "marks": [
+     {
+      "x0": 0.3,
+      "y0": 0.635,
+      "x1": 0.452,
+      "y1": 0.801,
+      "label": "W1690×H1400",
+      "basis": "アルミサッシの標準寸法を寸法の基準に使用"
+     },
+     {
+      "x0": 0.296,
+      "y0": 0.405,
+      "x1": 0.456,
+      "y1": 0.472,
+      "label": "手すり",
+      "basis": "手すり高さ≒1.1m"
+     },
+     {
+      "x0": 0.378,
+      "y0": 0.541,
+      "x1": 0.653,
+      "y1": 0.896,
+      "label": "鉄骨外階段（波板屋根付）",
+      "basis": "蹴上げ≒0.2m×段数"
+     },
+     {
+      "x0": 0.437,
+      "y0": 0.227,
+      "x1": 0.492,
+      "y1": 0.268,
+      "label": "妻換気口",
+      "basis": ""
+     },
+     {
+      "x0": 0.229,
+      "y0": 0.834,
+      "x1": 0.771,
+      "y1": 0.896,
+      "label": "ブロック塀",
+      "basis": "ブロック1段0.2m"
+     }
+    ]
+   },
+   {
+    "photo_index": 3,
+    "caption": "北面（共用廊下・玄関）",
+    "marks": [
+     {
+      "x0": 0.727,
+      "y0": 0.703,
+      "x1": 0.813,
+      "y1": 0.789,
+      "label": "窓",
+      "basis": "アルミサッシの標準寸法を寸法の基準に使用"
+     },
+     {
+      "x0": 0.837,
+      "y0": 0.703,
+      "x1": 0.9,
+      "y1": 0.863,
+      "label": "玄関 W780×H1900",
+      "basis": "ドア高さ≒2.0mを基準"
+     },
+     {
+      "x0": 0.1,
+      "y0": 0.56,
+      "x1": 0.934,
+      "y1": 0.66,
+      "label": "手すり",
+      "basis": "手すり高さ≒1.1m"
+     },
+     {
+      "x0": 0.047,
+      "y0": 0.64,
+      "x1": 0.117,
+      "y1": 0.896,
+      "label": "外階段",
+      "basis": ""
+     },
+     {
+      "x0": 0.226,
+      "y0": 0.6,
+      "x1": 0.288,
+      "y1": 0.66,
+      "label": "室外機",
+      "basis": ""
+     }
+    ]
+   },
+   {
+    "photo_index": 4,
+    "caption": "西面（側面通路）",
+    "marks": [
+     {
+      "x0": 0.413,
+      "y0": 0.635,
+      "x1": 0.566,
+      "y1": 0.801,
+      "label": "W1690×H1400",
+      "basis": "アルミサッシの標準寸法を寸法の基準に使用"
+     },
+     {
+      "x0": 0.41,
+      "y0": 0.405,
+      "x1": 0.57,
+      "y1": 0.472,
+      "label": "手すり",
+      "basis": "手すり高さ≒1.1m"
+     },
+     {
+      "x0": 0.374,
+      "y0": 0.227,
+      "x1": 0.43,
+      "y1": 0.268,
+      "label": "妻換気口",
+      "basis": ""
+     },
+     {
+      "x0": 0.59,
+      "y0": 0.352,
+      "x1": 0.806,
+      "y1": 0.896,
+      "label": "竹・植栽 H≈5m",
+      "basis": ""
+     }
+    ]
+   }
+  ],
+  "summary": [
+   "木造2階建て・1K×8戸のアパート（推定築1975〜80年頃）。延床 約132㎡（40坪）＋2F外廊下・鉄骨外階段。",
+   "西側の通路が約0.8mと狭く、隣地も近い → 西面は手壊し・養生強化の割増を見込んだ。",
+   "築年代からアスベスト含有の可能性（外壁吹付材・波板・軒天）。事前調査（義務）の結果で費用が大きく変わる。",
+   "柿の大木・竹・残置物（室外機約8台・庭のガラ）あり。竹は根の処理に注意。",
+   "【サンプル】この物件と画像は操作確認用の架空のものです。"
+  ],
+  "next_checks": [
+   "アスベスト事前調査（有資格者）：外壁吹付材・波板・軒天・屋根材の含有有無",
+   "浄化槽の有無（公共下水か）、井戸・地中埋設物の有無",
+   "西側通路の幅と隣地建物との離れ（手壊し範囲の確定）",
+   "道路側CB（7段）の所有者と高低差 → 造成時に残すか作り替えるか",
+   "敷地境界（境界杭の有無）・前面道路の幅員と種別（42条）",
+   "入居者の有無・残置物の量（室内写真があれば精度が上がる）"
+  ]
+ }
+}

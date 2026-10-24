@@ -165,6 +165,7 @@
     state.loading = list.slice(0, room).length;
     renderThumbs();
     for (const f of list.slice(0, room)) {
+      state.sample = null;
       try { state.photos.push(await resize(f)); }
       catch { failed.push(f.name); }
       state.loading -= 1;
@@ -185,7 +186,38 @@
     $("#btnAnalyze").disabled = !state.photos.length || state.loading > 0;
   }
 
+  async function loadSample() {
+    const btn = $("#btnSample");
+    btn.disabled = true;
+    try {
+      const sample = await (await fetch("/demo/sample.json")).json();
+      state.photos = [];
+      state.loading = sample.photos.length;
+      renderThumbs();
+      for (const url of sample.photos) {
+        const blob = await (await fetch(url)).blob();
+        state.photos.push(await resize(new File([blob], url.split("/").pop(), { type: blob.type || "image/jpeg" })));
+        state.loading -= 1;
+        renderThumbs();
+      }
+      $("#address").value = sample.address;
+      $("#projectName").value = sample.project_name;
+      $("#notes").value = sample.notes;
+      $("#region").value = "default";
+      state.sample = sample;
+      toast("サンプルを入れました。「AI で読み取る」を押してください（サンプルでは AI の代わりに用意した読み取り結果を使います）");
+      $("#btnAnalyze").scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (e) {
+      toast("サンプルを読み込めませんでした", true);
+    } finally {
+      state.loading = 0;
+      btn.disabled = false;
+      renderThumbs();
+    }
+  }
+
   function initStep1() {
+    $("#btnSample").addEventListener("click", loadSample);
     const drop = $("#drop");
     const input = $("#fileInput");
     drop.addEventListener("click", () => input.click());
@@ -198,6 +230,7 @@
       const b = e.target.closest(".thumb__del");
       if (!b) return;
       state.photos.splice(Number(b.dataset.i), 1);
+      state.sample = null;
       renderThumbs();
     });
     $("#address").addEventListener("change", () => {
@@ -219,13 +252,21 @@
         catch (e) { toast(`公開データを取得できませんでした（${e.message}）。写真だけで続けます。`, true); }
       }
       progress.step(1);
-      const r = await api("/api/analyze", {
-        address, notes: $("#notes").value.trim(),
-        photos: await payloadPhotos(),
-        land_info: state.land?.land_info || [], aerial_b64: state.land?.aerial_b64 || null,
-      });
+      let r;
+      if (state.sample) {
+        // サンプル: AI の読み取りの代わりに、用意した読み取り結果を使う（公開データの取得と資料作成は本物）
+        await new Promise((ok) => setTimeout(ok, 1200));
+        r = { reading: JSON.parse(JSON.stringify(state.sample.reading)) };
+      } else {
+        r = await api("/api/analyze", {
+          address, notes: $("#notes").value.trim(),
+          photos: await payloadPhotos(),
+          land_info: state.land?.land_info || [], aerial_b64: state.land?.aerial_b64 || null,
+        });
+      }
       progress.step(2);
       state.reading = r.reading;
+      document.querySelector("#view2 .sec-title__ja").innerHTML = "AI の読み取りを確認" + (state.sample ? '<span class="demo-tag">サンプル</span>' : "");
       if (!$("#projectName").value.trim() && r.reading.project_name) $("#projectName").value = r.reading.project_name;
       renderStep2();
       progress.end();
@@ -574,7 +615,7 @@
     $("#btnBack2").addEventListener("click", () => go(2));
     $("#btnNew").addEventListener("click", () => {
       if (!confirm("入力内容を消して、新しい物件を始めますか？")) return;
-      Object.assign(state, { photos: [], land: null, reading: null, summary: null, files: null });
+      Object.assign(state, { photos: [], land: null, reading: null, summary: null, files: null, sample: null });
       ["#address", "#projectName", "#notes"].forEach((s) => ($(s).value = ""));
       renderThumbs();
       go(1);
@@ -588,7 +629,7 @@
       const h = await (await fetch("/api/health")).json();
       if (!h.has_api_key) {
         const b = $("#banner");
-        b.textContent = "AI の読み取りに必要な Claude API キーがサーバーに設定されていません。管理者が Vercel の環境変数 ANTHROPIC_API_KEY を設定するまで、写真の読み取りはできません。";
+        b.textContent = "AI の読み取りに必要な Claude API キーがサーバーに設定されていません。管理者が Vercel の環境変数 ANTHROPIC_API_KEY を設定するまで、ご自身の写真の読み取りはできません（「サンプルで試す」は使えます）。";
         b.hidden = false;
       }
     } catch { /* 確認できなくても続ける */ }

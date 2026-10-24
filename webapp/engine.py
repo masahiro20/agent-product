@@ -13,5 +13,5 @@ if SCRIPTS not in sys.path:
     sys.path.insert(0, SCRIPTS)
 
 import public_data  # noqa: E402,F401
-from sitekit import demolition, grading, report, terrain  # noqa: E402,F401
+from sitekit import demolition, elevation, grading, report, terrain  # noqa: E402,F401
 from sitekit.common import load_data  # noqa: E402,F401
