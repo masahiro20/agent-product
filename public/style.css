@@ -19,6 +19,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
@@ -262,3 +263,28 @@ a { color: inherit; }
 .sample strong { color: var(--ink); font-family: var(--serif); font-size: 15px; letter-spacing: .1em; font-weight: 500; }
 @media (max-width: 600px) { .sample { flex-direction: column; align-items: stretch; } }
 .demo-tag { display: inline-block; background: var(--gold); color: #fff; font-size: 11px; padding: 0 8px; margin-left: 8px; vertical-align: middle; letter-spacing: .1em; }
+
+/* ---------- トップ（STEP 1） ---------- */
+.hero { text-align: center; padding: 36px 0 26px; }
+.hero__title { font-family: var(--serif); font-weight: 500; font-size: clamp(24px, 3.6vw, 36px); letter-spacing: .12em; line-height: 1.6; margin: 0 0 12px; }
+.hero__lead { color: var(--sub); font-size: 14px; margin: 0 auto 22px; max-width: 640px; }
+.hero__flow { list-style: none; display: flex; justify-content: center; gap: 10px; padding: 0; margin: 0; flex-wrap: wrap; }
+.hero__flow li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); letter-spacing: .08em; }
+.hero__flow li + li::before { content: ""; width: 26px; height: 1px; background: var(--line); margin-right: 2px; }
+.hero__flow span { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); display: grid; place-items: center; font-family: var(--serif); font-size: 12px; }
+.start { max-width: 720px; margin: 0 auto; padding: 28px; }
+.start .drop { padding: 44px 20px; }
+.start__address { margin-top: 20px; }
+.start__address .input { font-size: 16px; padding: 12px 14px; }
+.start .guide { margin-top: 6px; }
+.start__cta { text-align: center; margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.start__note { color: var(--sub); font-size: 12px; margin: 0; max-width: 460px; }
+.sp { display: none; }
+@media (max-width: 600px) {
+  .sp { display: inline; }
+  .hero { padding: 18px 0 16px; }
+  .hero__flow { gap: 6px 12px; }
+  .hero__flow li { font-size: 12px; }
+  .hero__flow li + li::before { display: none; }
+  .start { padding: 18px 16px; }
+}

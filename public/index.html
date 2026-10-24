@@ -24,74 +24,67 @@
   </div>
 </header>
 
-<nav class="steps" aria-label="進み具合">
+<nav class="steps" id="steps" aria-label="進み具合" hidden>
   <div class="step is-active" data-step="1"><div class="step__no">01</div><div class="step__label">写真と住所</div></div>
   <div class="step" data-step="2"><div class="step__no">02</div><div class="step__label">読み取りの確認</div></div>
   <div class="step" data-step="3"><div class="step__no">03</div><div class="step__label">資料</div></div>
 </nav>
 
 <main class="main">
-  <div class="banner" id="banner" hidden></div>
 
   <!-- ===== STEP 1 ===== -->
   <section class="view is-active" id="view1">
-    <h1 class="sec-title"><span class="sec-title__en">SITE PHOTOS</span><span class="sec-title__ja">現地写真と住所</span></h1>
-    <p class="lead">現地の写真と住所を入れると、AI が寸法・数量・高低差を読み取り、立面図・解体概算・造成計画図をまとめた資料を作ります。</p>
-    <div class="sample">
-      <div><strong>まずは試してみる</strong><br><span>サンプル物件（架空のアパート）の画像と住所を入れて、最後の資料まで一通り操作できます。</span></div>
-      <button class="btn btn--ghost btn--small" id="btnSample">サンプルで試す <span class="btn__arrow">➤</span></button>
+    <div class="hero">
+      <h1 class="hero__title">現地写真から、<br class="sp">解体・造成の概算と図面を。</h1>
+      <p class="hero__lead">写真と住所を入れるだけ。AI が寸法と数量を読み取り、概算見積・立面図・造成計画図を1つの資料にまとめます。</p>
+      <ol class="hero__flow"><li><span>1</span>写真と住所</li><li><span>2</span>読み取りを確認</li><li><span>3</span>資料をダウンロード</li></ol>
     </div>
 
-    <div class="grid2">
-      <div>
-        <div class="card">
-          <div class="card__head"><h2 class="card__title">写真</h2><span class="card__note">最大12枚・建物4面＋敷地の四隅＋道路</span></div>
-          <div class="drop" id="drop" role="button" tabindex="0" aria-label="写真を選ぶ・撮る">
-            <svg class="drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="1"/><circle cx="12" cy="13" r="3.6"/><path d="M8 6l1.6-2.2h4.8L16 6"/></svg>
-            <div class="drop__main">写真を選ぶ・撮る</div>
-            <div class="drop__sub">ここにドラッグ、またはタップ（スマホはその場で撮影もできます）</div>
-          </div>
-          <input type="file" id="fileInput" accept="image/*" multiple hidden>
-          <div class="thumbs" id="thumbs"></div>
-          <div class="count" id="count"></div>
-
-          <details class="guide">
-            <summary>撮影のコツ（精度が上がる撮り方）</summary>
-            <ol>
-              <li>建物の4面を、それぞれ正面から全体が入るように</li>
-              <li>敷地の四隅から対角方向に（境界杭・ブロックの端が写るように）</li>
-              <li>前面道路を左右両方向に（側溝・縁石が入るように）</li>
-              <li>道路と敷地の段差、隣地との段差を真横から。<strong>メジャーを縦に当てる</strong>と高さの精度が大きく上がります</li>
-              <li>ブロック塀・ドア・掃出し窓など、寸法の分かるものが写っていると寸法の基準になります</li>
-              <li>室内の写真があれば、残置物（家財）の量が正確になります</li>
-            </ol>
-          </details>
-        </div>
+    <div class="start card">
+      <div class="drop" id="drop" role="button" tabindex="0" aria-label="写真を選ぶ・撮る">
+        <svg class="drop__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="1"/><circle cx="12" cy="13" r="3.6"/><path d="M8 6l1.6-2.2h4.8L16 6"/></svg>
+        <div class="drop__main">写真を選ぶ・撮る</div>
+        <div class="drop__sub">建物の4面と敷地・道路の写真（最大12枚）</div>
       </div>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="count" id="count"></div>
 
-      <div>
-        <div class="card">
-          <div class="card__head"><h2 class="card__title">物件</h2></div>
-          <label class="field"><span class="field__label">住所（地番でも可）</span>
-            <input class="input" id="address" placeholder="例）愛知県小牧市小牧4丁目213" autocomplete="off"></label>
-          <label class="field"><span class="field__label">物件名（資料の表紙に入ります）</span>
-            <input class="input" id="projectName" placeholder="例）○○様 解体・造成 検討"></label>
-          <label class="field"><span class="field__label">分かっていること（任意）</span>
-            <textarea class="textarea" id="notes" placeholder="例）築45年・木造2階建てアパート8戸、入居者なし、浄化槽あり、前面道路は市道4m など"></textarea></label>
-          <div class="field"><span class="field__label">依頼内容</span>
-            <div class="checks">
-              <label class="chip-check"><input type="checkbox" id="optDemo" checked><span>解体の概算</span></label>
-              <label class="chip-check"><input type="checkbox" id="optGrade" checked><span>造成計画・概算</span></label>
-            </div>
+      <label class="field start__address"><span class="field__label">住所（地番でも可）</span>
+        <input class="input" id="address" placeholder="例）愛知県小牧市小牧4丁目213" autocomplete="off"></label>
+
+      <details class="guide" id="moreOptions">
+        <summary>詳しい条件（任意）</summary>
+        <label class="field"><span class="field__label">物件名（資料の表紙に入ります）</span>
+          <input class="input" id="projectName" placeholder="例）○○様 解体・造成 検討"></label>
+        <label class="field"><span class="field__label">分かっていること</span>
+          <textarea class="textarea" id="notes" placeholder="例）築45年・木造2階建てアパート8戸、入居者なし、浄化槽あり、前面道路は市道4m など"></textarea></label>
+        <div class="field"><span class="field__label">依頼内容</span>
+          <div class="checks">
+            <label class="chip-check"><input type="checkbox" id="optDemo" checked><span>解体の概算</span></label>
+            <label class="chip-check"><input type="checkbox" id="optGrade" checked><span>造成計画・概算</span></label>
           </div>
-          <label class="field"><span class="field__label">単価の地域</span>
-            <select class="select" id="region"></select></label>
         </div>
-      </div>
-    </div>
+        <label class="field"><span class="field__label">単価の地域</span>
+          <select class="select" id="region"></select></label>
+      </details>
+      <details class="guide">
+        <summary>撮影のコツ</summary>
+        <ol>
+          <li>建物の4面を、それぞれ正面から全体が入るように</li>
+          <li>敷地の四隅から対角方向に（境界杭・ブロックの端が写るように）</li>
+          <li>前面道路を左右両方向に（側溝・縁石が入るように）</li>
+          <li>道路と敷地の段差、隣地との段差を真横から。<strong>メジャーを縦に当てる</strong>と高さの精度が大きく上がります</li>
+          <li>ブロック塀・ドア・掃出し窓など、寸法の分かるものが写っていると寸法の基準になります</li>
+          <li>室内の写真があれば、残置物（家財）の量が正確になります</li>
+        </ol>
+      </details>
 
-    <div class="actions actions--center">
-      <button class="btn" id="btnAnalyze" disabled>AI で読み取る <span class="btn__arrow">➤</span></button>
+      <div class="start__cta">
+        <button class="btn" id="btnAnalyze" disabled>AI で読み取る <span class="btn__arrow">➤</span></button>
+        <p class="start__note" id="keyNote" hidden>いまは AI の設定前のため、ご自身の写真は読み取れません。下の「サンプルで試す」から操作をお試しください。</p>
+        <button class="link" id="btnSample">サンプル物件で試す（架空のアパート）</button>
+      </div>
     </div>
   </section>
 

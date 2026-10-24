@@ -64,6 +64,7 @@
 
   // ---------------- ステップ切り替え ----------------
   function go(step) {
+    $("#steps").hidden = step === 1;
     document.querySelectorAll(".view").forEach((v, i) => v.classList.toggle("is-active", i === step - 1));
     document.querySelectorAll(".step").forEach((s) => {
       const n = Number(s.dataset.step);
@@ -627,11 +628,7 @@
     initStep1(); initStep2(); initStep3();
     try {
       const h = await (await fetch("/api/health")).json();
-      if (!h.has_api_key) {
-        const b = $("#banner");
-        b.textContent = "AI の読み取りに必要な Claude API キーがサーバーに設定されていません。管理者が Vercel の環境変数 ANTHROPIC_API_KEY を設定するまで、ご自身の写真の読み取りはできません（「サンプルで試す」は使えます）。";
-        b.hidden = false;
-      }
+      if (!h.has_api_key) $("#keyNote").hidden = false;
     } catch { /* 確認できなくても続ける */ }
     try {
       state.catalog = await api("/api/catalog", null, { method: "GET" });
