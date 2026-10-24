@@ -95,7 +95,7 @@ async def api_build(request: Request):
         spec = convert.to_spec(body["reading"], body.get("land"), body.get("photos"), body.get("options"), job)
         summary = report.build(spec, os.path.join(job, "out"), job)
         if fmt == "summary":
-            return summary
+            return {k: v for k, v in summary.items() if k not in ("pdf", "xlsx", "dxf")}
         path = {"pdf": summary["pdf"], "xlsx": summary["xlsx"], "dxf": summary["dxf"]}.get(fmt)
         if not path or not os.path.exists(path):
             return JSONResponse({"error": f"{fmt} を作れませんでした"}, status_code=500)
