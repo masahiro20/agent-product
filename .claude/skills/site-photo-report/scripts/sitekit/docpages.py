@@ -450,11 +450,29 @@ def quantities_page(doc, spec, demo):
     if len(rows) > 1:
         flows.append(table(rows, [34, 40, 100]))
     flows += [Spacer(1, 5 * MM), P("解体数量", S["h2"])]
+    d = q.get("detail") or {}
     rows = [[hcell("項目"), hcell("数量"), hcell("算出")],
-            [P("建築面積", S["cell"]), P(f"{q['building_area_m2']:.1f} ㎡", S["cell_r"]), P("外形寸法から", S["cell_sub"])],
-            [P("延床面積", S["cell"]), P(f"{q['floor_area_m2']:.1f} ㎡（{q['floor_area_tsubo']:.1f}坪）", S["cell_r"]), P(f"{b.get('floors')}階建", S["cell_sub"])],
-            [P("外周長", S["cell"]), P(f"{q['perimeter_m']:.1f} m", S["cell_r"]), ""],
-            [P("足場架面積（参考）", S["cell"]), P(f"{q['scaffold_m2']:.0f} ㎡", S["cell_r"]), P("(外周+8m)×(軒高+1m)。本体単価に含む", S["cell_sub"])]]
+            [P("建築面積", S["cell"]), P(f"{q['building_area_m2']:.1f} ㎡", S["cell_r"]), P("1階の外形寸法から", S["cell_sub"])],
+            [P("延床面積", S["cell"]), P(f"{q['floor_area_m2']:.1f} ㎡（{q['floor_area_tsubo']:.1f}坪）", S["cell_r"]),
+             P("／".join(f"{f['floor']}階 {f['area_m2']:.1f}㎡（{f['basis']}）" if f.get("basis") else f"{f['floor']}階 {f['area_m2']:.1f}㎡"
+                        for f in d.get("floors", [])) or f"{b.get('floors')}階建", S["cell_sub"])]]
+    if d.get("wall"):
+        w, op = d["wall"], d["openings"]
+        rows += [[P("外壁面積（正味）", S["cell"]), P(f"{w['net_m2']:.1f} ㎡", S["cell_r"]),
+                  P(f"外周×階高 {w['gross_m2'] - w['gable_m2']:.1f}㎡＋妻壁 {w['gable_m2']:.1f}㎡−開口 {w['openings_m2']:.1f}㎡", S["cell_sub"])],
+                 [P("窓・ドア", S["cell"]), P(f"窓{op['window_n']}／ドア{op['door_n']}", S["cell_r"]),
+                  P(f"窓 {op['window_m2']:.1f}㎡・ドア {op['door_m2']:.1f}㎡（立面図の合計）", S["cell_sub"])]]
+    if d.get("roof"):
+        rf = d["roof"]
+        rows.append([P("屋根面積", S["cell"]), P(f"{rf['area_m2']:.1f} ㎡", S["cell_r"]),
+                     P(f"{rf['kind_label']}。水平投影 {rf['projected_m2']:.1f}㎡（軒の出{rf['overhang_m']:g}m込み）×伸び率{rf['slope_factor']}"
+                       + (f"（{rf['pitch_sun']:g}寸勾配）" if rf.get("pitch_sun") else "") + (f"、下屋 {rf['lower_projected_m2']:.1f}㎡含む" if rf.get("lower_projected_m2") else ""), S["cell_sub"])])
+    if d.get("foundation"):
+        fd = d["foundation"]
+        rows.append([P("基礎", S["cell"]), P(f"{fd['outer_m'] + fd['inner_m']:.0f} m／{fd['concrete_m3']:.1f}㎥", S["cell_r"]),
+                     P(f"{fd['type_label'] if fd['type'] != 'unknown' else '布基礎とみなす'}。外周 {fd['outer_m']:.1f}m＋内部 {fd['inner_m']:.1f}m（外周の8割と推定）", S["cell_sub"])])
+    rows += [[P("外周長", S["cell"]), P(f"{q['perimeter_m']:.1f} m", S["cell_r"]), P("1階", S["cell_sub"])],
+             [P("足場架面積（参考）", S["cell"]), P(f"{q['scaffold_m2']:.0f} ㎡", S["cell_r"]), P("(外周+8m)×(軒高+1m)。本体単価に含む", S["cell_sub"])]]
     if q.get("units_count"):
         chk = q.get("units_area_check_m2")
         rows.append([P("戸数・間取り", S["cell"]), P(f"{q['units_count']}戸（{q.get('units_layout', '')}）", S["cell_r"]),
@@ -462,7 +480,18 @@ def quantities_page(doc, spec, demo):
     for a in q.get("annexes", []):
         if a["area_m2"]:
             rows.append([P(a["name"], S["cell"]), P(f"{a['area_m2']:.1f} ㎡", S["cell_r"]), P(a.get("kind", ""), S["cell_sub"])])
-    flows.append(table(rows, [44, 46, 84]))
+    flows.append(table(rows, [36, 40, 98]))
+    if d.get("waste"):
+        wrows = [[hcell("品目"), hcell("発生量"), hcell("算出")]]
+        for x in d["waste"]:
+            wrows.append([P(x["name"], S["cell"]), P(f"{x['t']:.1f} t", S["cell_r"]), P(x["basis"], S["cell_sub"])])
+        wrows.append([P("合計", S["cell"]), P(f"{d['waste_total_t']:.1f} t", S["cell_r"]), P(f"延床1㎡あたり {d['waste_total_t'] / q['floor_area_m2']:.2f} t" if q['floor_area_m2'] else "", S["cell_sub"])])
+        flows.append(KeepTogether([Spacer(1, 4 * MM), P("廃材の発生量（見込み）", S["h2"]), table(wrows, [50, 24, 100]),
+                                   P("木くずは分別解体の手引き（延床×0.085t）、石膏ボード・金属・混合は木造解体の調査値の中央付近、基礎ガラは形状から計算。"
+                                     "分別の程度・基礎の形・内装材で大きく変わります。", S["small"])]))
+    notes = [c["msg"] for c in q.get("checks", [])] + d.get("assumptions", [])
+    if notes:
+        flows += [Spacer(1, 3 * MM), P("数量の前提と要確認", S["h2"])] + [P("・" + m, S["bullet"]) for m in notes]
     if q.get("asbestos_suspect_parts"):
         flows += [Spacer(1, 3 * MM), P(f"アスベスト含有の可能性がある部位（推定築年 {b.get('built_year_est')}年頃）", S["h2"]),
                   P("、".join(q["asbestos_suspect_parts"]), S["body"])]

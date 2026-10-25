@@ -97,6 +97,11 @@ def to_spec(reading, land, photos, options, job_dir):
                       "area_each_m2": b.get("unit_area_m2") or None},
             "annexes": annexes, "measure_basis": b.get("measure_basis") or [], "elevations": faces,
             "finishes": b.get("finishes") or {},
+            "floor_plans": [{**p, "w": b["frontage_m"], "d": b["depth_m"]} if p.get("floor") == 1 else p  # 1F の外形は建物の幅・奥行に合わせる
+                            for p in b.get("floor_plans") or [] if p.get("area_m2") or (p.get("w") and p.get("d"))],
+            "floor_levels": fl, "roof": {"pitch_sun": b.get("roof_pitch_sun"), "kind": b.get("roof_material") or "unknown",
+                                         "overhang": b.get("roof_overhang_m") or 0.45, "ridge_h": b.get("ridge_h")},
+            "foundation_type": b.get("foundation_type") or "unknown",
         }
         spec["leftover"] = {"layout": b.get("unit_layout") or "house_4LDK", "occupied_units": b.get("occupied_units") or 0,
                             "extra_m3": b.get("outdoor_leftover_m3") or 0, "aircon_units": b.get("aircon_units") or 0}

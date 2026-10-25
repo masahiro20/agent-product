@@ -5,6 +5,7 @@ low / mid / high を使い、見積は 3 本立て（安め・標準・高め）
 """
 import math
 
+from . import quantities
 from .common import load_data, tsubo
 
 
@@ -19,8 +20,8 @@ def _poly_perimeter(pts):
     return sum(math.hypot(x1 - x0, y1 - y0) for (x0, y0), (x1, y1) in zip(pts, pts[1:] + pts[:1]))
 
 
-def building_quantities(b):
-    """建物の数量（建築面積・延床・足場面積・廃材量・戸数）。"""
+def building_quantities(b, rates=None):
+    """建物の数量（建築面積・延床・足場面積・戸数）と詳細数量（外壁・屋根・基礎・廃材）。"""
     q = {}
     fp = b.get("footprint", {})
     if fp.get("polygon"):
@@ -31,8 +32,11 @@ def building_quantities(b):
         area = w * d
         perim = 2 * (w + d)
     floors = b.get("floors", 1)
+    det = quantities.detail(b, rates)
     if b.get("floor_areas_m2"):
         nobe = sum(b["floor_areas_m2"])
+    elif b.get("floor_plans"):
+        nobe = det["floor_area_m2"]
     else:
         nobe = area * floors
     annex_area = 0.0
@@ -52,6 +56,8 @@ def building_quantities(b):
     # 足場架面積: 建物外周から 1m 離れた外周 × (軒高 + 1m)
     q["scaffold_m2"] = (perim + 8.0) * (eave + 1.0)
     q["eave_h"] = eave
+    q["detail"] = det
+    q["checks"] = quantities.checks(b, det)
     units = b.get("units") or {}
     if units:
         q["units_count"] = units.get("count")
@@ -127,7 +133,7 @@ def estimate(spec):
     if not prices:
         raise RuntimeError("data/demolition_unit_prices.json がありません")
     b = spec["building"]
-    q = building_quantities(b)
+    q = building_quantities(b, prices.get("quantity_rates"))
     lines = []
 
     # 1. 建物本体
@@ -258,11 +264,11 @@ def estimate(spec):
         if len(parts) > 8:
             parts = parts[:8] + [f"ほか{len(parts) - 8}部位"]
         if parts:
-            wall_area = q["perimeter_m"] * q["eave_h"]
+            wall_area = q["detail"]["wall"]["net_m2"]
             if asb.get("level3"):
                 asb_extra.append(_line("アスベスト（含有時のみ）", "レベル3建材（外壁仕上塗材・スレート等）除去 ※含有判明時",
                                        round(wall_area, 1), "㎡", asb["level3"],
-                                       basis=f"外壁面積 推定 外周{q['perimeter_m']:.1f}m×軒高{q['eave_h']:.1f}m"))
+                                       basis=f"外壁面積（開口を除く）推定 {wall_area:.0f}㎡"))
             q["asbestos_suspect_parts"] = parts
 
     return {"quantities": q, "leftover": lo, "lines": lines, "subtotal": sub, "overhead": over,

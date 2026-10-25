@@ -11,7 +11,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as rl_canvas
 from reportlab.platypus import Paragraph, Table, TableStyle
 
-from . import demolition, docpages, elevation, grading, grading_draw, rfq
+from . import demolition, docpages, elevation, grading, grading_draw, quantities, rfq
 from .common import FONT, MM, ensure_font, font_path, man_yen, yen
 from .drawing import MARGIN, SHEET_H, SHEET_W, frame, jp, new_sheet, text_at
 
@@ -512,6 +512,42 @@ def write_xlsx(path, spec, demo, gest, grad=None):
         if est is demo and demo["asbestos_extra"]:
             a = demo["asbestos_extra"][0]
             w.cell(d + 5, 1, f"別途（合計に含めない）：{a['name']} 約{round(a['mid']):,}円（{a['basis']}）").font = f_s
+
+    if demo and demo["quantities"].get("detail"):
+        q = demo["quantities"]
+        d = q["detail"]
+        w = wb.create_sheet("建物数量")
+        setup(w, [26, 30, 64])
+        r = head(w, "建物の数量（写真からの推定）", 3)
+        hdr_row(w, r, ["項目", "数量", "算出"])
+        r += 1
+        for k, v, note in quantities.summary_rows(q):
+            w.cell(r, 1, k).font = f_b
+            w.cell(r, 2, v).font = f_bb
+            c = w.cell(r, 3, note)
+            c.font, c.alignment = f_s, Alignment(wrap_text=True, vertical="top")
+            box(w, r, r, 1, 3)
+            r += 1
+        r += 1
+        hdr_row(w, r, ["廃材の品目", "発生量（t）", "算出"])
+        r += 1
+        sum_cells = []
+        for x in d.get("waste", []):
+            if not x["name"].startswith("うち"):  # 内訳の行は合計に入れない
+                sum_cells.append(f"B{r}")
+            w.cell(r, 1, x["name"]).font = f_b
+            c = w.cell(r, 2, x["t"])
+            c.font, c.number_format = f_b, "0.0"
+            w.cell(r, 3, x["basis"]).font = f_s
+            box(w, r, r, 1, 3)
+            r += 1
+        w.cell(r, 1, "合計").font = f_bb
+        c = w.cell(r, 2, f"=SUM({','.join(sum_cells)})" if sum_cells else 0)
+        c.font, c.number_format, c.fill = f_bb, "0.0", fill_tot
+        r += 2
+        for m in [c_["msg"] for c_ in q.get("checks", [])] + d.get("assumptions", []):
+            w.cell(r, 1, "・" + m).font = f_s
+            r += 1
 
     if demo and demo["leftover"]["furniture"]:
         w = wb.create_sheet("残置物")

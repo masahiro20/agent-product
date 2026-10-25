@@ -20,6 +20,8 @@ ROOF_TYPES = ["gable_side", "gable_end", "hip_side", "shed", "flat"]
 STRUCTURES = ["wood", "light_steel", "heavy_steel", "rc"]
 LAYOUTS = ["1R", "1K", "1DK", "2DK", "3LDK", "house_4LDK"]
 SIDES = ["N", "E", "S", "W", "unknown"]
+ROOF_MATERIALS = ["kawara_dobuki", "kawara", "slate", "metal", "shingle", "flat", "unknown"]
+FOUNDATIONS = ["nuno", "beta", "dokuritsu", "unknown"]
 
 # 建物本体・手続きなど、外構として選ばせない単価キー
 _NOT_EXTERIOR = {"interior_stripping", "scaffold_m2", "heavy_machine_transport", "guard_person_day", "road_use_permit",
@@ -47,10 +49,12 @@ TEMPLATE = """{
     "exists": true, "structure": "wood|light_steel|heavy_steel|rc", "use": "用途", "floors": 2, "built_year_est": 1980,
     "frontage_m": 14.5, "depth_m": 4.6, "eave_h": 5.8, "ridge_h": 6.7, "roof_overhang_m": 0.45, "roof_label": "切妻 4寸 カラー鉄板",
     "floor_levels": [0.45, 3.2],
+    "floor_plans": [{"floor": 1, "w": 14.5, "d": 4.6, "area_m2": 66.7, "basis": "1Fの外形。L字・下屋・外廊下の扱いを書く"}, {"floor": 2, "w": 14.5, "d": 4.6, "area_m2": 66.7, "basis": "総2階"}],
+    "roof_pitch_sun": 4, "roof_material": "kawara_dobuki|kawara|slate|metal|shingle|flat|unknown", "foundation_type": "nuno|beta|dokuritsu|unknown",
     "units_count": 8, "unit_layout": "1R|1K|1DK|2DK|3LDK|house_4LDK", "unit_area_m2": 16.6,
     "occupied_units": 0, "aircon_units": 4, "outdoor_leftover_m3": 1.0,
     "annexes": [{"name": "鉄骨外階段", "price_key": "steel_stair|carport|storage_shed|none", "qty": 1, "unit": "基", "basis": "写真2"}],
-    "measure_basis": [{"item": "桁行", "value": "約14.5m", "basis": "根拠"}],
+    "measure_basis": [{"item": "桁行", "value": "約14.5m", "basis": "根拠", "confidence": "高|中|低"}],
     "finishes": {"屋根": "カラー鉄板 瓦棒葺き", "外壁": "モルタル吹付", "軒天": "ケイカル板（推定）", "破風・鼻隠し": "鉄板巻き",
                  "雨樋": "塩ビ 半丸", "サッシ": "アルミ 単板ガラス", "基礎": "布基礎（推定）", "バルコニー・廊下": "RC床＋鉄骨手すり", "外階段": "鉄骨"},
     "faces": [{"name": "南立面図（道路側）", "width_m": 14.5, "roof_type": "gable_side|gable_end|hip_side|shed|flat",
@@ -121,8 +125,20 @@ def normalize(r):
                          "price_key": _pick(a.get("price_key"), ["steel_stair", "carport", "storage_shed", "none"], "none"),
                          "qty": _num(a.get("qty"), 1) or 1, "unit": str(a.get("unit") or "基"), "basis": str(a.get("basis") or "")}
                         for a in (b.get("annexes") or []) if isinstance(a, dict)]
-    out_b["measure_basis"] = [{"item": str(m.get("item", "")), "value": str(m.get("value", "")), "basis": str(m.get("basis", ""))}
+    out_b["measure_basis"] = [{"item": str(m.get("item", "")), "value": str(m.get("value", "")), "basis": str(m.get("basis", "")),
+                               "confidence": _pick(m.get("confidence"), ["高", "中", "低"], "")}
                               for m in (b.get("measure_basis") or []) if isinstance(m, dict)]
+    pitch = _num(b.get("roof_pitch_sun"), 0)
+    out_b["roof_pitch_sun"] = round(min(12.0, pitch), 1) if pitch > 0 else None
+    out_b["roof_material"] = _pick(b.get("roof_material"), ROOF_MATERIALS, "unknown")
+    out_b["foundation_type"] = _pick(b.get("foundation_type"), FOUNDATIONS, "unknown")
+    plans = {}
+    for p in b.get("floor_plans") or []:
+        fno = _int(p.get("floor"), 0) if isinstance(p, dict) else 0
+        if 1 <= fno <= out_b["floors"] and fno not in plans:
+            plans[fno] = {"floor": fno, "w": _num(p.get("w"), 0) or None, "d": _num(p.get("d"), 0) or None,
+                          "area_m2": _num(p.get("area_m2"), 0) or None, "basis": str(p.get("basis") or "")}
+    out_b["floor_plans"] = [plans[k] for k in sorted(plans)]
     faces = []
     for f in b.get("faces") or []:
         if not isinstance(f, dict):
@@ -146,6 +162,8 @@ def normalize(r):
         f0 = faces[0]["width_m"]
         if abs(f0 - out_b["depth_m"]) < abs(f0 - out_b["frontage_m"]):
             out_b["frontage_m"], out_b["depth_m"] = out_b["depth_m"], out_b["frontage_m"]
+            for p in out_b["floor_plans"]:
+                p["w"], p["d"] = p["d"], p["w"]
     cat = exterior_catalog()
     ext = []
     for e in r.get("exterior") or []:
@@ -234,6 +252,14 @@ SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築�
 - elements の使い方: window/door（x,z＝左下、w,h）、railing（手すり。z＝床、h＝高さ）、slab（廊下・バルコニー床、h≈0.15〜0.2）、post（柱。x＝中心、h）、pipe（たて樋。x、z＝下端、h＝長さ）、stair（側面から見た外階段。x,z＝下端、w,h＝上端までのx・z差。下りが右なら w は負）、stair_front（正面から見た外階段。x,w、z＝下端、h＝昇る高さ）、box（室外機・メーター等）、block_wall（x,w、courses＝段数、z＝基礎天端。h は0）、fence（x,w,h、z＝下端）、tree（x＝幹、h＝樹高、w＝枝張り）、canopy（庇。x,z,w、h≈0.1）。
 - courses と grille は該当しない要素では 0／false。label は空文字なら表示しない。窓は数が多いので、ラベルは各面の代表1か所だけ（例「掃出し窓 W1690×H1800」）。
 - 屋根: 平側の面は gable_side、妻側の面は gable_end（切妻の場合）。building.ridge_h は最高高さ、eave_h は軒高。floor_levels は各階の床高 [1FL, 2FL, ...]（GL基準）。
+
+# 数量の精度（解体業者が積算に使う。特に丁寧に）
+- 延床面積は「外形×階数」で済ませない。floor_plans に階ごとの外形（w＝x方向、d＝y方向、area_m2）を出す。部分2階・下屋・L字・オーバーハング・吹抜けは、立面写真の屋根の段差・窓の並び・航空写真の屋根形状から読み、basis に書く。外廊下・バルコニーは床面積に含めない（外廊下が屋内扱いのアパートは含めて basis に明記）。
+- 1Fの外形（building.frontage_m × depth_m）は、航空写真の屋根の大きさ（軒の出を差し引く）と、立面写真の基準物からの寸法の両方で確かめ、食い違えば measure_basis に両方の値を書く。
+- 寸法は尺モジュール（0.91m）・メーターモジュール（1.0m）のどちらかに乗ることが多い。柱間・窓の割付から判断して丸める。
+- roof_pitch_sun は屋根の勾配（寸。4寸＝4/10）。妻側の写真の屋根の傾きから読む。roof_material は屋根材（土葺きの瓦は古い和瓦で棟が高いもの、slate＝化粧スレート、metal＝鋼板・瓦棒）。
+- foundation_type は写真に写る基礎の立上りと築年から（1981年以前は布基礎が多い。分からなければ unknown）。
+- measure_basis の confidence は、基準物で直接測れた＝高、他の寸法からの比例や一般的な割付＝中、写らない部分の補完＝低。延床・間口・奥行・軒高・戸数は必ず入れる。
 
 # 外部仕上げ・設備（細かく）
 - building.finishes に、屋根・外壁・軒天・破風・雨樋・サッシ・基礎・バルコニー/廊下・外階段の材料を、写真から分かる範囲で書く（推定は「（推定）」を付ける）。解体の分別とアスベストの判断に使う。

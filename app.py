@@ -6,6 +6,7 @@ API:
   GET  /api/catalog   入力画面の選択肢（外構の単価キー・施工条件・地域）
   POST /api/land      住所 → 公開データ（航空写真・標高・用途地域・地価・ハザード）
   POST /api/analyze   写真 → AI の読み取り結果
+  POST /api/quantities 読み取り結果 → 建物の数量と食い違いチェック（確認画面用）
   POST /api/build     読み取り結果 → 概算サマリー / PDF / Excel / DXF
 """
 import hmac
@@ -19,7 +20,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 
 from webapp import convert, land, reading
-from webapp.engine import load_data, report
+from webapp.engine import demolition, load_data, report
 
 app = FastAPI(title="現地写真レポート")
 ACCESS_PASSWORD = os.environ.get("ACCESS_PASSWORD", "")
@@ -103,6 +104,23 @@ async def api_analyze(request: Request):
         return _err(RuntimeError("AI に接続できませんでした。少し待ってからもう一度お試しください。"), 502)
     except Exception as e:
         return _err(e)
+
+
+@app.post("/api/quantities")
+async def api_quantities(request: Request):
+    """確認画面の編集中に、建物の数量（延床・外壁・屋根・基礎・廃材）と食い違いチェックだけを返す。"""
+    body = await request.json()
+    job = tempfile.mkdtemp(prefix="q_", dir="/tmp")
+    try:
+        spec = convert.to_spec(body["reading"], None, None, {"include_grading": False}, job)
+        if not spec.get("building"):
+            return {"detail": None, "checks": []}
+        q = demolition.building_quantities(spec["building"], load_data("demolition_unit_prices.json").get("quantity_rates"))
+        return {"floor_area_m2": q["floor_area_m2"], "detail": q["detail"], "checks": q["checks"]}
+    except Exception as e:
+        return _err(e, 400)
+    finally:
+        shutil.rmtree(job, ignore_errors=True)
 
 
 @app.post("/api/build")

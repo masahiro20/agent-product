@@ -6,6 +6,9 @@
   const MAX_PHOTOS = 12;
   const MAX_SIDE = 1568; // Claude の画像入力に最適な長辺
   const STRUCT_LABELS = { wood: "木造", light_steel: "軽量鉄骨造", heavy_steel: "重量鉄骨造", rc: "RC造" };
+  const ROOF_LABELS = { unknown: "不明", kawara_dobuki: "瓦（土葺き・古い和瓦）", kawara: "瓦（桟瓦）", slate: "化粧スレート",
+    metal: "金属板（鋼板・瓦棒）", shingle: "アスファルトシングル", flat: "陸屋根（防水）" };
+  const FOUND_LABELS = { unknown: "不明", nuno: "布基礎", beta: "ベタ基礎", dokuritsu: "独立基礎" };
   const SIDE_LABELS = { S: "南", N: "北", E: "東", W: "西", unknown: "不明" };
 
   const state = { photos: [], land: null, reading: null, summary: null, pdfUrl: null, catalog: null, current: 0 };
@@ -296,7 +299,9 @@
   const B_FIELDS = [
     ["structure", "構造", "select", "", STRUCT_LABELS], ["use", "用途", "text"], ["floors", "階数", "int", "階"],
     ["built_year_est", "推定築年", "int", "年頃"], ["frontage_m", "建物の幅（道路側）", "num", "m"], ["depth_m", "建物の奥行", "num", "m"],
-    ["eave_h", "軒高", "num", "m"], ["ridge_h", "最高高さ", "num", "m"], ["units_count", "戸数", "int", "戸"],
+    ["eave_h", "軒高", "num", "m"], ["ridge_h", "最高高さ", "num", "m"], ["roof_pitch_sun", "屋根の勾配", "num", "寸"],
+    ["roof_material", "屋根材", "select", "", ROOF_LABELS], ["foundation_type", "基礎", "select", "", FOUND_LABELS],
+    ["units_count", "戸数", "int", "戸"],
     ["unit_layout", "間取り", "select", "", null], ["unit_area_m2", "1戸の面積", "num", "㎡"],
     ["occupied_units", "家財が残る戸数", "int", "戸"], ["aircon_units", "室外機", "int", "台"], ["outdoor_leftover_m3", "屋外の残置物", "num", "㎥"],
   ];
@@ -338,7 +343,7 @@
   function renderStats() {
     const b = state.reading.building || {};
     const s = state.reading.site || {};
-    const nobe = (b.frontage_m || 0) * (b.depth_m || 0) * (b.floors || 1);
+    const nobe = state.qty?.floor_area_m2 ?? (b.frontage_m || 0) * (b.depth_m || 0) * (b.floors || 1);
     const dz = (s.level_points || []).map((p) => p.dz_from_road_center_m);
     const rng = dz.length ? `${num(Math.min(0, ...dz), 1)}〜${num(Math.max(0, ...dz), 1)}` : "-";
     const items = b.exists === false ? [] : [
@@ -348,6 +353,66 @@
     $("#stats").innerHTML = items.map(([l, v, u]) =>
       `<div class="stat"><div class="stat__label">${esc(l)}</div><div class="stat__value">${esc(v ?? "-")}<small>${u}</small></div></div>`).join("");
     $("#nobe").textContent = b.exists === false ? "" : `延床 約${Math.round(nobe)}㎡（${(nobe / 3.30579).toFixed(1)}坪）`;
+  }
+
+  // 階ごとの床面積（空欄＝外形どおり）
+  function renderFloors() {
+    const b = state.reading.building || {};
+    const n = Math.max(1, Math.min(5, b.floors || 1));
+    const outline = Math.round((b.frontage_m || 0) * (b.depth_m || 0) * 10) / 10;
+    const plans = Object.fromEntries((b.floor_plans || []).map((p) => [p.floor, p]));
+    $("#floorFields").innerHTML = Array.from({ length: n }, (_, i) => {
+      const p = plans[i + 1] || {};
+      const v = p.area_m2 ?? (p.w && p.d ? Math.round(p.w * p.d * 10) / 10 : "");
+      return `<label class="field"><span class="field__label">${i + 1}階の床面積<span class="unit">㎡</span></span>` +
+        `<input class="input input--num" type="number" step="0.1" inputmode="decimal" data-floor="${i + 1}" value="${esc(v)}" placeholder="${outline}（外形どおり）"></label>`;
+    }).join("");
+  }
+
+  let qtyTimer = null;
+  let qtySeq = 0;
+  function scheduleQty(delay = 500) {
+    clearTimeout(qtyTimer);
+    qtyTimer = setTimeout(async () => {
+      const b = state.reading?.building;
+      if (!b || b.exists === false) return;
+      const seq = ++qtySeq;
+      try {
+        const r = await api("/api/quantities", { reading: state.reading });
+        if (seq !== qtySeq) return;  // 古い結果は捨てる
+        state.qty = r;
+        renderQty();
+        renderStats();
+      } catch { /* 数量の表示は補助なので、失敗しても入力は続けられる */ }
+    }, delay);
+  }
+
+  function renderQty() {
+    const q = state.qty;
+    const d = q?.detail;
+    if (!d) {
+      $("#qtyRows").innerHTML = `<tr><td colspan="2" style="color:var(--sub)">計算中…</td></tr>`;
+      $("#qtyChecks").innerHTML = "";
+      return;
+    }
+    const f1 = (v) => num(v, 1);
+    const tsubo = (m2) => (m2 / 3.30579).toFixed(1);
+    const floors = d.floors.map((f) => `${f.floor}階 ${f1(f.area_m2)}㎡`).join("／");
+    const w = d.wall, rf = d.roof, fd = d.foundation, op = d.openings;
+    const waste = d.waste.filter((x) => !x.name.startsWith("うち")).map((x) => `${x.name.replace(/（.*?）/, "")} ${num(x.t, 1)}t`).join("、");
+    const rows = [
+      ["延床面積", `${f1(q.floor_area_m2)}㎡（${tsubo(q.floor_area_m2)}坪）`, floors],
+      ["外壁面積", `${f1(w.net_m2)}㎡（窓・ドアを除く）`, `外周×階高 ${f1(w.gross_m2 - w.gable_m2)}㎡ ＋ 妻壁 ${f1(w.gable_m2)}㎡ − 開口 ${f1(w.openings_m2)}㎡`],
+      ["窓・ドア", `窓 ${op.window_n}か所 ${f1(op.window_m2)}㎡、ドア ${op.door_n}か所`, "立面図に描いたものの合計"],
+      ["屋根面積", `${f1(rf.area_m2)}㎡`, `水平投影 ${f1(rf.projected_m2)}㎡ × 勾配${rf.pitch_sun ? ` ${num(rf.pitch_sun, 1)}寸` : ""}の伸び率 ${rf.slope_factor}${rf.lower_projected_m2 ? `（下屋 ${f1(rf.lower_projected_m2)}㎡ 含む）` : ""}`],
+      ["基礎", `長さ 約${f1(fd.outer_m + fd.inner_m)}m、コンクリート 約${f1(fd.concrete_m3)}㎥`, `${fd.type_label === "不明" ? "布基礎とみなす" : fd.type_label}：外周 ${f1(fd.outer_m)}m ＋ 内部 ${f1(fd.inner_m)}m（推定）`],
+      ["廃材の発生量", `約${num(d.waste_total_t, 1)}t`, waste],
+    ];
+    $("#qtyRows").innerHTML = rows.map(([k, v, sub]) =>
+      `<tr><td>${esc(k)}</td><td><span class="qty-main">${esc(v)}</span><span class="qty-sub">${esc(sub)}</span></td></tr>`).join("");
+    const items = [...(q.checks || []), ...(d.assumptions || []).map((m) => ({ level: "info", msg: m }))];
+    $("#qtyChecks").innerHTML = items.map((c) =>
+      `<li class="${c.level === "warn" ? "" : "is-info"}">${c.level === "warn" ? "要確認：" : ""}${esc(c.msg)}</li>`).join("");
   }
 
   function renderViewer() {
@@ -444,6 +509,7 @@
     state.current = 0;
     $("#cardBuilding").hidden = r.building.exists === false || !$("#optDemo").checked;
     $("#cardExterior").hidden = $("#cardBuilding").hidden;
+    $("#cardQty").hidden = $("#cardBuilding").hidden;
     $("#cardSite").hidden = !$("#optGrade").checked;
     $("#buildingFields").innerHTML = B_FIELDS.map((f) => fieldHtml(r.building, f, "b")).join("");
     $("#basisList").innerHTML = (r.building.measure_basis || []).map((m) =>
@@ -454,6 +520,10 @@
       `<label class="chip-check"><input type="checkbox" value="${k}" ${(r.conditions || []).includes(k) ? "checked" : ""}><span>${esc(v)}</span></label>`).join("");
     $("#summaryText").value = (r.summary || []).join("\n");
     $("#checksText").value = (r.next_checks || []).join("\n");
+    state.qty = null;
+    renderFloors();
+    renderQty();
+    scheduleQty(0);
     renderExterior();
     renderSite();
     renderLand();
@@ -462,7 +532,21 @@
   }
 
   function initStep2() {
-    bindFields($("#buildingFields"), () => state.reading.building, renderStats);
+    bindFields($("#buildingFields"), () => state.reading.building, () => { renderStats(); scheduleQty(); });
+    $("#buildingFields").addEventListener("input", (e) => { if (["floors", "frontage_m", "depth_m"].includes(e.target.dataset.k)) renderFloors(); });
+    $("#buildingFields").addEventListener("change", () => scheduleQty());
+    $("#floorFields").addEventListener("input", (e) => {
+      const el = e.target.closest("[data-floor]");
+      if (!el) return;
+      const b = state.reading.building;
+      const fno = Number(el.dataset.floor);
+      b.floor_plans = (b.floor_plans || []).filter((p) => p.floor !== fno);
+      const n = parseFloat(el.value);
+      // 面積を手で入れた階は、AI の外形（幅・奥行）を使わず面積から外周を出す
+      if (!isNaN(n) && n > 0) b.floor_plans.push({ floor: fno, w: null, d: null, area_m2: n, basis: "手入力" });
+      b.floor_plans.sort((x, y) => x.floor - y.floor);
+      scheduleQty();
+    });
     bindFields($("#siteFields"), () => state.reading.site, () => { renderPlan(); renderStats(); });
     $("#siteFields").addEventListener("change", (e) => { if (e.target.dataset.k === "road_side") renderPlan(); });
     $("#buildingFields").addEventListener("change", renderStats);

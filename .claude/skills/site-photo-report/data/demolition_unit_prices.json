@@ -302,6 +302,24 @@
       "title": "imitsu 解体工事の費用相場",
       "url": "https://imitsu.jp/cost/demolition_work/article",
       "accessed": "2026-10-22"
+    },
+    {
+      "id": "S51",
+      "title": "建設副産物リサイクル広報推進会議 木造建築物の分別解体の手引き（解体木材量≒0.085×延床面積）",
+      "url": "https://suishinkaigi.jp/publish/pdf/080228.pdf",
+      "accessed": "2026-10-25"
+    },
+    {
+      "id": "S52",
+      "title": "解体のウエノ 発生する廃棄物の量（木造解体の品目別発生原単位 6調査の比較）",
+      "url": "https://www.kaitai-ueno.com/haikibutsuryo.html",
+      "accessed": "2026-10-25"
+    },
+    {
+      "id": "S53",
+      "title": "平成12年建設省告示第1347号 建築物の基礎の構造方法（国交省）",
+      "url": "https://www.mlit.go.jp/notice/noticedata/pdf/201703/00006441.pdf",
+      "accessed": "2026-10-25"
     }
   ],
   "building": {
@@ -1694,5 +1712,52 @@
       "label": "その他の地方",
       "basis": "九州 1.8〜3.5万円/坪、東北 2.0〜3.5万円/坪 [S11]。全国の約0.9倍"
     }
+  },
+  "quantity_rates": {
+    "note": "建物の詳細数量（sitekit/quantities.py）に使う係数。すべて概算用の目安。",
+    "src": [
+      "S51",
+      "S52",
+      "S53",
+      "S27"
+    ],
+    "waste": {
+      "wood": {
+        "wood_t_m2": 0.085,
+        "gypsum_t_m2": 0.012,
+        "metal_t_m2": 0.009,
+        "mixed_t_m2": 0.07,
+        "note": "木くず0.085はS51（100〜120㎡で約10t）。石膏ボード・金属・混合はS52の6調査（金属5.8〜14.9、混合48〜348 kg/㎡）の中央付近。混合は分別の程度で大きく振れる。基礎のコンクリートは形状から別計算"
+      },
+      "light_steel": {
+        "total_t_m2": 0.7,
+        "note": "waste_generation と同じ（出典弱）"
+      },
+      "heavy_steel": {
+        "total_t_m2": 1.0,
+        "note": "waste_generation と同じ（東京都S造0.80、兵庫県鉄骨1.27）"
+      },
+      "rc": {
+        "total_t_m2": 1.1,
+        "note": "waste_generation と同じ（国交省H30 非木造コンガラ1.04 t/㎡ ほか）"
+      }
+    },
+    "foundation": {
+      "inner_ratio": 0.8,
+      "nuno_m3_per_m": 0.18,
+      "beta_slab_t": 0.15,
+      "beta_wall_m3_per_m": 0.09,
+      "concrete_t_per_m3": 2.3,
+      "note": "布基礎は立上り15cm×高さ約75cm（地上40＋根入れ35）＋底盤45cm×15cm ≒ 0.18㎥/m。建告1347号（S53）の最小は布基礎で根入れ24cm・底盤厚15cm・地上30cm。ベタ基礎は底盤15cm＋立上り0.09㎥/m。内部の基礎長さ＝外周×0.8は出典弱（木造住宅の一般的な割合）"
+    },
+    "roof_weight_t_m2": {
+      "kawara_dobuki": 0.09,
+      "kawara": 0.045,
+      "slate": 0.02,
+      "metal": 0.005,
+      "shingle": 0.012,
+      "note": "屋根材のみ（下地を除く）の目安。出典弱（メーカー公表値の一般的な範囲）"
+    },
+    "glass_t_m2": 0.0125
   }
 }

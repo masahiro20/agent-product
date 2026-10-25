@@ -52,6 +52,7 @@ python .claude/skills/site-photo-report/scripts/run.py fetch jobs/.../site.json
 ### 4. site.json を埋める
 スキーマは `examples/site.template.json`（コメント付き）。要点:
 - `building`: 構造・階数・外形・軒高・戸数・付属物、`elevations`（4面。要素の種類は `scripts/sitekit/elevation.py` の冒頭）
+  - 数量の精度のために `floor_plans`（階ごとの外形 w・d か area_m2。部分2階・下屋はここで表す）、`roof`（`pitch_sun` 寸勾配、`kind` 屋根材: kawara_dobuki/kawara/slate/metal/shingle/flat）、`foundation_type`（nuno/beta/dokuritsu）を入れる。外壁・屋根・基礎・廃材の数量と食い違いチェックは `scripts/sitekit/quantities.py`（係数は単価JSONの `quantity_rates`）
 - `exterior`: 外構の数量（`key` は単価JSONの items キー）。`geom` を入れると現況平面図に描かれる
 - `leftover`: 間取り・残置がある戸数・屋外残置物㎥・室外機台数
 - `site`: 敷地境界（ローカル座標 m、x=東 y=北）、前面道路（edge・幅員）、`existing.points`（写真・実測の高さ）、
