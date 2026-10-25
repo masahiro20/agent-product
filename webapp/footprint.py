@@ -75,6 +75,7 @@ def draw_on_aerial(aerial_b64, lat, outs, zoom=19):
         font = ImageFont.load_default(size=22)
     except TypeError:
         font = ImageFont.load_default()
+    d.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], outline=(0, 160, 255), width=3)  # 番号より先に描き、番号を隠さない
     for o in outs:
         pts = [(cx + x / mpp, cy - y / mpp) for x, y in o["poly_m"]]
         d.line(pts + [pts[0]], fill=(255, 215, 0), width=3)
@@ -82,7 +83,6 @@ def draw_on_aerial(aerial_b64, lat, outs, zoom=19):
         my = sum(p[1] for p in pts) / len(pts)
         d.rectangle([mx - 14, my - 14, mx + 14, my + 14], fill=(210, 40, 40))
         d.text((mx, my), str(o["no"]), fill=(255, 255, 255), font=font, anchor="mm")
-    d.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], outline=(0, 160, 255), width=3)
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=88)
     return base64.b64encode(buf.getvalue()).decode()
