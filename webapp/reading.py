@@ -257,9 +257,18 @@ SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築�
 - 延床面積は「外形×階数」で済ませない。floor_plans に階ごとの外形（w＝x方向、d＝y方向、area_m2）を出す。部分2階・下屋・L字・オーバーハング・吹抜けは、立面写真の屋根の段差・窓の並び・航空写真の屋根形状から読み、basis に書く。外廊下・バルコニーは床面積に含めない（外廊下が屋内扱いのアパートは含めて basis に明記）。
 - 1Fの外形（building.frontage_m × depth_m）は、航空写真の屋根の大きさ（軒の出を差し引く）と、立面写真の基準物からの寸法の両方で確かめ、食い違えば measure_basis に両方の値を書く。
 - 寸法は尺モジュール（0.91m）・メーターモジュール（1.0m）のどちらかに乗ることが多い。柱間・窓の割付から判断して丸める。
+- 写っていない奥行（側面・裏面）は、「4間」「10m」のような決め打ちで埋めない（誤差の最大の原因）。次の手がかりを全部当てて、いちばん整合する値にする:
+  (1) 妻面（三角の破風が見える面）が写っていれば、その幅がそのまま奥行（平側が道路なら）または間口になる。
+  (2) 屋根の幾何: 切妻・寄棟は 棟までの立上り ≒ (妻側の幅÷2)×(勾配÷10)。平側の写真で軒高と棟高が読めて勾配が分かれば、妻側の幅 ≒ 2×(棟高−軒高)÷(勾配÷10)。
+  (3) 斜めから写った側面の窓・戸・換気口・たて樋の数と間隔（部屋1つ＝おおむね2〜3間の外壁、窓1〜2か所）。
+  (4) 側面が見えない場合でも、窓の数・掃出し窓の数・2階の窓の数から部屋数（間取り）を見立て、間取りから延床の目安と照合する（目安: 3DK〜3LDK 70〜95㎡、4LDK 95〜120㎡、5LDK以上 120〜150㎡、古い平屋の和風住宅で座敷・続き間があれば 120〜170㎡）。
+  使った手がかりと、外形から出した延床と間取りの目安が食い違うときの判断を measure_basis の「延床面積」の basis に書く。
+- 部分2階の2Fは、2Fの外壁が写っている面の幅と、1F屋根（下屋）の出から読む。2Fの奥行が見えないときは 1F の奥行から下屋の出（片側 0.9〜1.8m）を差し引く。一般に2Fは1Fの 45〜80%。
 - roof_pitch_sun は屋根の勾配（寸。4寸＝4/10）。妻側の写真の屋根の傾きから読む。roof_material は屋根材（土葺きの瓦は古い和瓦で棟が高いもの、slate＝化粧スレート、metal＝鋼板・瓦棒）。
 - foundation_type は写真に写る基礎の立上りと築年から（1981年以前は布基礎が多い。分からなければ unknown）。
 - measure_basis の confidence は、基準物で直接測れた＝高、他の寸法からの比例や一般的な割付＝中、写らない部分の補完＝低。延床・間口・奥行・軒高・戸数は必ず入れる。
+
+- 敷地（site.frontage_m×depth_m）は広く取りすぎない（実測より大きく読む傾向がある）。写真に写る塀・境界ブロック・隣家の外壁から読み、写らない側は建物の外壁から境界まで 0.6〜1.0m 程度とする。庭・駐車場は写っている広さだけ足す。郊外の分譲地は 150〜250㎡ が多い。
 
 # 外部仕上げ・設備（細かく）
 - building.finishes に、屋根・外壁・軒天・破風・雨樋・サッシ・基礎・バルコニー/廊下・外階段の材料を、写真から分かる範囲で書く（推定は「（推定）」を付ける）。解体の分別とアスベストの判断に使う。
@@ -282,7 +291,7 @@ SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築�
 - すべて日本語。数値は推定であり断定しない書き方にする。"""
 
 
-def read_site(photos_b64, address, notes, land_info, aerial_b64=None):
+def read_site(photos_b64, address, notes, land_info, aerial_b64=None, effort=None):
     """photos_b64: [{"name":..., "data": base64 JPEG}]. 戻り値: (reading dict, usage dict)"""
     content = []
     for i, p in enumerate(photos_b64, 1):
@@ -303,7 +312,8 @@ def read_site(photos_b64, address, notes, land_info, aerial_b64=None):
     content.append({"type": "text", "text": "\n".join(lines)})
 
     client = anthropic.Anthropic()
-    msg = _call(client, [{"role": "user", "content": content}])
+    effort = effort if effort in ("low", "medium", "high") else EFFORT
+    msg = _call(client, [{"role": "user", "content": content}], effort)
     text = "".join(b.text for b in msg.content if b.type == "text")
     usage = {"input_tokens": msg.usage.input_tokens, "output_tokens": msg.usage.output_tokens, "model": msg.model}
     try:
@@ -311,18 +321,18 @@ def read_site(photos_b64, address, notes, land_info, aerial_b64=None):
     except (ValueError, json.JSONDecodeError):
         # JSON が崩れていたら1回だけ直させる
         fix = _call(client, [{"role": "user", "content": content}, {"role": "assistant", "content": text},
-                             {"role": "user", "content": "出力が JSON として読めませんでした。同じ内容を、正しい JSON だけで出し直してください。"}])
+                             {"role": "user", "content": "出力が JSON として読めませんでした。同じ内容を、正しい JSON だけで出し直してください。"}], effort)
         data = _extract_json("".join(b.text for b in fix.content if b.type == "text"))
     return normalize(data), usage
 
 
-def _call(client, messages):
+def _call(client, messages, effort=EFFORT):
     with client.beta.messages.stream(
         model=MODEL,
         max_tokens=64000,
         system=SYSTEM,
         messages=messages,
-        output_config={"effort": EFFORT},
+        output_config={"effort": effort},
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
     ) as stream:

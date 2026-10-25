@@ -88,7 +88,7 @@ async def api_analyze(request: Request):
                                       "ANTHROPIC_API_KEY を設定してください。"}, status_code=503)
     try:
         r, usage = reading.read_site(photos, body.get("address"), body.get("notes"), body.get("land_info"),
-                                     body.get("aerial_b64"))
+                                     body.get("aerial_b64"), effort=body.get("effort"))  # effort は精度検証用（既定は SITE_EFFORT）
         return {"reading": r, "usage": usage}
     except anthropic.AuthenticationError as e:
         return _err(RuntimeError("Claude API キーが無効です。設定されているキーを確認してください。"), 503)
