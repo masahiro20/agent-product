@@ -7,6 +7,7 @@ import os
 
 import anthropic
 
+from . import footprint
 from .engine import load_data
 
 MODEL = os.environ.get("SITE_MODEL", "claude-opus-5-5")
@@ -46,7 +47,7 @@ def condition_catalog():
 TEMPLATE = """{
   "project_name": "物件名の案",
   "building": {
-    "exists": true, "structure": "wood|light_steel|heavy_steel|rc", "use": "用途", "floors": 2, "built_year_est": 1980,
+    "exists": true, "map_outline_no": 0, "structure": "wood|light_steel|heavy_steel|rc", "use": "用途", "floors": 2, "built_year_est": 1980,
     "frontage_m": 14.5, "depth_m": 4.6, "eave_h": 5.8, "ridge_h": 6.7, "roof_overhang_m": 0.45, "roof_label": "切妻 4寸 カラー鉄板",
     "floor_levels": [0.45, 3.2],
     "floor_plans": [{"floor": 1, "w": 14.5, "d": 4.6, "area_m2": 66.7, "basis": "1Fの外形。L字・下屋・外廊下の扱いを書く"}, {"floor": 2, "w": 14.5, "d": 4.6, "area_m2": 66.7, "basis": "総2階"}],
@@ -102,6 +103,7 @@ def normalize(r):
     b = r.get("building") or {}
     out_b = {
         "exists": bool(b.get("exists", True)),
+        "map_outline_no": max(0, _int(b.get("map_outline_no"), 0)),
         "structure": _pick(b.get("structure"), STRUCTURES, "wood"),
         "use": str(b.get("use") or ""),
         "floors": max(1, _int(b.get("floors"), 2)),
@@ -256,6 +258,7 @@ SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築�
 # 数量の精度（解体業者が積算に使う。特に丁寧に）
 - 延床面積は「外形×階数」で済ませない。floor_plans に階ごとの外形（w＝x方向、d＝y方向、area_m2）を出す。部分2階・下屋・L字・オーバーハング・吹抜けは、立面写真の屋根の段差・窓の並び・航空写真の屋根形状から読み、basis に書く。外廊下・バルコニーは床面積に含めない（外廊下が屋内扱いのアパートは含めて basis に明記）。
 - 1Fの外形（building.frontage_m × depth_m）は、航空写真の屋根の大きさ（軒の出を差し引く）と、立面写真の基準物からの寸法の両方で確かめ、食い違えば measure_basis に両方の値を書く。
+- 地図の建物外形（番号付き）が渡されたら、写真の建物（屋根の形・色、道路との位置、隣家との並び、カーポートや物置の位置）と見比べて、どの番号かを building.map_outline_no に入れる（どれでもない・判断できなければ 0）。番号が決まったら、1Fの外形はその外形の寸法と面積を基本にする（外壁線なので軒の出は含まない）。L字などで外接長方形より面積が小さいときは floor_plans の 1F の area_m2 に外形の面積を入れる。カーポート・物置・増築部が一体で描かれていると判断したら差し引き、basis に書く。写真の寸法と 15% 以上食い違う場合は、どちらを採ったかと理由を measure_basis に書く。
 - 寸法は尺モジュール（0.91m）・メーターモジュール（1.0m）のどちらかに乗ることが多い。柱間・窓の割付から判断して丸める。
 - 写っていない奥行（側面・裏面）は、「4間」「10m」のような決め打ちで埋めない（誤差の最大の原因）。次の手がかりを全部当てて、いちばん整合する値にする:
   (1) 妻面（三角の破風が見える面）が写っていれば、その幅がそのまま奥行（平側が道路なら）または間口になる。
@@ -291,18 +294,20 @@ SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築�
 - すべて日本語。数値は推定であり断定しない書き方にする。"""
 
 
-def read_site(photos_b64, address, notes, land_info, aerial_b64=None, effort=None):
+def read_site(photos_b64, address, notes, land_info, aerial_b64=None, effort=None, outlines=None):
     """photos_b64: [{"name":..., "data": base64 JPEG}]. 戻り値: (reading dict, usage dict)"""
     content = []
     for i, p in enumerate(photos_b64, 1):
         content.append({"type": "text", "text": f"写真{i}（{p.get('name', '')}）"})
         content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": p["data"]}})
     if aerial_b64:
-        content.append({"type": "text", "text": "航空写真（国土地理院、北が上、中心＝住所の代表点。敷地とずれていることがある。約0.5m/画素）"})
+        content.append({"type": "text", "text": "航空写真（国土地理院、北が上、中心＝住所の代表点。敷地とずれていることがある。約0.24m/画素、768画素≒187m四方）"
+                                                 + ("。地図の建物外形があるときは中央の約95m四方に拡大し、黄線と赤い番号で外形を描いている（約0.12m/画素）" if outlines else "")})
         content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": aerial_b64}})
     cat = exterior_catalog()
     lines = [f"住所: {address or '（未入力）'}",
              f"担当者メモ: {notes or '（なし）'}",
+             footprint.describe(outlines or []) if aerial_b64 else "地図の建物外形: なし",
              "公開データからの土地情報: " + ("; ".join(f"{x['item']}={x['value']}" for x in (land_info or [])[:12]) or "（なし）"),
              "外構・付帯の単価キー: " + "、".join(f"{k}（{v['name']}／{v['unit']}）" for k, v in cat.items()),
              "施工条件のキー: " + "、".join(f"{k}（{v}）" for k, v in condition_catalog().items()),

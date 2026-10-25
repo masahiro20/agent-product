@@ -280,10 +280,12 @@
           address, notes: $("#notes").value.trim(),
           photos: await payloadPhotos(),
           land_info: state.land?.land_info || [], aerial_b64: state.land?.aerial_b64 || null,
+          outlines: (state.land?.outlines || []).map(({ poly_m, ...o }) => o),
         });
       }
       progress.step(2);
       state.reading = r.reading;
+      state.aiOutlineNo = r.reading.building?.map_outline_no || 0;
       document.querySelector("#view2 .sec-title__ja").innerHTML = "AI の読み取りを確認" + (state.sample ? '<span class="demo-tag">サンプル</span>' : "");
       if (!$("#projectName").value.trim() && r.reading.project_name) $("#projectName").value = r.reading.project_name;
       renderStep2();
@@ -358,6 +360,38 @@
     $("#nobe").textContent = b.exists === false ? "" : `延床 約${Math.round(nobe)}㎡（${(nobe / 3.30579).toFixed(1)}坪）`;
   }
 
+  // 地図の建物外形（基盤地図情報）。AI が選んだ番号を表示し、選び直し・1階の外形への反映ができる
+  function renderOutline() {
+    const outs = state.land?.outlines || [];
+    const b = state.reading.building || {};
+    $("#outlineBox").hidden = !outs.length || b.exists === false;
+    if (!outs.length) return;
+    $("#outlineSel").innerHTML = `<option value="0">使わない・該当なし</option>` + outs.map((o) =>
+      `<option value="${o.no}" ${o.no === b.map_outline_no ? "selected" : ""}>No.${o.no}　約${Math.round(o.area_m2)}㎡（${num(o.long_m, 1)}×${num(o.short_m, 1)}m）${o.contains_point ? "・住所の位置" : ""}</option>`).join("");
+    const o = outs.find((x) => x.no === b.map_outline_no);
+    const fp = (b.frontage_m || 0) * (b.depth_m || 0);
+    $("#outlineNote").textContent = o
+      ? `${o.no === state.aiOutlineNo ? "AI が写真と見比べて選んだ外形です。" : ""}1階の外形 ${Math.round(fp)}㎡ ／ 地図 No.${o.no} ${Math.round(o.area_m2)}㎡` +
+        (Math.abs(fp - o.area_m2) / o.area_m2 > 0.15 ? "（15%以上違います。どちらが正しいか確認してください）" : "")
+      : "航空写真の番号と見比べて、該当する建物を選ぶと 1階の外形に使えます。";
+    $("#btnOutline").disabled = !o;
+  }
+  function applyOutline() {
+    const b = state.reading.building;
+    const o = (state.land?.outlines || []).find((x) => x.no === b.map_outline_no);
+    if (!o) return;
+    // 長辺・短辺のどちらを道路側にするかは、今の幅・奥行の長短に合わせる
+    const wide = (b.frontage_m || 0) >= (b.depth_m || 0);
+    b.frontage_m = wide ? o.long_m : o.short_m;
+    b.depth_m = wide ? o.short_m : o.long_m;
+    const rect = o.long_m * o.short_m;
+    b.floor_plans = (b.floor_plans || []).filter((p) => p.floor !== 1);
+    if (o.area_m2 < rect * 0.95) b.floor_plans.push({ floor: 1, w: null, d: null, area_m2: o.area_m2, basis: `地図の建物外形 No.${o.no}` });
+    b.floor_plans.sort((x, y) => x.floor - y.floor);
+    renderStep2Building();
+    toast(`地図の外形 No.${o.no}（約${Math.round(o.area_m2)}㎡）を 1階の外形にしました`);
+  }
+
   // 階ごとの床面積（空欄＝外形どおり）
   function renderFloors() {
     const b = state.reading.building || {};
@@ -381,7 +415,7 @@
       if (!b || b.exists === false) return;
       const seq = ++qtySeq;
       try {
-        const r = await api("/api/quantities", { reading: state.reading });
+        const r = await api("/api/quantities", { reading: state.reading, outlines: (state.land?.outlines || []).map(({ poly_m, ...o }) => o) });
         if (seq !== qtySeq) return;  // 古い結果は捨てる
         state.qty = r;
         renderQty();
@@ -536,6 +570,21 @@
     $("#cardLand").hidden = !l;
   }
 
+  function renderBuildingFields() {
+    const b = state.reading.building;
+    $("#buildingFields").innerHTML = B_GROUPS.map(([title, fs]) =>
+      `<div class="fgroup"><div class="fgroup__title">${esc(title)}</div><div class="fields">${fs.map((f) => fieldHtml(b, f, "b")).join("")}</div></div>`).join("");
+    renderOutline();
+  }
+  // 外形を反映したあと、建物まわりの表示をまとめて更新する
+  function renderStep2Building() {
+    renderBuildingFields();
+    renderFloors();
+    renderStats();
+    renderPlan();
+    scheduleQty(0);
+  }
+
   function renderStep2() {
     const r = state.reading;
     r.building = r.building || { exists: false };
@@ -548,8 +597,7 @@
     $("#cardSite").hidden = !$("#optGrade").checked;
     showTab("bldg");
     syncTabs();
-    $("#buildingFields").innerHTML = B_GROUPS.map(([title, fs]) =>
-      `<div class="fgroup"><div class="fgroup__title">${esc(title)}</div><div class="fields">${fs.map((f) => fieldHtml(r.building, f, "b")).join("")}</div></div>`).join("");
+    renderBuildingFields();
     $("#basisList").innerHTML = (r.building.measure_basis || []).map((m) =>
       `<li><span>${esc(m.item)}：${esc(m.value)}${m.confidence ? ` <span class="conf conf--${esc(m.confidence)}">確からしさ ${esc(m.confidence)}</span>` : ""}` +
       `<br><span class="marks__basis">${esc(m.basis)}</span></span></li>`).join("");
@@ -572,8 +620,16 @@
 
   function initStep2() {
     bindFields($("#buildingFields"), () => state.reading.building, () => { renderStats(); scheduleQty(); });
-    $("#buildingFields").addEventListener("input", (e) => { if (["floors", "frontage_m", "depth_m"].includes(e.target.dataset.k)) renderFloors(); });
+    $("#buildingFields").addEventListener("input", (e) => {
+      if (["floors", "frontage_m", "depth_m"].includes(e.target.dataset.k)) { renderFloors(); renderOutline(); }
+    });
     $("#buildingFields").addEventListener("change", () => scheduleQty());
+    $("#outlineSel").addEventListener("change", (e) => {
+      state.reading.building.map_outline_no = Number(e.target.value);
+      renderOutline();
+      scheduleQty();
+    });
+    $("#btnOutline").addEventListener("click", applyOutline);
     $("#floorFields").addEventListener("input", (e) => {
       const el = e.target.closest("[data-floor]");
       if (!el) return;

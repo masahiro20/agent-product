@@ -194,6 +194,12 @@ def checks(b, q):
             out.append({"level": "warn", "msg": f"戸数×専有面積（{need:.0f}㎡）と延床（{nobe:.0f}㎡）が合いません。戸数か外形寸法を確認してください"})
     if w and d and max(w, d) / min(w, d) > 4:
         out.append({"level": "info", "msg": f"建物の縦横比が {max(w, d) / min(w, d):.1f} と細長です。間口と奥行の読み違いがないか確認してください"})
+    mo = b.get("map_outline")
+    if mo and fl:
+        a1 = fl[0]["area_m2"]
+        if abs(a1 - mo["area_m2"]) / mo["area_m2"] > 0.15:
+            out.append({"level": "warn", "msg": f"1階の床面積 {a1:.0f}㎡ が地図の建物外形 No.{mo['no']}（約{mo['area_m2']:.0f}㎡）と "
+                                                f"{(a1 - mo['area_m2']) / mo['area_m2']:+.0%} 違います（下屋・カーポートの扱いを確認）"})
     if not faces:
         out.append({"level": "info", "msg": "立面の読み取りが無いため、窓・ドアの面積を差し引いていません"})
     elif len(faces) < 4:

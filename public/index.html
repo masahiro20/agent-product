@@ -118,6 +118,12 @@
         <div class="tabpanel is-active" data-panel="bldg">
           <div class="card" id="cardBuilding">
             <div class="card__head"><h2 class="card__title">建物</h2><span class="card__note" id="nobe"></span></div>
+            <div class="outline" id="outlineBox" hidden>
+              <div class="fgroup__title">地図の建物外形（国土地理院）</div>
+              <div class="outline__row"><select class="select" id="outlineSel"></select>
+                <button class="btn btn--ghost btn--small" id="btnOutline">1階の外形に使う</button></div>
+              <p class="outline__note" id="outlineNote"></p>
+            </div>
             <div id="buildingFields"></div>
             <details class="guide"><summary>寸法の根拠（AI のメモ）</summary><ul class="marks" id="basisList"></ul></details>
           </div>

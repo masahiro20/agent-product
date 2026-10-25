@@ -88,7 +88,8 @@ async def api_analyze(request: Request):
                                       "ANTHROPIC_API_KEY を設定してください。"}, status_code=503)
     try:
         r, usage = reading.read_site(photos, body.get("address"), body.get("notes"), body.get("land_info"),
-                                     body.get("aerial_b64"), effort=body.get("effort"))  # effort は精度検証用（既定は SITE_EFFORT）
+                                     body.get("aerial_b64"), effort=body.get("effort"),
+                                     outlines=body.get("outlines"))  # effort は精度検証用（既定は SITE_EFFORT）
         return {"reading": r, "usage": usage}
     except anthropic.AuthenticationError as e:
         return _err(RuntimeError("Claude API キーが無効です。設定されているキーを確認してください。"), 503)
@@ -112,7 +113,7 @@ async def api_quantities(request: Request):
     body = await request.json()
     job = tempfile.mkdtemp(prefix="q_", dir="/tmp")
     try:
-        spec = convert.to_spec(body["reading"], None, None, {"include_grading": False}, job)
+        spec = convert.to_spec(body["reading"], {"outlines": body.get("outlines") or []}, None, {"include_grading": False}, job)
         if not spec.get("building"):
             return {"detail": None, "checks": []}
         q = demolition.building_quantities(spec["building"], load_data("demolition_unit_prices.json").get("quantity_rates"))

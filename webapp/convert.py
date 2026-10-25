@@ -102,6 +102,8 @@ def to_spec(reading, land, photos, options, job_dir):
             "floor_levels": fl, "roof": {"pitch_sun": b.get("roof_pitch_sun"), "kind": b.get("roof_material") or "unknown",
                                          "overhang": b.get("roof_overhang_m") or 0.45, "ridge_h": b.get("ridge_h")},
             "foundation_type": b.get("foundation_type") or "unknown",
+            "map_outline": next(({k: o[k] for k in ("no", "area_m2", "long_m", "short_m")}
+                                 for o in land.get("outlines") or [] if o.get("no") == b.get("map_outline_no")), None),
         }
         spec["leftover"] = {"layout": b.get("unit_layout") or "house_4LDK", "occupied_units": b.get("occupied_units") or 0,
                             "extra_m3": b.get("outdoor_leftover_m3") or 0, "aircon_units": b.get("aircon_units") or 0}
