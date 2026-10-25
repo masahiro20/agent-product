@@ -106,60 +106,81 @@
         </div>
       </div>
 
-      <div>
-        <div class="card" id="cardBuilding">
-          <div class="card__head"><h2 class="card__title">建物</h2><span class="card__note" id="nobe"></span></div>
-          <div class="fields" id="buildingFields"></div>
-          <details class="guide"><summary>寸法の根拠（AI のメモ）</summary><ul class="marks" id="basisList"></ul></details>
+      <div class="editor">
+        <div class="tabs" id="tabs" role="tablist" aria-label="確認する項目">
+          <button class="tab is-active" role="tab" data-tab="bldg">建物</button>
+          <button class="tab" role="tab" data-tab="qty">数量<span class="tab__badge" id="qtyBadge" hidden></span></button>
+          <button class="tab" role="tab" data-tab="ext">外構</button>
+          <button class="tab" role="tab" data-tab="site">敷地・高低差</button>
+          <button class="tab" role="tab" data-tab="other">条件・メモ</button>
         </div>
 
-        <div class="card" id="cardQty">
-          <div class="card__head"><h2 class="card__title">建物の数量</h2><span class="card__note">数値を直すと計算し直します</span></div>
-          <div class="fields" id="floorFields"></div>
-          <table class="table qty-table"><tbody id="qtyRows"></tbody></table>
-          <ul class="qchecks" id="qtyChecks"></ul>
+        <div class="tabpanel is-active" data-panel="bldg">
+          <div class="card" id="cardBuilding">
+            <div class="card__head"><h2 class="card__title">建物</h2><span class="card__note" id="nobe"></span></div>
+            <div id="buildingFields"></div>
+            <details class="guide"><summary>寸法の根拠（AI のメモ）</summary><ul class="marks" id="basisList"></ul></details>
+          </div>
         </div>
 
-        <div class="card" id="cardExterior">
-          <div class="card__head"><h2 class="card__title">外構・付帯</h2><span class="card__note">解体で撤去するもの</span></div>
-          <table class="table"><thead><tr><th>項目</th><th class="num">数量</th><th>単位</th><th></th></tr></thead><tbody id="extRows"></tbody></table>
-          <div class="add-row"><select class="select" id="extAdd"></select><button class="btn btn--ghost btn--small" id="btnExtAdd">追加</button></div>
+        <div class="tabpanel" data-panel="qty">
+          <div class="card" id="cardQty">
+            <div class="card__head"><h2 class="card__title">建物の数量</h2><span class="card__note">数値を直すと計算し直します</span></div>
+            <ul class="qchecks" id="qtyChecks"></ul>
+            <div class="fields" id="floorFields"></div>
+            <table class="table qty-table"><tbody id="qtyRows"></tbody></table>
+            <ul class="qchecks qchecks--info" id="qtyNotes"></ul>
+          </div>
         </div>
 
-        <div class="card" id="cardSite">
-          <div class="card__head"><h2 class="card__title">敷地と高低差</h2><span class="card__note">道路側から見た図</span></div>
-          <svg class="plan-svg" id="planSvg" viewBox="0 0 400 300"></svg>
-          <div class="fields" id="siteFields" style="margin-top:14px"></div>
-          <table class="table table--stack"><thead><tr><th>高さを読んだ場所</th><th class="num">左から(m)</th><th class="num">道路から奥(m)</th><th class="num">道路中心との差(m)</th><th></th></tr></thead><tbody id="lvlRows"></tbody></table>
-          <div class="add-row"><button class="btn btn--ghost btn--small" id="btnLvlAdd">高さの点を追加</button></div>
-          <label class="field" style="margin-top:14px"><span class="field__label">計画地盤の高さの決め方</span>
-            <select class="select" id="fhMode">
-              <option value="optimize">道路より高く、費用が最小になる高さ（おすすめ）</option>
-              <option value="balance">切土と盛土の量を釣り合わせる（残土が最少）</option>
-              <option value="road_plus">道路より 0.3m 高く</option>
-            </select></label>
+        <div class="tabpanel" data-panel="ext">
+          <div class="card" id="cardExterior">
+            <div class="card__head"><h2 class="card__title">外構・付帯</h2><span class="card__note">解体で撤去するもの</span></div>
+            <table class="table"><thead><tr><th>項目</th><th class="num">数量</th><th>単位</th><th></th></tr></thead><tbody id="extRows"></tbody></table>
+            <div class="add-row"><select class="select" id="extAdd"></select><button class="btn btn--ghost btn--small" id="btnExtAdd">追加</button></div>
+          </div>
         </div>
 
-        <div class="card" id="cardCond">
-          <div class="card__head"><h2 class="card__title">施工条件</h2><span class="card__note">費用の割増に反映</span></div>
-          <div class="checks" id="condChecks"></div>
+        <div class="tabpanel" data-panel="site">
+          <div class="card" id="cardSite">
+            <div class="card__head"><h2 class="card__title">敷地と高低差</h2><span class="card__note">道路側から見た図</span></div>
+            <svg class="plan-svg" id="planSvg" viewBox="0 0 400 300"></svg>
+            <div class="fields" id="siteFields" style="margin-top:14px"></div>
+            <details class="guide" id="lvlBox"><summary>高さを読んだ点（<span id="lvlCount">0</span>）</summary>
+              <table class="table table--stack"><thead><tr><th>高さを読んだ場所</th><th class="num">左から(m)</th><th class="num">道路から奥(m)</th><th class="num">道路中心との差(m)</th><th></th></tr></thead><tbody id="lvlRows"></tbody></table>
+              <div class="add-row"><button class="btn btn--ghost btn--small" id="btnLvlAdd">高さの点を追加</button></div>
+            </details>
+            <label class="field" style="margin-top:14px"><span class="field__label">計画地盤の高さの決め方</span>
+              <select class="select" id="fhMode">
+                <option value="optimize">道路より高く、費用が最小になる高さ（おすすめ）</option>
+                <option value="balance">切土と盛土の量を釣り合わせる（残土が最少）</option>
+                <option value="road_plus">道路より 0.3m 高く</option>
+              </select></label>
+          </div>
         </div>
 
-        <div class="card" id="cardLand">
-          <div class="card__head"><h2 class="card__title">土地の情報</h2><span class="card__note">公開データ（代表点）</span></div>
-          <img class="aerial" id="aerial" alt="航空写真" hidden>
-          <table class="table" style="margin-top:12px"><tbody id="landRows"></tbody></table>
-        </div>
-
-        <div class="card">
-          <div class="card__head"><h2 class="card__title">要点と確認事項</h2><span class="card__note">1行に1項目</span></div>
-          <label class="field"><span class="field__label">表紙に載せる要点</span><textarea class="textarea" id="summaryText"></textarea></label>
-          <label class="field"><span class="field__label">次に確認すること</span><textarea class="textarea" id="checksText"></textarea></label>
+        <div class="tabpanel" data-panel="other">
+          <div class="card" id="cardCond">
+            <div class="card__head"><h2 class="card__title">施工条件</h2><span class="card__note">当てはまるものを選ぶと費用に反映</span></div>
+            <div class="checks" id="condChecks"></div>
+          </div>
+          <div class="card">
+            <div class="card__head"><h2 class="card__title">要点と確認事項</h2><span class="card__note">1行に1項目</span></div>
+            <label class="field"><span class="field__label">表紙に載せる要点</span><textarea class="textarea" id="summaryText"></textarea></label>
+            <label class="field"><span class="field__label">次に確認すること</span><textarea class="textarea" id="checksText"></textarea></label>
+          </div>
+          <div class="card" id="cardLand">
+            <div class="card__head"><h2 class="card__title">土地の情報</h2><span class="card__note">公開データ（代表点）</span></div>
+            <img class="aerial" id="aerial" alt="航空写真" hidden>
+            <table class="table" style="margin-top:12px"><tbody id="landRows"></tbody></table>
+            <details class="guide" id="landMoreBox" hidden><summary>ほかの項目（<span id="landMoreCount"></span>件）</summary>
+              <table class="table"><tbody id="landMore"></tbody></table></details>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="actions actions--center">
+    <div class="actions actions--center actions--sticky">
       <button class="link link--muted" id="btnBack1">写真を選び直す</button>
       <button class="btn" id="btnBuild">この内容で資料を作る <span class="btn__arrow">➤</span></button>
     </div>
@@ -183,30 +204,32 @@
     </div>
 
     <h2 class="sec-title"><span class="sec-title__en">DOWNLOAD</span><span class="sec-title__ja">資料のダウンロード</span></h2>
-    <div class="downloads">
-      <button class="dl" data-fmt="pdf"><span class="dl__type">PDF 一式</span><span class="dl__desc">表紙・土地概況・写真台帳・立面図・解体範囲図・概算見積・造成計画図・断面図</span><span class="dl__go">ダウンロード ➤</span></button>
-      <button class="dl" data-fmt="xlsx"><span class="dl__type">Excel 見積</span><span class="dl__desc">単価を自社単価に書き換えると金額が再計算されます</span><span class="dl__go">ダウンロード ➤</span></button>
-      <button class="dl" data-fmt="dxf"><span class="dl__type">DXF 図面</span><span class="dl__desc">立面図・造成計画平面（CADで開けます）</span><span class="dl__go">ダウンロード ➤</span></button>
+    <div class="dlgrid">
+      <div class="card">
+        <div class="card__head"><h2 class="card__title">社内・お客様向け</h2></div>
+        <button class="dlrow" data-fmt="pdf"><span class="dlrow__name">調査レポート</span><span class="dlrow__fmt">PDF</span><span class="dlrow__desc">概算見積・数量・立面図・造成計画図・写真台帳の一式</span></button>
+        <button class="dlrow" data-fmt="xlsx"><span class="dlrow__name">概算見積</span><span class="dlrow__fmt">Excel</span><span class="dlrow__desc">単価を書き換えると金額が再計算されます</span></button>
+        <button class="dlrow" data-fmt="dxf"><span class="dlrow__name">図面</span><span class="dlrow__fmt">DXF</span><span class="dlrow__desc">立面図・造成計画平面（CAD で開けます）</span></button>
+      </div>
+      <div class="card rfq">
+        <div class="card__head"><h2 class="card__title">業者さんへの見積依頼</h2><span class="card__note">金額欄は空欄で出します</span></div>
+        <div class="fields">
+          <label class="field"><span class="field__label">回答期限</span><input class="input" type="date" id="rfqDue"></label>
+          <label class="field rfq__contact"><span class="field__label">担当者・連絡先（依頼書に載ります）</span>
+            <input class="input" id="rfqContact" placeholder="例）工務部 山田 090-0000-0000"></label>
+        </div>
+        <div class="rfqrow" data-rfq-row="demolition"><span class="rfqrow__name">解体</span>
+          <button class="chipbtn" data-rfq="demolition" data-fmt="rfq_pdf">依頼書 PDF</button>
+          <button class="chipbtn" data-rfq="demolition" data-fmt="rfq_xlsx">数量表 Excel</button></div>
+        <div class="rfqrow" data-rfq-row="grading"><span class="rfqrow__name">造成</span>
+          <button class="chipbtn" data-rfq="grading" data-fmt="rfq_pdf">依頼書 PDF</button>
+          <button class="chipbtn" data-rfq="grading" data-fmt="rfq_xlsx">数量表 Excel</button></div>
+        <p class="rfq__note">依頼書は依頼文・物件概要・数量表・写真・図面のセット。数量表は業者さんが単価を入れると合計まで自動で出ます。</p>
+      </div>
     </div>
 
-    <h2 class="sec-title"><span class="sec-title__en">REQUEST</span><span class="sec-title__ja">業者への見積依頼</span></h2>
-    <p class="lead">金額を入れずに、数量・現場条件・写真・図面をまとめた依頼書を作ります。解体屋さん・造成屋さんに「この数量で見積もってください」と渡せます。Excel は業者さんが単価を入れると合計まで自動で出ます。</p>
-    <div class="card rfq">
-      <div class="fields">
-        <label class="field"><span class="field__label">回答期限</span><input class="input" type="date" id="rfqDue"></label>
-        <label class="field rfq__contact"><span class="field__label">依頼元の担当者・連絡先（依頼書に載ります）</span>
-          <input class="input" id="rfqContact" placeholder="例）工務部 山田 090-0000-0000"></label>
-      </div>
-      <div class="downloads">
-        <button class="dl" data-rfq="demolition" data-fmt="rfq_pdf"><span class="dl__type">解体 見積依頼書</span><span class="dl__desc">依頼文・物件概要・数量表（単価空欄）・写真・配置図・立面図</span><span class="dl__go">PDF をダウンロード ➤</span></button>
-        <button class="dl" data-rfq="demolition" data-fmt="rfq_xlsx"><span class="dl__type">解体 数量表</span><span class="dl__desc">業者さんの記入用（単価を入れると金額・合計が自動計算）</span><span class="dl__go">Excel をダウンロード ➤</span></button>
-        <button class="dl" data-rfq="grading" data-fmt="rfq_pdf"><span class="dl__type">造成 見積依頼書</span><span class="dl__desc">依頼文・物件概要・数量表（単価空欄）・写真・造成計画図・断面図</span><span class="dl__go">PDF をダウンロード ➤</span></button>
-        <button class="dl" data-rfq="grading" data-fmt="rfq_xlsx"><span class="dl__type">造成 数量表</span><span class="dl__desc">業者さんの記入用（土量・擁壁・排水の数量入り）</span><span class="dl__go">Excel をダウンロード ➤</span></button>
-      </div>
-    </div>
-
-    <h2 class="sec-title"><span class="sec-title__en">PREVIEW</span><span class="sec-title__ja">PDF のプレビュー</span></h2>
-    <iframe class="pdf-frame" id="pdfFrame" title="PDF プレビュー"></iframe>
+    <details class="guide preview"><summary>調査レポートをこの画面で確認する</summary>
+      <iframe class="pdf-frame" id="pdfFrame" title="PDF プレビュー"></iframe></details>
 
     <div class="actions actions--center">
       <button class="link link--muted" id="btnBack2">読み取り内容を直して作り直す</button>

@@ -296,14 +296,17 @@
   }
 
   // ---------------- STEP 2: 確認 ----------------
-  const B_FIELDS = [
-    ["structure", "構造", "select", "", STRUCT_LABELS], ["use", "用途", "text"], ["floors", "階数", "int", "階"],
-    ["built_year_est", "推定築年", "int", "年頃"], ["frontage_m", "建物の幅（道路側）", "num", "m"], ["depth_m", "建物の奥行", "num", "m"],
-    ["eave_h", "軒高", "num", "m"], ["ridge_h", "最高高さ", "num", "m"], ["roof_pitch_sun", "屋根の勾配", "num", "寸"],
-    ["roof_material", "屋根材", "select", "", ROOF_LABELS], ["foundation_type", "基礎", "select", "", FOUND_LABELS],
-    ["units_count", "戸数", "int", "戸"],
-    ["unit_layout", "間取り", "select", "", null], ["unit_area_m2", "1戸の面積", "num", "㎡"],
-    ["occupied_units", "家財が残る戸数", "int", "戸"], ["aircon_units", "室外機", "int", "台"], ["outdoor_leftover_m3", "屋外の残置物", "num", "㎥"],
+  // 建物の入力欄は、見る順にまとめて並べる
+  const B_GROUPS = [
+    ["基本", [["structure", "構造", "select", "", STRUCT_LABELS], ["floors", "階数", "int", "階"],
+      ["built_year_est", "推定築年", "int", "年頃"], ["use", "用途", "text"]]],
+    ["寸法", [["frontage_m", "幅（道路側）", "num", "m"], ["depth_m", "奥行", "num", "m"],
+      ["eave_h", "軒高", "num", "m"], ["ridge_h", "最高高さ", "num", "m"]]],
+    ["屋根・基礎", [["roof_material", "屋根材", "select", "", ROOF_LABELS], ["roof_pitch_sun", "勾配", "num", "寸"],
+      ["foundation_type", "基礎", "select", "", FOUND_LABELS]]],
+    ["戸数・残置物", [["units_count", "戸数", "int", "戸"], ["unit_layout", "間取り", "select", "", null],
+      ["unit_area_m2", "1戸の面積", "num", "㎡"], ["occupied_units", "家財が残る戸数", "int", "戸"],
+      ["aircon_units", "室外機", "int", "台"], ["outdoor_leftover_m3", "屋外の残置物", "num", "㎥"]]],
   ];
   const S_FIELDS = [
     ["frontage_m", "敷地の間口", "num", "m"], ["depth_m", "敷地の奥行", "num", "m"], ["road_side", "前面道路の方位", "select", "", SIDE_LABELS],
@@ -392,7 +395,8 @@
     const d = q?.detail;
     if (!d) {
       $("#qtyRows").innerHTML = `<tr><td colspan="2" style="color:var(--sub)">計算中…</td></tr>`;
-      $("#qtyChecks").innerHTML = "";
+      $("#qtyChecks").innerHTML = $("#qtyNotes").innerHTML = "";
+      $("#qtyBadge").hidden = true;
       return;
     }
     const f1 = (v) => num(v, 1);
@@ -410,9 +414,12 @@
     ];
     $("#qtyRows").innerHTML = rows.map(([k, v, sub]) =>
       `<tr><td>${esc(k)}</td><td><span class="qty-main">${esc(v)}</span><span class="qty-sub">${esc(sub)}</span></td></tr>`).join("");
-    const items = [...(q.checks || []), ...(d.assumptions || []).map((m) => ({ level: "info", msg: m }))];
-    $("#qtyChecks").innerHTML = items.map((c) =>
-      `<li class="${c.level === "warn" ? "" : "is-info"}">${c.level === "warn" ? "要確認：" : ""}${esc(c.msg)}</li>`).join("");
+    const warns = (q.checks || []).filter((c) => c.level === "warn");
+    const notes = [...(q.checks || []).filter((c) => c.level !== "warn").map((c) => c.msg), ...(d.assumptions || [])];
+    $("#qtyChecks").innerHTML = warns.map((c) => `<li>要確認：${esc(c.msg)}</li>`).join("");
+    $("#qtyNotes").innerHTML = notes.map((m) => `<li class="is-info">${esc(m)}</li>`).join("");
+    $("#qtyBadge").textContent = warns.length;
+    $("#qtyBadge").hidden = !warns.length;
   }
 
   function renderViewer() {
@@ -445,8 +452,29 @@
       `<tr><td colspan="4" style="color:var(--sub)">外構・付帯はありません</td></tr>`;
   }
 
+  // 確認画面のタブ（中身が全部隠れているタブは出さない）
+  function showTab(name) {
+    document.querySelectorAll("#tabs .tab").forEach((t) => {
+      const on = t.dataset.tab === name;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on);
+    });
+    document.querySelectorAll(".tabpanel").forEach((p) => p.classList.toggle("is-active", p.dataset.panel === name));
+  }
+  function syncTabs() {
+    let first = null;
+    document.querySelectorAll("#tabs .tab").forEach((t) => {
+      const cards = [...document.querySelectorAll(`.tabpanel[data-panel="${t.dataset.tab}"] > .card`)];
+      t.hidden = cards.length > 0 && cards.every((c) => c.hidden);
+      if (!t.hidden && !first) first = t.dataset.tab;
+    });
+    const cur = document.querySelector("#tabs .tab.is-active");
+    if (!cur || cur.hidden) showTab(first);
+  }
+
   function renderLevels() {
     const pts = state.reading.site.level_points || [];
+    $("#lvlCount").textContent = `${pts.length}点`;
     $("#lvlRows").innerHTML = pts.map((p, i) =>
       `<tr><td data-label="高さを読んだ場所"><input class="input" data-i="${i}" data-f="label" value="${esc(p.label)}"></td>` +
       [["x", "左から m"], ["y", "道路から奥 m"], ["dz_from_road_center_m", "道路中心との差 m"]].map(([f, lab]) =>
@@ -495,9 +523,16 @@
     const img = $("#aerial");
     if (l?.aerial_b64) { img.src = "data:image/jpeg;base64," + l.aerial_b64; img.hidden = false; } else img.hidden = true;
     const rows = l?.land_info || [];
-    $("#landRows").innerHTML = rows.length ? rows.map((r) =>
-      `<tr><td style="width:34%">${esc(r.item)}</td><td>${esc(r.value)}</td><td><span class="badge badge--${esc(r.confidence)}">${esc(r.confidence)}</span></td></tr>`).join("")
+    // 判断に効く項目（用途地域・防火・地価・ハザード）を先に、残りは折りたたむ
+    const KEY = /用途|防火|地価|ハザード|盛土|土砂|洪水|浸水/;
+    const main = rows.filter((r) => KEY.test(r.item)).slice(0, 6);
+    const more = rows.filter((r) => !main.includes(r));
+    const tr = (r) => `<tr><td style="width:34%">${esc(r.item)}</td><td>${esc(r.value)}</td><td><span class="badge badge--${esc(r.confidence)}">${esc(r.confidence)}</span></td></tr>`;
+    $("#landRows").innerHTML = rows.length ? (main.length ? main : more.splice(0, 6)).map(tr).join("")
       : `<tr><td style="color:var(--sub)">住所が無いため公開データは使っていません</td></tr>`;
+    $("#landMore").innerHTML = more.map(tr).join("");
+    $("#landMoreCount").textContent = more.length;
+    $("#landMoreBox").hidden = !more.length;
     $("#cardLand").hidden = !l;
   }
 
@@ -511,9 +546,13 @@
     $("#cardExterior").hidden = $("#cardBuilding").hidden;
     $("#cardQty").hidden = $("#cardBuilding").hidden;
     $("#cardSite").hidden = !$("#optGrade").checked;
-    $("#buildingFields").innerHTML = B_FIELDS.map((f) => fieldHtml(r.building, f, "b")).join("");
+    showTab("bldg");
+    syncTabs();
+    $("#buildingFields").innerHTML = B_GROUPS.map(([title, fs]) =>
+      `<div class="fgroup"><div class="fgroup__title">${esc(title)}</div><div class="fields">${fs.map((f) => fieldHtml(r.building, f, "b")).join("")}</div></div>`).join("");
     $("#basisList").innerHTML = (r.building.measure_basis || []).map((m) =>
-      `<li><span>${esc(m.item)}：${esc(m.value)}<br><span class="marks__basis">${esc(m.basis)}</span></span></li>`).join("");
+      `<li><span>${esc(m.item)}：${esc(m.value)}${m.confidence ? ` <span class="conf conf--${esc(m.confidence)}">確からしさ ${esc(m.confidence)}</span>` : ""}` +
+      `<br><span class="marks__basis">${esc(m.basis)}</span></span></li>`).join("");
     const cat = state.catalog;
     $("#extAdd").innerHTML = Object.entries(cat?.exterior || {}).map(([k, v]) => `<option value="${k}">${esc(v.name)}</option>`).join("");
     $("#condChecks").innerHTML = Object.entries(cat?.conditions || {}).map(([k, v]) =>
@@ -550,6 +589,13 @@
     bindFields($("#siteFields"), () => state.reading.site, () => { renderPlan(); renderStats(); });
     $("#siteFields").addEventListener("change", (e) => { if (e.target.dataset.k === "road_side") renderPlan(); });
     $("#buildingFields").addEventListener("change", renderStats);
+    $("#tabs").addEventListener("click", (e) => {
+      const t = e.target.closest(".tab");
+      if (!t) return;
+      showTab(t.dataset.tab);
+      const top = $("#tabs").getBoundingClientRect().top + window.scrollY - 70;
+      if (window.scrollY > top) window.scrollTo({ top, behavior: "smooth" });
+    });
     $("#viewerThumbs").addEventListener("click", (e) => {
       const b = e.target.closest("button");
       if (!b) return;
@@ -687,8 +733,8 @@
     if (s.asbestos_extra?.length) flags.push("築年からアスベスト含有の可能性。解体前の事前調査（有資格者）が義務です");
     $("#flags").innerHTML = flags.length ? flags.map((f) => `<li>${esc(f)}</li>`).join("") : "<li>特記事項なし</li>";
 
-    document.querySelectorAll('.dl[data-rfq="demolition"]').forEach((b) => (b.hidden = !s.demolition_total));
-    document.querySelectorAll('.dl[data-rfq="grading"]').forEach((b) => (b.hidden = !s.grading_total));
+    $('[data-rfq-row="demolition"]').hidden = !s.demolition_total;
+    $('[data-rfq-row="grading"]').hidden = !s.grading_total;
 
     const frame = $("#pdfFrame");
     frame.src = state.pdfUrl;
@@ -726,7 +772,7 @@
   }
 
   function initStep3() {
-    document.querySelectorAll(".dl").forEach((b) => b.addEventListener("click", () => download(b.dataset.fmt, b.dataset.rfq)));
+    document.querySelectorAll("#view3 [data-fmt]").forEach((b) => b.addEventListener("click", () => download(b.dataset.fmt, b.dataset.rfq)));
     const due = new Date(Date.now() + 7 * 864e5);
     $("#rfqDue").value = due.toISOString().slice(0, 10);
     try { $("#rfqContact").value = localStorage.getItem("hl_rfq_contact") || ""; } catch { /* なし */ }
@@ -742,6 +788,9 @@
 
   // ---------------- 起動 ----------------
   async function init() {
+    const setHdr = () => document.documentElement.style.setProperty("--hdr", `${document.querySelector(".header").offsetHeight}px`);
+    setHdr();
+    window.addEventListener("resize", setHdr);
     initStep1(); initStep2(); initStep3();
     try {
       const h = await (await fetch("/api/health")).json();
