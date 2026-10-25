@@ -50,7 +50,8 @@ def _overview(spec, kind, demo, grad):
             ("外形寸法（推定）", f"約{b.get('footprint', {}).get('width_m', 0):.2f}m × {b.get('footprint', {}).get('depth_m', 0):.2f}m、軒高 約{b.get('eave_h', 0):.2f}m"),
             ("推定築年", f"{b.get('built_year_est')}年頃（アスベスト事前調査は未実施）"),
         ]
-        rows += [(f"{k}（推定）", f"{v}　{note}" if note else v) for k, v, note in quantities.summary_rows(q)[1:]]
+        rows += [(k.replace("）", "・推定）", 1) if "（" in k else f"{k}（推定）", f"{v}　{note}" if note else v)
+                 for k, v, note in quantities.summary_rows(q)[1:]]
         if q.get("units_count") and q["units_count"] > 1:
             rows.append(("戸数・間取り", f"{q['units_count']}戸（{q.get('units_layout', '')}）"))
         if fin:
