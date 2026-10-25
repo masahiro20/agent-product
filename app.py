@@ -18,6 +18,7 @@ import traceback
 import anthropic
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
+from starlette.requests import ClientDisconnect
 
 from webapp import convert, land, reading
 from webapp.engine import demolition, load_data, report
@@ -25,6 +26,12 @@ from webapp.engine import demolition, load_data, report
 app = FastAPI(title="現地写真レポート")
 ACCESS_PASSWORD = os.environ.get("ACCESS_PASSWORD", "")
 MAX_PHOTOS = 12
+
+
+@app.exception_handler(ClientDisconnect)
+async def client_disconnect(request: Request, exc: ClientDisconnect):
+    # 写真の送信が途中で切れた（回線の瞬断）。画面側が送り直すので、エラー落ちにしない
+    return JSONResponse({"error": "通信が途中で切れました。もう一度お試しください。"}, status_code=503)
 
 
 @app.middleware("http")

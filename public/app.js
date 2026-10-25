@@ -45,12 +45,23 @@
   }
 
   async function api(path, body, { raw = false, method = "POST" } = {}) {
+    let resent = false;
     for (let attempt = 0; attempt < 3; attempt++) {
-      const res = await fetch(path, {
-        method, headers: { "content-type": "application/json", "x-access-key": getKey() },
-        body: method === "POST" ? JSON.stringify(body || {}) : undefined,
-      });
+      const t0 = Date.now();
+      let res;
+      try {
+        res = await fetch(path, {
+          method, headers: { "content-type": "application/json", "x-access-key": getKey() },
+          body: method === "POST" ? JSON.stringify(body || {}) : undefined,
+        });
+      } catch (e) {
+        // 回線が一瞬切れたときは1回だけ送り直す
+        if (!resent) { resent = true; attempt--; continue; }
+        throw new Error("通信が切れました。電波の良い場所でもう一度お試しください。");
+      }
       if (res.status === 401) { await askKey(); continue; }
+      // 写真の送信が途中で切れると、数秒でサーバーエラーになる。処理が始まる前なので1回だけ送り直す
+      if (res.status >= 500 && Date.now() - t0 < 20000 && !resent) { resent = true; attempt--; continue; }
       if (!res.ok) {
         let msg = `通信エラー（${res.status}）`;
         try { const j = await res.json(); if (j.error) msg = j.error; } catch { /* 本文なし */ }
