@@ -222,6 +222,7 @@ def estimate(spec):
             applied.append(f"{cf.get('name', cond)} ×{f}")
     region = spec.get("region", "default")
     rf = prices.get("region_factor", {}).get(region, prices.get("region_factor", {}).get("default", 1.0))
+    rinfo = prices.get("region_info", {}).get(region) or {}
     rf = _num(rf) or 1.0
 
     def total(key):
@@ -265,7 +266,7 @@ def estimate(spec):
             q["asbestos_suspect_parts"] = parts
 
     return {"quantities": q, "leftover": lo, "lines": lines, "subtotal": sub, "overhead": over,
-            "overhead_rate": ov_rate, "total": tot, "region": region, "region_factor": rf,
+            "overhead_rate": ov_rate, "total": tot, "region": region, "region_label": rinfo.get("label", region), "region_factor": rf,
             "condition_factor": factor, "conditions_applied": applied, "asbestos_extra": asb_extra,
             "per_tsubo_mid": tot["mid"] / q["floor_area_tsubo"] if q["floor_area_tsubo"] else None,
             "sources": prices.get("sources", [])}

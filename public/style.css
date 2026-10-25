@@ -201,6 +201,7 @@ a { color: inherit; }
 .dl__go { margin-top: 6px; font-size: 13px; border-bottom: 1px solid var(--ink); }
 .pdf-frame { width: 100%; height: 78vh; border: 1px solid var(--line-soft); background: #fff; }
 
+.field__basis { display: block; color: var(--sub); font-size: 12px; line-height: 1.6; margin-top: 6px; }
 .hint { background: var(--gold-soft); border-left: 3px solid var(--gold); padding: 10px 14px; font-size: 13px; margin-top: 12px; }
 .flags { list-style: none; padding: 0; margin: 0; font-size: 14px; }
 .flags li { padding: 8px 0 8px 18px; border-bottom: 1px solid var(--line-soft); position: relative; }

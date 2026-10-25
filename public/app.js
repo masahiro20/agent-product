@@ -5,8 +5,6 @@
   const $ = (s) => document.querySelector(s);
   const MAX_PHOTOS = 12;
   const MAX_SIDE = 1568; // Claude の画像入力に最適な長辺
-  const REGION_LABELS = { default: "全国標準", tokyo23: "東京23区", kanagawa: "神奈川", osaka: "大阪", nagoya: "名古屋",
-    fukuoka: "福岡", hokkaido: "北海道" };
   const STRUCT_LABELS = { wood: "木造", light_steel: "軽量鉄骨造", heavy_steel: "重量鉄骨造", rc: "RC造" };
   const SIDE_LABELS = { S: "南", N: "北", E: "東", W: "西", unknown: "不明" };
 
@@ -204,7 +202,7 @@
       $("#address").value = sample.address;
       $("#projectName").value = sample.project_name;
       $("#notes").value = sample.notes;
-      $("#region").value = "default";
+      setRegionFromAddress(true);
       state.sample = sample;
       toast("サンプルを入れました。「AI で読み取る」を押してください（サンプルでは AI の代わりに用意した読み取り結果を使います）");
       $("#btnAnalyze").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -234,10 +232,26 @@
       state.sample = null;
       renderThumbs();
     });
-    $("#address").addEventListener("change", () => {
-      if (/名古屋/.test($("#address").value)) $("#region").value = "nagoya";
-    });
+    $("#address").addEventListener("change", () => setRegionFromAddress());
+    $("#region").addEventListener("change", () => { state.regionTouched = true; showRegionBasis(); });
     $("#btnAnalyze").addEventListener("click", analyze);
+  }
+
+  // 住所から単価の地域を選ぶ（手で選び直した後は変えない）
+  const REGION_RULES = [
+    [/東京都[^市町村郡]{1,4}区/, "tokyo23"], [/東京都/, "tokyo_tama"], [/神奈川/, "kanagawa"], [/埼玉/, "saitama"],
+    [/千葉/, "chiba"], [/名古屋市/, "nagoya"], [/愛知/, "aichi_other"], [/大阪/, "osaka"], [/福岡/, "fukuoka"],
+    [/新潟/, "niigata"], [/北海道/, "hokkaido"]];
+  function setRegionFromAddress(force) {
+    if (state.regionTouched && !force) return;
+    const a = $("#address").value;
+    const hit = REGION_RULES.find(([re]) => re.test(a));
+    $("#region").value = hit ? hit[1] : "default";
+    showRegionBasis();
+  }
+  function showRegionBasis() {
+    const r = (state.catalog?.regions || []).find((x) => x.key === $("#region").value);
+    $("#regionBasis").textContent = r?.basis ? `根拠: ${r.basis.replace(/\s*\[S[0-9,S]+\]/g, "")}` : "";
   }
 
   async function analyze() {
@@ -651,10 +665,14 @@
     } catch { /* 確認できなくても続ける */ }
     try {
       state.catalog = await api("/api/catalog", null, { method: "GET" });
-    } catch (e) { toast(e.message, true); state.catalog = { exterior: {}, conditions: {}, regions: { default: 1 }, layouts: [] }; }
-    const regions = Object.keys(state.catalog.regions || { default: 1 });
-    $("#region").innerHTML = ["default", ...regions.filter((r) => r !== "default")].map((r) =>
-      `<option value="${r}">${REGION_LABELS[r] || r}（係数 ×${state.catalog.regions?.[r] ?? 1}）</option>`).join("");
+    } catch (e) {
+      toast(e.message, true);
+      state.catalog = { exterior: {}, conditions: {}, layouts: [],
+        regions: [{ key: "default", label: "全国標準", factor: 1, basis: "" }] };
+    }
+    $("#region").innerHTML = state.catalog.regions.map((r) =>
+      `<option value="${esc(r.key)}">${esc(r.label)}（×${Number(r.factor).toFixed(2)}）</option>`).join("");
+    setRegionFromAddress();
     renderThumbs();
   }
   init();

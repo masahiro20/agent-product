@@ -278,7 +278,7 @@ def estimate_page(c, spec, est, title, sheet_no, extra_lines=None, conditions=No
           [f"諸経費（{est['overhead_rate']['low'] * 100:.0f}〜{est['overhead_rate']['high'] * 100:.0f}%）", yen(over["low"]), yen(over["mid"]), yen(over["high"])],
           ["合計（税別）", yen(tot["low"]), yen(tot["mid"]), yen(tot["high"])]]
     flows.append(_table(sm, [80, 40, 40, 40], align_right_cols=(1, 2, 3)))
-    memo = [f"地域係数 ×{est.get('region_factor', 1.0)}"]
+    memo = [f"地域係数 ×{est.get('region_factor', 1.0)}" + (f"（{est['region_label']}）" if est.get("region_label") else "")]
     if conditions:
         memo += conditions
     flows.append(P("適用：" + "／".join(memo) + "。単価の出典は巻末「出典一覧」。単価を自社単価に差し替える場合は同梱の Excel を使用。", st["s"]))

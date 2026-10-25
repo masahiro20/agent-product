@@ -8,7 +8,7 @@
     "author": "現地写真AI推定（参考図）"
   },
   "region": "default",
-  "_region": "tokyo23 / kanagawa / osaka / nagoya / fukuoka / hokkaido / default（解体）。造成は tokyo23 / tokyo_metro_suburb / osaka_nagoya_city / rural / default",
+  "_region": "demolition_unit_prices.json の region_info.order のキー（例: aichi_other＝愛知県（名古屋市以外）, nagoya, tokyo23）。造成の地域係数にも同じキーが使える",
   "conditions": [],
   "_conditions": "narrow_road_small_machine / narrow_road_handwork / adjacent_close / no_parking_road_use / slope_site / long_carry / mortar_wall_or_tile_roof など（demolition_unit_prices.json の condition_factor）",
   "conditions_detail": {"guard_days": 0},

@@ -432,7 +432,10 @@ def estimate(spec, res):
         add("調査・設計", "造成設計・許可申請", 1, "式", _it(gp, "design_and_permit"), "許可対象の可能性あり")
     add("調査・設計", "地盤調査（SWS）", opts.get("sws_points", 1), "件", _it(gp, "soil_test_sws"), "建築前")
 
-    rf = gp.get("region_factor", {}).get(spec.get("region", "default"), gp.get("region_factor", {}).get("default", 1.0))
+    rft = gp.get("region_factor", {})
+    region = spec.get("region", "default")
+    region = rft.get("alias", {}).get(region, region)  # 解体側の地域キーも受け付ける
+    rf = rft.get(region, rft.get("default", 1.0))
     if isinstance(rf, dict):
         rf = rf.get("mid", 1.0)
     sub = {}

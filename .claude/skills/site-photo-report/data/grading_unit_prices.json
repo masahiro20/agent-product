@@ -931,7 +931,20 @@
    "G20",
    "G21"
   ],
-  "note": "出典弱・一般的目安。国税庁R8の造成費は東京と三重でほぼ同水準（土止費 91,800 vs 89,200円/㎡、+3%）だが、首都圏は残土受入費・狭小地の小運搬・交通誘導で上がるため係数で補正。残土処分は soil_disposal_m3 の low/high で別に振る。"
+  "note": "出典弱・一般的目安。国税庁R8の造成費は東京と三重でほぼ同水準（土止費 91,800 vs 89,200円/㎡、+3%）だが、首都圏は残土受入費・狭小地の小運搬・交通誘導で上がるため係数で補正。残土処分は soil_disposal_m3 の low/high で別に振る。",
+  "alias": {
+   "note": "解体側の地域キー → 造成側の地域キー（画面の地域選択は1つで両方に効く）",
+   "tokyo_tama": "tokyo_metro_suburb",
+   "kanagawa": "tokyo_metro_suburb",
+   "saitama": "tokyo_metro_suburb",
+   "chiba": "tokyo_metro_suburb",
+   "osaka": "osaka_nagoya_city",
+   "nagoya": "osaka_nagoya_city",
+   "hokkaido": "rural",
+   "fukuoka": "default",
+   "niigata": "default",
+   "aichi_other": "default"
+  }
  },
  "regulation": {
   "morido_permit": [

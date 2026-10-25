@@ -49,7 +49,10 @@ def health():
 @app.get("/api/catalog")
 def catalog():
     prices = load_data("demolition_unit_prices.json")
-    regions = {k: v for k, v in prices.get("region_factor", {}).items() if isinstance(v, (int, float))}
+    factors = prices.get("region_factor", {})
+    info = prices.get("region_info", {})
+    regions = [{"key": k, "factor": factors.get(k, 1.0), "label": info[k]["label"], "basis": info[k]["basis"]}
+               for k in info.get("order", []) if k in info]
     return {"exterior": reading.exterior_catalog(), "conditions": reading.condition_catalog(),
             "regions": regions, "layouts": reading.LAYOUTS, "structures": reading.STRUCTURES}
 

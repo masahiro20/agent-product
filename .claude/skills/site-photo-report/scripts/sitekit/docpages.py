@@ -347,7 +347,7 @@ def summary_page(doc, spec, demo, grad, gest):
     flows = [t, Spacer(1, 6 * MM), P("見積の条件", S["h2"])]
     conds = []
     if demo:
-        conds.append(f"単価は公開相場（巻末の出典）の標準値。地域係数 ×{demo['region_factor']}"
+        conds.append(f"単価は公開相場（巻末の出典）の標準値。地域係数 ×{demo['region_factor']}" + (f"（{demo['region_label']}）" if demo.get("region_label") else "")
                      + (f"、施工条件の割増 {'／'.join(demo['conditions_applied'])}" if demo["conditions_applied"] else "") + "。")
         conds.append(f"解体の諸経費は直接工事費の {demo['overhead_rate']['mid'] * 100:.0f}%（幅 {demo['overhead_rate']['low'] * 100:.0f}〜{demo['overhead_rate']['high'] * 100:.0f}%）。")
         conds.append("建物本体の単価には、足場・養生、通常の基礎撤去、廃材の運搬処分、簡易整地を含みます。")
