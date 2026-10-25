@@ -86,8 +86,8 @@ def P(text, style):
 class Doc:
     """ページ番号・ヘッダー・フッターを管理する。2回描いて総ページ数を入れる。"""
 
-    def __init__(self, c, spec, total=None):
-        self.c, self.spec, self.total = c, spec, total
+    def __init__(self, c, spec, total=None, header="現地写真 調査レポート"):
+        self.c, self.spec, self.total, self.header = c, spec, total, header
         self.page = 0
         # 図面側（elevation / grading_draw）も c.showPage() でページを閉じるので、そこでページ番号を入れる
         self._show = c.showPage
@@ -109,7 +109,7 @@ class Doc:
         c.setStrokeColor(LINE)
         c.setLineWidth(0.5)
         c.line(ML * MM, (PH - 14) * MM, (PW - MR) * MM, (PH - 14) * MM)
-        self.text(ML, PH - 11.5, f"現地写真 調査レポート｜{p.get('name', '')}"[:48], 7.5, SUB)
+        self.text(ML, PH - 11.5, f"{self.header}｜{p.get('name', '')}"[:48], 7.5, SUB)
         self.text(PW - MR, PH - 11.5, COMPANY or p.get("author", ""), 7.5, SUB, "r")
         y = PH - MT
         if title_ja:
@@ -159,7 +159,7 @@ class Doc:
             f = queue.pop(0)
             if f == "PAGEBREAK":
                 self.c.showPage()
-                y = self.a4(title_en, title_ja + "（続き）")
+                y = self.a4(title_en, (title_ja + "（続き）") if title_ja else None)
                 continue
             avail = y - MB
             w, h = f.wrapOn(self.c, CW * MM, avail * MM)
@@ -171,14 +171,14 @@ class Doc:
                 # まとめて次のページへ
                 queue.insert(0, f)
                 self.c.showPage()
-                y = self.a4(title_en, title_ja + "（続き）")
+                y = self.a4(title_en, (title_ja + "（続き）") if title_ja else None)
                 continue
             parts = f.split(CW * MM, avail * MM) if avail > 25 else []
             if parts and "Break" in parts[0].__class__.__name__:  # KeepTogether が「次ページへ」と返した
                 queue = parts[1:] + queue
                 parts = []
                 self.c.showPage()
-                y = self.a4(title_en, title_ja + "（続き）")
+                y = self.a4(title_en, (title_ja + "（続き）") if title_ja else None)
                 continue
             if parts and len(parts) > 1:
                 w, h = parts[0].wrapOn(self.c, CW * MM, avail * MM)
@@ -187,7 +187,7 @@ class Doc:
             else:
                 queue.insert(0, f)
             self.c.showPage()
-            y = self.a4(title_en, title_ja + "（続き）")
+            y = self.a4(title_en, (title_ja + "（続き）") if title_ja else None)
         self.c.showPage()
 
 

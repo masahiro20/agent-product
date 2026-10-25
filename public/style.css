@@ -288,3 +288,7 @@ a { color: inherit; }
   .hero__flow li + li::before { display: none; }
   .start { padding: 18px 16px; }
 }
+
+.rfq .fields { grid-template-columns: 180px 1fr; }
+.rfq .downloads { grid-template-columns: repeat(2, 1fr); margin-top: 6px; }
+@media (max-width: 700px) { .rfq .fields, .rfq .downloads { grid-template-columns: 1fr; } }

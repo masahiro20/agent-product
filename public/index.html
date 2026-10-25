@@ -181,6 +181,22 @@
       <button class="dl" data-fmt="dxf"><span class="dl__type">DXF 図面</span><span class="dl__desc">立面図・造成計画平面（CADで開けます）</span><span class="dl__go">ダウンロード ➤</span></button>
     </div>
 
+    <h2 class="sec-title"><span class="sec-title__en">REQUEST</span><span class="sec-title__ja">業者への見積依頼</span></h2>
+    <p class="lead">金額を入れずに、数量・現場条件・写真・図面をまとめた依頼書を作ります。解体屋さん・造成屋さんに「この数量で見積もってください」と渡せます。Excel は業者さんが単価を入れると合計まで自動で出ます。</p>
+    <div class="card rfq">
+      <div class="fields">
+        <label class="field"><span class="field__label">回答期限</span><input class="input" type="date" id="rfqDue"></label>
+        <label class="field rfq__contact"><span class="field__label">依頼元の担当者・連絡先（依頼書に載ります）</span>
+          <input class="input" id="rfqContact" placeholder="例）工務部 山田 090-0000-0000"></label>
+      </div>
+      <div class="downloads">
+        <button class="dl" data-rfq="demolition" data-fmt="rfq_pdf"><span class="dl__type">解体 見積依頼書</span><span class="dl__desc">依頼文・物件概要・数量表（単価空欄）・写真・配置図・立面図</span><span class="dl__go">PDF をダウンロード ➤</span></button>
+        <button class="dl" data-rfq="demolition" data-fmt="rfq_xlsx"><span class="dl__type">解体 数量表</span><span class="dl__desc">業者さんの記入用（単価を入れると金額・合計が自動計算）</span><span class="dl__go">Excel をダウンロード ➤</span></button>
+        <button class="dl" data-rfq="grading" data-fmt="rfq_pdf"><span class="dl__type">造成 見積依頼書</span><span class="dl__desc">依頼文・物件概要・数量表（単価空欄）・写真・造成計画図・断面図</span><span class="dl__go">PDF をダウンロード ➤</span></button>
+        <button class="dl" data-rfq="grading" data-fmt="rfq_xlsx"><span class="dl__type">造成 数量表</span><span class="dl__desc">業者さんの記入用（土量・擁壁・排水の数量入り）</span><span class="dl__go">Excel をダウンロード ➤</span></button>
+      </div>
+    </div>
+
     <h2 class="sec-title"><span class="sec-title__en">PREVIEW</span><span class="sec-title__ja">PDF のプレビュー</span></h2>
     <iframe class="pdf-frame" id="pdfFrame" title="PDF プレビュー"></iframe>
 

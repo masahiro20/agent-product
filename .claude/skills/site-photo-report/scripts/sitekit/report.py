@@ -11,7 +11,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as rl_canvas
 from reportlab.platypus import Paragraph, Table, TableStyle
 
-from . import demolition, docpages, elevation, grading, grading_draw
+from . import demolition, docpages, elevation, grading, grading_draw, rfq
 from .common import FONT, MM, ensure_font, font_path, man_yen, yen
 from .drawing import MARGIN, SHEET_H, SHEET_W, frame, jp, new_sheet, text_at
 
@@ -709,7 +709,9 @@ def _render_pdf(target, spec, base_dir, demo, grad, gest, total):
     c.save()
     return doc.page
 
-def build(spec, out_dir, base_dir):
+def build(spec, out_dir, base_dir, formats=("pdf", "xlsx", "dxf"), rfq_opts=None):
+    """formats: pdf / xlsx / dxf / rfq_pdf / rfq_xlsx のうち作るもの（空なら計算と概要だけ）。
+    rfq_opts: {"kind": "demolition"|"grading", "due": "...", "contact": "...", "company": "..."}"""
     os.makedirs(out_dir, exist_ok=True)
     spec.setdefault("project", {}).setdefault("date", datetime.date.today().isoformat())
     demo = demolition.estimate(spec) if spec.get("building") else None
@@ -717,18 +719,33 @@ def build(spec, out_dir, base_dir):
     if spec.get("site"):
         grad, gest = grading.plan_and_estimate(spec)
     stem = spec.get("project", {}).get("slug", "site_report")
-    pdf_path = os.path.join(out_dir, f"{stem}.pdf")
-    # 1回目でページ数を数え、2回目に「n / 総数」を入れて描く
-    total = _render_pdf(io.BytesIO(), spec, base_dir, demo, grad, gest, None)
-    _render_pdf(pdf_path, spec, base_dir, demo, grad, gest, total)
-    xlsx_path = os.path.join(out_dir, f"{stem}_見積.xlsx")
-    write_xlsx(xlsx_path, spec, demo, gest, grad)
-    dxf_path = os.path.join(out_dir, f"{stem}_図面.dxf")
-    try:
-        write_dxf(dxf_path, spec, grad)
-    except Exception as e:  # DXF は補助出力なので失敗してもレポートは出す
-        dxf_path = f"(DXF出力失敗: {e})"
+    pdf_path = xlsx_path = dxf_path = None
+    if "pdf" in formats:
+        pdf_path = os.path.join(out_dir, f"{stem}.pdf")
+        # 1回目でページ数を数え、2回目に「n / 総数」を入れて描く
+        total = _render_pdf(io.BytesIO(), spec, base_dir, demo, grad, gest, None)
+        _render_pdf(pdf_path, spec, base_dir, demo, grad, gest, total)
+    if "xlsx" in formats:
+        xlsx_path = os.path.join(out_dir, f"{stem}_見積.xlsx")
+        write_xlsx(xlsx_path, spec, demo, gest, grad)
+    if "dxf" in formats:
+        dxf_path = os.path.join(out_dir, f"{stem}_図面.dxf")
+        try:
+            write_dxf(dxf_path, spec, grad)
+        except Exception as e:  # DXF は補助出力なので失敗してもレポートは出す
+            dxf_path = f"(DXF出力失敗: {e})"
     summary = {"pdf": pdf_path, "xlsx": xlsx_path, "dxf": dxf_path}
+    if {"rfq_pdf", "rfq_xlsx"} & set(formats):
+        ro = dict(rfq_opts or {})
+        kind = ro.get("kind") or ("demolition" if demo else "grading")
+        if (kind == "demolition" and not demo) or (kind == "grading" and not gest):
+            raise ValueError("見積依頼の対象（解体／造成）のデータがありません")
+        if "rfq_pdf" in formats:
+            summary["rfq_pdf"] = os.path.join(out_dir, f"{stem}_見積依頼書.pdf")
+            rfq.build_rfq_pdf(summary["rfq_pdf"], spec, base_dir, demo, grad, gest, kind, ro, annotate_photo)
+        if "rfq_xlsx" in formats:
+            summary["rfq_xlsx"] = os.path.join(out_dir, f"{stem}_見積依頼_数量表.xlsx")
+            rfq.write_rfq_xlsx(summary["rfq_xlsx"], spec, demo, gest, grad, kind, ro)
     if demo:
         summary["demolition_total"] = {k: round(v) for k, v in demo["total"].items()}
         summary["floor_area_m2"] = round(demo["quantities"]["floor_area_m2"], 1)

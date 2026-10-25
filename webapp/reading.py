@@ -13,7 +13,9 @@ MODEL = os.environ.get("SITE_MODEL", "claude-opus-5-5")
 EFFORT = os.environ.get("SITE_EFFORT", "medium")
 
 ELEMENT_TYPES = ["window", "door", "railing", "slab", "post", "pipe", "stair", "stair_front",
-                 "box", "block_wall", "fence", "tree", "canopy"]
+                 "box", "block_wall", "fence", "tree", "canopy", "vent", "meter", "heater"]
+WALL_PATTERNS = ["mortar", "siding_h", "siding_v", "board", "panel", "tile", "alc"]
+FINISH_KEYS = ["屋根", "外壁", "軒天", "破風・鼻隠し", "雨樋", "サッシ", "基礎", "バルコニー・廊下", "外階段"]
 ROOF_TYPES = ["gable_side", "gable_end", "hip_side", "shed", "flat"]
 STRUCTURES = ["wood", "light_steel", "heavy_steel", "rc"]
 LAYOUTS = ["1R", "1K", "1DK", "2DK", "3LDK", "house_4LDK"]
@@ -49,8 +51,11 @@ TEMPLATE = """{
     "occupied_units": 0, "aircon_units": 4, "outdoor_leftover_m3": 1.0,
     "annexes": [{"name": "鉄骨外階段", "price_key": "steel_stair|carport|storage_shed|none", "qty": 1, "unit": "基", "basis": "写真2"}],
     "measure_basis": [{"item": "桁行", "value": "約14.5m", "basis": "根拠"}],
+    "finishes": {"屋根": "カラー鉄板 瓦棒葺き", "外壁": "モルタル吹付", "軒天": "ケイカル板（推定）", "破風・鼻隠し": "鉄板巻き",
+                 "雨樋": "塩ビ 半丸", "サッシ": "アルミ 単板ガラス", "基礎": "布基礎（推定）", "バルコニー・廊下": "RC床＋鉄骨手すり", "外階段": "鉄骨"},
     "faces": [{"name": "南立面図（道路側）", "width_m": 14.5, "roof_type": "gable_side|gable_end|hip_side|shed|flat",
-               "elements": [{"type": "window|door|railing|slab|post|pipe|stair|stair_front|box|block_wall|fence|tree|canopy",
+               "wall_pattern": "mortar|siding_h|siding_v|board|panel|tile|alc",
+               "elements": [{"type": "window|door|railing|slab|post|pipe|stair|stair_front|box|block_wall|fence|tree|canopy|vent|meter|heater",
                              "x": 1.0, "z": 0.45, "w": 1.69, "h": 1.8, "label": "", "courses": 0, "grille": false}]}]
   },
   "exterior": [{"key": "単価キー", "label": "CB塀 南側 H≈0.8 L≈15m", "qty": 12.0, "unit": "㎡", "basis": "写真3：4段", "x0": 0, "y0": 0, "x1": 0, "y1": 0}],
@@ -58,7 +63,9 @@ TEMPLATE = """{
     "frontage_m": 19.5, "depth_m": 12.5, "road_side": "N|E|S|W|unknown", "road_width_m": 4.0, "road_name": "市道",
     "building_offset_left_m": 1.2, "building_setback_m": 3.0,
     "extra_footprints": [{"label": "外階段", "x": 15.8, "y": 3.0, "w": 1.0, "d": 3.0}],
-    "level_points": [{"label": "敷地左手前", "x": 0.5, "y": 0.5, "dz_from_road_center_m": 0.4, "basis": "CB2段"}]
+    "level_points": [{"label": "敷地左手前", "x": 0.5, "y": 0.5, "dz_from_road_center_m": 0.4, "basis": "CB2段"}],
+    "access": {"road_width_m": 4.0, "machine": "0.25㎥級（ミニ）まで進入可|0.45㎥級まで進入可|重機進入不可（手壊し）", "truck": "4t車可|2t車まで|軽トラックのみ",
+               "neighbor_gap_m": 0.8, "carry_distance_m": 0, "notes": "電線・電柱、隣家の窓、通学路など搬出・近隣で気をつけること"}
   },
   "conditions": ["施工条件のキー"],
   "photos": [{"photo_index": 1, "caption": "南面（道路側）", "marks": [{"x0": 0.1, "y0": 0.3, "x1": 0.3, "y1": 0.5, "label": "掃出し窓 W≈1.69m", "basis": "寸法の基準"}]}],
@@ -128,8 +135,11 @@ def normalize(r):
                         "label": str(e.get("label") or ""), "courses": _int(e.get("courses"), 0), "grille": bool(e.get("grille"))})
         faces.append({"name": str(f.get("name") or f"立面図{len(faces) + 1}"),
                       "width_m": max(1.0, _num(f.get("width_m"), out_b["frontage_m"])),
-                      "roof_type": _pick(f.get("roof_type"), ROOF_TYPES, "gable_side"), "elements": els})
+                      "roof_type": _pick(f.get("roof_type"), ROOF_TYPES, "gable_side"),
+                      "wall_pattern": _pick(f.get("wall_pattern"), WALL_PATTERNS, "mortar"), "elements": els})
     out_b["faces"] = faces
+    fin = b.get("finishes") if isinstance(b.get("finishes"), dict) else {}
+    out_b["finishes"] = {k: str(fin.get(k)) for k in FINISH_KEYS if fin.get(k)}
     # 敷地座標の x は道路沿い。道路側の立面（1面目）の幅が建物の奥行に近ければ、幅と奥行が入れ替わっているので直す
     # （立面の幅は外廊下などを含むことがあるので、面積には AI が出した外壁の寸法をそのまま使う）
     if faces:
@@ -159,6 +169,11 @@ def normalize(r):
                           "dz_from_road_center_m": _num(p.get("dz_from_road_center_m")), "basis": str(p.get("basis") or "")}
                          for p in (s.get("level_points") or []) if isinstance(p, dict)],
     }
+    acc = s.get("access") if isinstance(s.get("access"), dict) else {}
+    site["access"] = {"road_width_m": _num(acc.get("road_width_m"), site["road_width_m"]) or site["road_width_m"],
+                      "machine": str(acc.get("machine") or ""), "truck": str(acc.get("truck") or ""),
+                      "neighbor_gap_m": _num(acc.get("neighbor_gap_m"), 0) or None,
+                      "carry_distance_m": _num(acc.get("carry_distance_m"), 0) or None, "notes": str(acc.get("notes") or "")}
     # 建物が敷地からはみ出していたら敷地を広げる（読み取りの食い違い対策）
     need_f = site["building_offset_left_m"] + out_b["frontage_m"] + 0.5
     need_d = site["building_setback_m"] + out_b["depth_m"] + 0.5
@@ -219,6 +234,14 @@ SYSTEM = """あなたは解体工事と宅地造成の積算に慣れた建築�
 - elements の使い方: window/door（x,z＝左下、w,h）、railing（手すり。z＝床、h＝高さ）、slab（廊下・バルコニー床、h≈0.15〜0.2）、post（柱。x＝中心、h）、pipe（たて樋。x、z＝下端、h＝長さ）、stair（側面から見た外階段。x,z＝下端、w,h＝上端までのx・z差。下りが右なら w は負）、stair_front（正面から見た外階段。x,w、z＝下端、h＝昇る高さ）、box（室外機・メーター等）、block_wall（x,w、courses＝段数、z＝基礎天端。h は0）、fence（x,w,h、z＝下端）、tree（x＝幹、h＝樹高、w＝枝張り）、canopy（庇。x,z,w、h≈0.1）。
 - courses と grille は該当しない要素では 0／false。label は空文字なら表示しない。窓は数が多いので、ラベルは各面の代表1か所だけ（例「掃出し窓 W1690×H1800」）。
 - 屋根: 平側の面は gable_side、妻側の面は gable_end（切妻の場合）。building.ridge_h は最高高さ、eave_h は軒高。floor_levels は各階の床高 [1FL, 2FL, ...]（GL基準）。
+
+# 外部仕上げ・設備（細かく）
+- building.finishes に、屋根・外壁・軒天・破風・雨樋・サッシ・基礎・バルコニー/廊下・外階段の材料を、写真から分かる範囲で書く（推定は「（推定）」を付ける）。解体の分別とアスベストの判断に使う。
+- 各面の wall_pattern に外壁の張り方（mortar=モルタル・吹付、siding_h=横張りサイディング、siding_v=縦張り、board=板張り、panel=パネル、tile=タイル、alc=ALC）。
+- 立面の elements には、窓・ドアだけでなく、換気口（vent）、電気・ガスメーター（meter）、給湯器（heater）、室外機（box）、たて樋（pipe）、庇（canopy）、面格子付き窓（window の grille=true）も見える範囲で入れる。各面で窓・ドアの位置と大きさは写真の比率から丁寧に割り付ける。
+
+# 搬出・施工条件（site.access）
+- 前面道路の幅、入れそうな重機の大きさ、トラックの大きさ、隣家との最も近い離れ、車両から建物までの搬出距離、電線・電柱・通学路など近隣で気をつけることを書く（解体業者への見積依頼にそのまま載せる）。
 
 # 外構・付帯（exterior）
 - key は単価表のキーから選ぶ。数量の単位はその単価に合わせる（ブロック塀は見付面積㎡＝長さ×段数×0.2m、フェンスは m、樹木は本、竹は㎡ など）。伐採した高木・中木には抜根（tree_stump）も別行で入れる。

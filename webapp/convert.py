@@ -78,6 +78,7 @@ def to_spec(reading, land, photos, options, job_dir):
         faces = []
         for k, f in enumerate(b.get("faces") or []):
             faces.append({"name": f["name"], "width_m": f["width_m"], "eave_h": b["eave_h"], "floors": fl,
+                          "wall_pattern": f.get("wall_pattern", "mortar"),
                           "roof": {"type": f["roof_type"], "ridge_h": b.get("ridge_h") or b["eave_h"],
                                    "overhang": b.get("roof_overhang_m") or 0.45,
                                    **({"label": b["roof_label"]} if k == 0 and b.get("roof_label") else {})},
@@ -95,6 +96,7 @@ def to_spec(reading, land, photos, options, job_dir):
             "units": {"count": b.get("units_count") or 1, "layout": b.get("unit_layout") or "house_4LDK",
                       "area_each_m2": b.get("unit_area_m2") or None},
             "annexes": annexes, "measure_basis": b.get("measure_basis") or [], "elevations": faces,
+            "finishes": b.get("finishes") or {},
         }
         spec["leftover"] = {"layout": b.get("unit_layout") or "house_4LDK", "occupied_units": b.get("occupied_units") or 0,
                             "extra_m3": b.get("outdoor_leftover_m3") or 0, "aircon_units": b.get("aircon_units") or 0}
@@ -136,8 +138,13 @@ def to_spec(reading, land, photos, options, job_dir):
                                                                [r["x"] + r["w"], r["y"] + r["d"]], [r["x"], r["y"] + r["d"]]],
                                                    "label": r["label"]})
         spec["site"] = site
+        if s.get("access"):
+            spec["access"] = s["access"]
         spec["_level_points"] = s.get("level_points") or []
         spec["_road_center"] = [F / 2, -rw / 2]
+
+    if s.get("access") and not spec.get("access"):
+        spec["access"] = s["access"]
 
     # 公開データ
     if land.get("lat") is not None:

@@ -589,22 +589,38 @@
     if (s.asbestos_extra?.length) flags.push("築年からアスベスト含有の可能性。解体前の事前調査（有資格者）が義務です");
     $("#flags").innerHTML = flags.length ? flags.map((f) => `<li>${esc(f)}</li>`).join("") : "<li>特記事項なし</li>";
 
+    document.querySelectorAll('.dl[data-rfq="demolition"]').forEach((b) => (b.hidden = !s.demolition_total));
+    document.querySelectorAll('.dl[data-rfq="grading"]').forEach((b) => (b.hidden = !s.grading_total));
+
     const frame = $("#pdfFrame");
     frame.src = state.pdfUrl;
   }
 
-  async function download(fmt) {
+  function rfqOptions(kind) {
+    const due = $("#rfqDue").value;
+    const contact = $("#rfqContact").value.trim();
+    try { localStorage.setItem("hl_rfq_contact", contact); } catch { /* 保存できなくても続ける */ }
+    const d = due ? new Date(due) : null;
+    return { kind, contact, due: d ? `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日` : "" };
+  }
+
+  async function download(fmt, kind) {
     try {
-      let blob = state.files?.[fmt];
+      let blob = kind ? null : state.files?.[fmt];
       if (!blob) {
-        toast(`${fmt.toUpperCase()} を作成中…`);
-        blob = await api("/api/build", await buildBody(fmt), { raw: true });
-        state.files[fmt] = blob;
+        toast(kind ? "見積依頼書を作成中…（30秒ほど）" : `${fmt.toUpperCase()} を作成中…`);
+        const body = await buildBody(fmt);
+        if (kind) body.options.rfq = rfqOptions(kind);
+        blob = await api("/api/build", body, { raw: true });
+        if (!kind) state.files[fmt] = blob;
       }
       const name = ($("#projectName").value.trim() || "現地写真レポート").replace(/[\\/:*?"<>|]/g, "_");
+      const label = { xlsx: "_見積", dxf: "_図面", rfq_pdf: `_${kind === "grading" ? "造成" : "解体"}見積依頼書`, rfq_xlsx: `_${kind === "grading" ? "造成" : "解体"}数量表` }[fmt] || "";
+      const ext = fmt.replace("rfq_", "");
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `${name}${fmt === "xlsx" ? "_見積" : fmt === "dxf" ? "_図面" : ""}.${fmt}`;
+      a.download = `${name}${label}.${ext}`;
+
       document.body.appendChild(a);
       a.click();
       setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -612,7 +628,10 @@
   }
 
   function initStep3() {
-    document.querySelectorAll(".dl").forEach((b) => b.addEventListener("click", () => download(b.dataset.fmt)));
+    document.querySelectorAll(".dl").forEach((b) => b.addEventListener("click", () => download(b.dataset.fmt, b.dataset.rfq)));
+    const due = new Date(Date.now() + 7 * 864e5);
+    $("#rfqDue").value = due.toISOString().slice(0, 10);
+    try { $("#rfqContact").value = localStorage.getItem("hl_rfq_contact") || ""; } catch { /* なし */ }
     $("#btnBack2").addEventListener("click", () => go(2));
     $("#btnNew").addEventListener("click", () => {
       if (!confirm("入力内容を消して、新しい物件を始めますか？")) return;

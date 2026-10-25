@@ -96,6 +96,22 @@ class View:
         px, py = self.p(x, y)
         text_at(c, px / MM, py / MM + dy_mm, s, size, anchor, color, angle)
 
+    def clip_lines(self, poly, segs, w=0.1, color=None):
+        """多角形の内側だけに線分を描く（外壁の仕上げ模様など）。"""
+        c = self.c
+        c.saveState()
+        path = c.beginPath()
+        path.moveTo(*self.p(*poly[0]))
+        for q in poly[1:]:
+            path.lineTo(*self.p(*q))
+        path.close()
+        c.clipPath(path, stroke=0, fill=0)
+        c.setLineWidth(w)
+        c.setStrokeColor(color or Color(0.62, 0.62, 0.62))
+        for (x0, y0), (x1, y1) in segs:
+            c.line(*self.p(x0, y0), *self.p(x1, y1))
+        c.restoreState()
+
     def hatch(self, poly, spacing_m=0.2, angle_deg=45, w=0.12, color=GRAY):
         """多角形内をハッチング（単純な走査線＋クリップ）。"""
         c = self.c

@@ -106,21 +106,26 @@ async def api_analyze(request: Request):
 async def api_build(request: Request):
     body = await request.json()
     fmt = body.get("format", "summary")
+    fmts = {"summary": (), "pdf": ("pdf",), "xlsx": ("xlsx",), "dxf": ("dxf",), "rfq_pdf": ("rfq_pdf",), "rfq_xlsx": ("rfq_xlsx",)}
+    if fmt not in fmts:
+        return JSONResponse({"error": f"不明な形式です: {fmt}"}, status_code=400)
     job = tempfile.mkdtemp(prefix="job_", dir="/tmp")
     try:
-        spec = convert.to_spec(body["reading"], body.get("land"), body.get("photos"), body.get("options"), job)
-        summary = report.build(spec, os.path.join(job, "out"), job)
+        opts = body.get("options") or {}
+        spec = convert.to_spec(body["reading"], body.get("land"), body.get("photos"), opts, job)
+        summary = report.build(spec, os.path.join(job, "out"), job, formats=fmts[fmt], rfq_opts=opts.get("rfq"))
         if fmt == "summary":
             return {k: v for k, v in summary.items() if k not in ("pdf", "xlsx", "dxf")}
-        path = {"pdf": summary["pdf"], "xlsx": summary["xlsx"], "dxf": summary["dxf"]}.get(fmt)
+        path = summary.get(fmt)
         if not path or not os.path.exists(path):
             return JSONResponse({"error": f"{fmt} を作れませんでした"}, status_code=500)
-        media = {"pdf": "application/pdf",
-                 "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                 "dxf": "application/dxf"}[fmt]
+        media = {"pdf": "application/pdf", "rfq_pdf": "application/pdf", "dxf": "application/dxf"}.get(
+            fmt, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         with open(path, "rb") as f:
             data = f.read()
         return Response(data, media_type=media)
+    except ValueError as e:
+        return _err(e, 400)
     except Exception as e:
         return _err(e)
     finally:

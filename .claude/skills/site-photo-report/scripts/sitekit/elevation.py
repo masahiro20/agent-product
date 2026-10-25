@@ -67,6 +67,8 @@ def draw_face(v: View, face):
     else:
         wall = [(0, 0), (w, 0), (w, eave), (0, eave)]
     v.polyline(wall, w=0.5, closed=True, fill=WALL_FILL)
+    if hasattr(v, "clip_lines"):
+        _wall_texture(v, wall, w, max(eave, ridge), face.get("wall_pattern", "mortar"))
 
     # 屋根
     if rtype == "gable_end":
@@ -107,6 +109,45 @@ def draw_face(v: View, face):
 
     for fl in face.get("floors", [])[1:]:
         v.line(0, fl, w, fl, w=0.12, color=GRAY, dash=(4, 2))
+
+
+def _wall_texture(v, wall, w, top, pattern):
+    """外壁の張り方を薄い線で表す（立面図の仕上げ表現）。"""
+    segs = []
+    if pattern == "siding_h":
+        z = 0.455
+        while z < top:
+            segs.append(((-1, z), (w + 1, z)))
+            z += 0.455
+    elif pattern in ("siding_v", "board"):
+        step = 0.455 if pattern == "siding_v" else 0.15
+        x = step
+        while x < w:
+            segs.append(((x, 0), (x, top)))
+            x += step
+    elif pattern in ("panel", "alc"):
+        step_z = 0.91 if pattern == "panel" else 0.6
+        z = step_z
+        while z < top:
+            segs.append(((-1, z), (w + 1, z)))
+            z += step_z
+        x = 0.91 if pattern == "panel" else 1.82
+        while x < w:
+            segs.append(((x, 0), (x, top)))
+            x += 0.91 if pattern == "panel" else 1.82
+    elif pattern == "tile":
+        z = 0.1
+        while z < top:
+            segs.append(((-1, z), (w + 1, z)))
+            z += 0.1
+    else:  # モルタル・吹付: 点描
+        import random
+        rnd = random.Random(int(w * 100))
+        n = int(w * top * 5)
+        for _ in range(n):
+            x, z = rnd.uniform(0.05, w - 0.05), rnd.uniform(0.05, top - 0.05)
+            segs.append(((x, z), (x + 0.02, z)))
+    v.clip_lines(wall, segs, w=0.08)
 
 
 def _draw_element(v: View, e):
@@ -209,6 +250,18 @@ def _draw_element(v: View, e):
         v.line(x, 0, x, h * 0.45, w=0.6)
         v.ellipse(x, h * 0.65, cw / 2, h * 0.35, dash=(1, 1))
         v.text(x, h, e.get("label", f"樹木 H≈{h:.0f}m"), 1.7, "c", dy_mm=0.6)
+    elif t in ("vent", "meter", "heater"):
+        x, z = e["x"], e["z"]
+        w = e.get("w") or {"vent": 0.15, "meter": 0.25, "heater": 0.45}[t]
+        h = e.get("h") or {"vent": 0.15, "meter": 0.35, "heater": 0.6}[t]
+        v.rect(x, z, w, h, lw=0.3, fill=Color(1, 1, 1))
+        if t == "vent":
+            for k in range(1, 4):
+                v.line(x + 0.02, z + h * k / 4, x + w - 0.02, z + h * k / 4, w=0.1)
+        else:
+            v.text(x + w / 2, z + h / 2, "M" if t == "meter" else "給", 1.4, "c", dy_mm=-0.5)
+        if e.get("label"):
+            v.text(x + w / 2, z + h, e["label"], 1.6, "c", dy_mm=0.5)
     elif t == "band":
         x0 = e.get("x", 0)
         v.rect(x0, e["z"], e.get("w", 0), e.get("h", 0.12), lw=0.25) if e.get("w") else None
@@ -263,6 +316,29 @@ def draw_face_dims(v: View, face):
         v.text(w / 2, max(ridge, eave), roof["label"], 1.8, "c", dy_mm=1.5)
 
 
+def _finish_table(c, x, ytop, fin):
+    """外部仕上げ表（推定）。図面の右上に置く。"""
+    rows = [(k, v) for k, v in fin.items() if v][:9]
+    rh = 4.4
+    c.saveState()
+    c.setLineWidth(0.2)
+    c.setFillColor(Color(1, 1, 1))
+    c.rect(x * 2.8346, (ytop - rh * (len(rows) + 1)) * 2.8346, 96 * 2.8346, rh * (len(rows) + 1) * 2.8346, stroke=1, fill=1)
+    c.setFillColor(Color(0.2, 0.2, 0.2))
+    c.rect(x * 2.8346, (ytop - rh) * 2.8346, 96 * 2.8346, rh * 2.8346, stroke=0, fill=1)
+    c.restoreState()
+    text_at(c, x + 2, ytop - rh + 1.2, "外部仕上げ表（写真からの推定）", 2.2, color=Color(1, 1, 1))
+    for i, (k, val) in enumerate(rows, 1):
+        y = ytop - rh * (i + 1)
+        c.saveState()
+        c.setLineWidth(0.15)
+        c.setStrokeColor(LIGHT)
+        c.line(x * 2.8346, y * 2.8346, (x + 96) * 2.8346, y * 2.8346)
+        c.restoreState()
+        text_at(c, x + 2, y + 1.3, k, 2.0, color=GRAY)
+        text_at(c, x + 30, y + 1.3, str(val)[:32], 2.1)
+
+
 def render_elevations(c, spec, sheet_prefix="A"):
     """立面図を 1シート2面ずつ（大きい建物は1面）描く。シート数を返す。"""
     faces = spec["building"].get("elevations", [])
@@ -309,6 +385,9 @@ def render_elevations(c, spec, sheet_prefix="A"):
                 text_at(c, left + wd * k / 2, base + 3, f"{f['name']}  S=1/{scale}", 3.2, "c")
                 left += wd * k
         scale_bar(c, ax + 2, ay + ah - 6, scale)
+        fin = spec["building"].get("finishes") or {}
+        if fin:
+            _finish_table(c, ax + aw - 98, ay + ah - 2, fin)
         c.showPage()
         sheets += 1
         i += len(group)
