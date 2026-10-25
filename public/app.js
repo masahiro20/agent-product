@@ -378,29 +378,35 @@
     $("#outlineBox").hidden = !outs.length || b.exists === false;
     if (!outs.length) return;
     $("#outlineSel").innerHTML = `<option value="0">使わない・該当なし</option>` + outs.map((o) =>
-      `<option value="${o.no}" ${o.no === b.map_outline_no ? "selected" : ""}>No.${o.no}　約${Math.round(o.area_m2)}㎡（${num(o.long_m, 1)}×${num(o.short_m, 1)}m）${o.contains_point ? "・住所の位置" : ""}</option>`).join("");
+      `<option value="${o.no}" ${o.no === b.map_outline_no ? "selected" : ""}>No.${o.no}　1階の目安 約${Math.round(floorEst(o))}㎡（屋根 ${Math.round(o.area_m2)}㎡）${o.contains_point ? "・住所の位置" : ""}</option>`).join("");
     const o = outs.find((x) => x.no === b.map_outline_no);
-    const fp = (b.frontage_m || 0) * (b.depth_m || 0);
+    const fp = (b.floor_plans || []).find((p) => p.floor === 1)?.area_m2 || (b.frontage_m || 0) * (b.depth_m || 0);
+    const est = o ? floorEst(o) : 0;
     $("#outlineNote").textContent = o
-      ? `${o.no === state.aiOutlineNo ? "AI が写真と見比べて選んだ外形です。" : ""}1階の外形 ${Math.round(fp)}㎡ ／ 地図 No.${o.no} ${Math.round(o.area_m2)}㎡` +
-        (Math.abs(fp - o.area_m2) / o.area_m2 > 0.15 ? "（15%以上違います。どちらが正しいか確認してください）" : "")
+      ? `${o.no === state.aiOutlineNo ? "AI が写真と見比べて選んだ外形です。" : ""}地図の外形は屋根の外周（軒・ポーチ込み）なので、1階の床はその約7割が目安です。` +
+        `いまの1階 ${Math.round(fp)}㎡ ／ 目安 ${Math.round(est)}㎡` +
+        (Math.abs(fp - est) / est > 0.15 ? "（15%以上違います。どちらが正しいか確認してください）" : "")
       : "航空写真の番号と見比べて、該当する建物を選ぶと 1階の外形に使えます。";
     $("#btnOutline").disabled = !o;
   }
+  // 地図の外形（屋根の外周）→ 1階床の目安。SUUMO の物件で実測と比べた比率 0.72 を使う（webapp/footprint.py と同じ）
+  const floorEst = (o) => o.floor_est_m2 ?? o.area_m2 * 0.72;
   function applyOutline() {
     const b = state.reading.building;
     const o = (state.land?.outlines || []).find((x) => x.no === b.map_outline_no);
     if (!o) return;
+    const L = o.wall_long_m ?? Math.max(1, o.long_m - 1.2);
+    const S = o.wall_short_m ?? Math.max(1, o.short_m - 1.2);
     // 長辺・短辺のどちらを道路側にするかは、今の幅・奥行の長短に合わせる
     const wide = (b.frontage_m || 0) >= (b.depth_m || 0);
-    b.frontage_m = wide ? o.long_m : o.short_m;
-    b.depth_m = wide ? o.short_m : o.long_m;
-    const rect = o.long_m * o.short_m;
+    b.frontage_m = Math.round((wide ? L : S) * 100) / 100;
+    b.depth_m = Math.round((wide ? S : L) * 100) / 100;
+    const est = Math.round(floorEst(o) * 10) / 10;
     b.floor_plans = (b.floor_plans || []).filter((p) => p.floor !== 1);
-    if (o.area_m2 < rect * 0.95) b.floor_plans.push({ floor: 1, w: null, d: null, area_m2: o.area_m2, basis: `地図の建物外形 No.${o.no}` });
+    b.floor_plans.push({ floor: 1, w: null, d: null, area_m2: est, basis: `地図の建物外形 No.${o.no}（屋根の外周×0.72）` });
     b.floor_plans.sort((x, y) => x.floor - y.floor);
     renderStep2Building();
-    toast(`地図の外形 No.${o.no}（約${Math.round(o.area_m2)}㎡）を 1階の外形にしました`);
+    toast(`地図の外形 No.${o.no} から、1階を約${Math.round(est)}㎡にしました`);
   }
 
   // 階ごとの床面積（空欄＝外形どおり）

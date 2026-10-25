@@ -196,10 +196,12 @@ def checks(b, q):
         out.append({"level": "info", "msg": f"建物の縦横比が {max(w, d) / min(w, d):.1f} と細長です。間口と奥行の読み違いがないか確認してください"})
     mo = b.get("map_outline")
     if mo and fl:
+        # 地図の外形は屋根の外周（軒・ポーチ込み）。1階床面積 ≒ 外形×0.72（0.66〜0.80）が実測との比較での目安
         a1 = fl[0]["area_m2"]
-        if abs(a1 - mo["area_m2"]) / mo["area_m2"] > 0.15:
-            out.append({"level": "warn", "msg": f"1階の床面積 {a1:.0f}㎡ が地図の建物外形 No.{mo['no']}（約{mo['area_m2']:.0f}㎡）と "
-                                                f"{(a1 - mo['area_m2']) / mo['area_m2']:+.0%} 違います（下屋・カーポートの扱いを確認）"})
+        r = a1 / mo["area_m2"] if mo["area_m2"] else 0
+        if not 0.62 <= r <= 0.85:
+            out.append({"level": "warn", "msg": f"1階の床面積 {a1:.0f}㎡ が、地図の建物外形 No.{mo['no']}（屋根の外周 約{mo['area_m2']:.0f}㎡、"
+                                                f"1階床の目安 約{mo['area_m2'] * 0.72:.0f}㎡）と合いません。外形の選び方か寸法を確認してください"})
     if not faces:
         out.append({"level": "info", "msg": "立面の読み取りが無いため、窓・ドアの面積を差し引いていません"})
     elif len(faces) < 4:
