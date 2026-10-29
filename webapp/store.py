@@ -81,7 +81,9 @@ def save_case(case):
     old = _paths(f"cases/{case['id']}/case-") + _paths(f"{IDX}{case['id']}__")
     ver = f"cases/{case['id']}/case-{int(time.time() * 1000)}.json"
     blob.put_blob(ver, json.dumps(case, ensure_ascii=False).encode(), access=ACCESS, content_type="application/json")
-    blob.put_blob(f"{IDX}{case['id']}__{_encode_brief(_brief(case))}", b"", access=ACCESS, content_type="text/plain")
+    marker = f"{IDX}{case['id']}__{_encode_brief(_brief(case))}"
+    blob.put_blob(marker, b"", access=ACCESS, content_type="text/plain", allow_overwrite=True)
+    old = [p for p in old if p not in (ver, marker)]
     if old:
         blob.delete_blob(old)
     return case
