@@ -84,7 +84,10 @@
       <div class="start__cta">
         <button class="btn" id="btnAnalyze" disabled>AI で読み取る <span class="btn__arrow">➤</span></button>
         <p class="start__note" id="keyNote" hidden>いまは AI の設定前のため、ご自身の写真は読み取れません。下の「サンプルで試す」から操作をお試しください。</p>
-        <button class="link" id="btnSample">サンプル物件で試す（架空のアパート）</button>
+        <div class="start__links">
+          <button class="link" id="btnCases">保存した案件を開く</button>
+          <button class="link" id="btnSample">サンプル物件で試す（架空のアパート）</button>
+        </div>
       </div>
     </div>
   </section>
@@ -209,6 +212,8 @@
       </div>
     </div>
 
+    <p class="case-status" id="caseStatus"></p>
+
     <h2 class="sec-title"><span class="sec-title__en">DOWNLOAD</span><span class="sec-title__ja">資料のダウンロード</span></h2>
     <div class="dlgrid">
       <div class="card">
@@ -251,6 +256,14 @@
     <div class="progress__time" id="progTime"></div>
     <ul class="progress__list" id="progList"></ul>
     <div class="progress__hint" id="progHint">画面を閉じずにお待ちください</div>
+  </div>
+</div>
+
+<div class="modal" id="casesModal">
+  <div class="modal__box modal__box--wide">
+    <div class="cases__head"><h2 class="modal__title">保存した案件</h2><button class="icon-btn" id="casesClose" aria-label="閉じる">×</button></div>
+    <input class="input" id="casesQuery" placeholder="物件名・住所で絞り込み">
+    <ul class="cases" id="casesList"></ul>
   </div>
 </div>
 

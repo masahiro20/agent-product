@@ -787,6 +787,8 @@ def build(spec, out_dir, base_dir, formats=("pdf", "xlsx", "dxf"), rfq_opts=None
         summary["floor_area_m2"] = round(demo["quantities"]["floor_area_m2"], 1)
         summary["floor_area_tsubo"] = round(demo["quantities"]["floor_area_tsubo"], 1)
         summary["per_tsubo_mid"] = round(demo["per_tsubo_mid"] or 0)
+        summary["quantity_checks"] = demo["quantities"].get("checks", [])
+        summary["quantity_rows"] = [list(r) for r in quantities.summary_rows(demo["quantities"])] if demo["quantities"].get("detail") else []
         summary["asbestos_extra"] = [{k: (round(v) if isinstance(v, float) else v) for k, v in a.items() if k in ("name", "low", "mid", "high")}
                                      for a in demo["asbestos_extra"]]
         summary["demolition_lines"] = [{"cat": l["cat"], "name": l["name"], "qty": l["qty"], "unit": l["unit"],

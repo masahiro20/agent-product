@@ -44,15 +44,15 @@
     });
   }
 
-  async function api(path, body, { raw = false, method = "POST" } = {}) {
+  async function api(path, body, { raw = false, method = "POST", bin = null } = {}) {
     let resent = false;
     for (let attempt = 0; attempt < 3; attempt++) {
       const t0 = Date.now();
       let res;
       try {
         res = await fetch(path, {
-          method, headers: { "content-type": "application/json", "x-access-key": getKey() },
-          body: method === "POST" ? JSON.stringify(body || {}) : undefined,
+          method, headers: { "content-type": bin ? "image/jpeg" : "application/json", "x-access-key": getKey() },
+          body: bin || (method === "POST" ? JSON.stringify(body || {}) : undefined),
         });
       } catch (e) {
         // 回線が一瞬切れたときは1回だけ送り直す
@@ -758,10 +758,106 @@
       renderStep3();
       progress.end();
       go(3);
+      saveCase();
     } catch (e) {
       progress.end();
       toast(e.message, true);
     }
+  }
+
+  // ---------------- 案件の保存 ----------------
+  // 資料を作ったら自動で保存する（サンプルは保存しない）。2回目以降は同じ案件を上書きする
+  async function saveCase() {
+    const el = $("#caseStatus");
+    if (state.sample) { el.textContent = "サンプルのため保存していません"; return; }
+    el.textContent = "案件を保存しています…";
+    try {
+      const body = await buildBody("summary");
+      const payload = { reading: body.reading, options: body.options, summary: state.summary };
+      if (state.caseId) {
+        await api("/api/cases", { id: state.caseId, ...payload, title: body.options.project_name, address: body.options.address });
+      } else {
+        const r = await api("/api/cases", { ...payload, land: state.land, photo_names: state.photos.map((p) => p.name) });
+        state.caseId = r.case.id;
+        for (const [i, p] of state.photos.entries()) {
+          const bin = Uint8Array.from(atob(p.data), (c) => c.charCodeAt(0));
+          await api(`/api/cases/${state.caseId}/photos/${i + 1}`, null, { method: "PUT", bin });
+        }
+        history.replaceState(null, "", `?case=${state.caseId}`);
+      }
+      el.innerHTML = `保存しました（案件 ${esc(state.caseId)}）。<button class="link" id="btnCasesInline">保存した案件</button>から開き直せます`;
+      $("#btnCasesInline").addEventListener("click", openCases);
+    } catch (e) {
+      el.textContent = `保存できませんでした: ${e.message}`;
+    }
+  }
+
+  async function openCases() {
+    const m = $("#casesModal");
+    m.classList.add("is-active");
+    $("#casesList").innerHTML = "<li class='cases__empty'>読み込み中…</li>";
+    try {
+      const { cases } = await api("/api/cases", null, { method: "GET" });
+      const q = $("#casesQuery").value.trim();
+      const rows = cases.filter((c) => !q || `${c.title}${c.address}`.includes(q));
+      $("#casesList").innerHTML = rows.length ? rows.map((c) =>
+        `<li class="cases__item"><button class="cases__open" data-id="${esc(c.id)}">` +
+        `<span class="cases__title">${esc(c.title || "（物件名なし）")}</span>` +
+        `<span class="cases__addr">${esc(c.address || "")}</span>` +
+        `<span class="cases__meta">${esc((c.updated_at || "").slice(0, 10))}　延床 ${c.floor_area_m2 ? Math.round(c.floor_area_m2) + "㎡" : "-"}　` +
+        `解体 ${c.demolition_mid ? man(c.demolition_mid) + "万円" : "-"}${c.source && c.source.startsWith("mcp") ? "　Claude から作成" : ""}</span></button>` +
+        `<button class="icon-btn" data-del="${esc(c.id)}" aria-label="削除">×</button></li>`).join("")
+        : "<li class='cases__empty'>保存した案件はまだありません</li>";
+    } catch (e) {
+      $("#casesList").innerHTML = `<li class='cases__empty'>${esc(e.message)}</li>`;
+    }
+  }
+
+  async function openCase(id) {
+    $("#casesModal").classList.remove("is-active");
+    progress.start("案件を開いています", ["読み取り結果", "写真"], "");
+    try {
+      const { case: c } = await api(`/api/cases/${encodeURIComponent(id)}`, null, { method: "GET" });
+      progress.step(1);
+      const photos = [];
+      for (let i = 1; i <= (c.photo_count || 0); i++) {
+        const blob = await api(`/api/cases/${c.id}/photos/${i}`, null, { method: "GET", raw: true });
+        const url = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(blob); });
+        photos.push({ name: (c.photo_names || [])[i - 1] || `写真${i}`, data: url.split(",")[1], url });
+      }
+      Object.assign(state, { photos, land: c.land, reading: c.reading, summary: null, files: null, sample: null, caseId: c.id });
+      state.aiOutlineNo = c.reading?.building?.map_outline_no || 0;
+      const o = c.options || {};
+      $("#address").value = o.address || c.address || "";
+      $("#projectName").value = o.project_name || c.title || "";
+      if (o.region) { $("#region").value = o.region; state.regionTouched = true; }
+      if (o.fh_mode) $("#fhMode").value = o.fh_mode;
+      $("#optDemo").checked = o.include_demolition !== false;
+      $("#optGrade").checked = o.include_grading !== false;
+      renderThumbs();
+      renderStep2();
+      history.replaceState(null, "", `?case=${c.id}`);
+      progress.end();
+      go(2);
+      toast(`案件「${c.title || c.id}」を開きました`);
+    } catch (e) {
+      progress.end();
+      toast(e.message, true);
+    }
+  }
+
+  function initCases() {
+    $("#btnCases").addEventListener("click", openCases);
+    $("#casesClose").addEventListener("click", () => $("#casesModal").classList.remove("is-active"));
+    $("#casesQuery").addEventListener("input", openCases);
+    $("#casesList").addEventListener("click", async (e) => {
+      const o = e.target.closest(".cases__open");
+      if (o) return openCase(o.dataset.id);
+      const d = e.target.closest("[data-del]");
+      if (d && confirm("この案件を削除しますか？（写真も消えます）")) {
+        try { await api(`/api/cases/${d.dataset.del}`, null, { method: "DELETE" }); openCases(); } catch (err) { toast(err.message, true); }
+      }
+    });
   }
 
   function resultCard(label, t, note, total = false) {
@@ -852,7 +948,8 @@
     $("#btnBack2").addEventListener("click", () => go(2));
     $("#btnNew").addEventListener("click", () => {
       if (!confirm("入力内容を消して、新しい物件を始めますか？")) return;
-      Object.assign(state, { photos: [], land: null, reading: null, summary: null, files: null, sample: null });
+      Object.assign(state, { photos: [], land: null, reading: null, summary: null, files: null, sample: null, caseId: null });
+      history.replaceState(null, "", location.pathname);
       ["#address", "#projectName", "#notes"].forEach((s) => ($(s).value = ""));
       renderThumbs();
       go(1);
@@ -864,7 +961,7 @@
     const setHdr = () => document.documentElement.style.setProperty("--hdr", `${document.querySelector(".header").offsetHeight}px`);
     setHdr();
     window.addEventListener("resize", setHdr);
-    initStep1(); initStep2(); initStep3();
+    initStep1(); initStep2(); initStep3(); initCases();
     try {
       const h = await (await fetch("/api/health")).json();
       if (!h.has_api_key) $("#keyNote").hidden = false;
@@ -880,6 +977,8 @@
       `<option value="${esc(r.key)}">${esc(r.label)}（×${Number(r.factor).toFixed(2)}）</option>`).join("");
     setRegionFromAddress();
     renderThumbs();
+    const cid = new URLSearchParams(location.search).get("case");
+    if (cid) openCase(cid);
   }
   init();
 })();
