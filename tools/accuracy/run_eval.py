@@ -56,6 +56,8 @@ def run_one(folder):
             if os.environ.get("EVAL_EFFORT"):
                 body["effort"] = os.environ["EVAL_EFFORT"]
             res = post("/api/analyze", body)
+            if res.get("error"):  # 長い処理は 200 で本文に error を入れて返す
+                raise RuntimeError(res["error"])
             break
         except Exception as e:  # 混雑時は少し待って再試行
             err = getattr(e, "read", lambda: b"")()[:300]

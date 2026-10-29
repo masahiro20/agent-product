@@ -69,7 +69,11 @@
         if (res.status === 504) msg = "時間がかかりすぎて止まりました。写真の枚数を減らして再度お試しください。";
         throw new Error(msg);
       }
-      return raw ? res.blob() : res.json();
+      if (raw) return res.blob();
+      const j = await res.json();
+      // 長い処理は空白を流しながら 200 で返すので、エラーは本文の error で判定する
+      if (res.headers.get("x-stream") && j && j.error) throw new Error(j.error);
+      return j;
     }
     throw new Error("アクセスキーを確認してください");
   }

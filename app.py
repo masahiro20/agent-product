@@ -12,7 +12,9 @@ API:
   GET  /files/<id>/<形式>  期限付きリンクで資料をダウンロード（MCP の回答に載せる）
   POST /mcp           MCP サーバー（claude.ai のカスタムコネクタ用。認証は /oauth/* の Google ログイン）
 """
+import asyncio
 import hmac
+import json
 import html
 import os
 import shutil
@@ -22,7 +24,7 @@ import urllib.parse
 
 import anthropic
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
 from starlette.requests import ClientDisconnect
 
 from webapp import convert, land, links, mcp_server, oauth, reading, service, store
@@ -92,31 +94,58 @@ async def api_analyze(request: Request):
         return JSONResponse({"error": f"写真は{MAX_PHOTOS}枚までです"}, status_code=400)
     mock = os.environ.get("SITE_MOCK_READING")  # 開発用: APIキー無しで画面を確認する
     if mock:
-        import json
         with open(mock, encoding="utf-8") as f:
             return {"reading": json.load(f)["reading"], "usage": {"mock": True}}
     if not os.environ.get("ANTHROPIC_API_KEY"):
         return JSONResponse({"error": "AI の読み取りに必要な Claude API キーが未設定です。管理者が Vercel の環境変数 "
                                       "ANTHROPIC_API_KEY を設定してください。"}, status_code=503)
-    try:
+
+    def work():
         r, usage = reading.read_site(photos, body.get("address"), body.get("notes"), body.get("land_info"),
                                      body.get("aerial_b64"), effort=body.get("effort"),
                                      outlines=body.get("outlines"))  # effort は精度検証用（既定は SITE_EFFORT）
         return {"reading": r, "usage": usage}
-    except anthropic.AuthenticationError as e:
-        return _err(RuntimeError("Claude API キーが無効です。設定されているキーを確認してください。"), 503)
-    except anthropic.RateLimitError:
-        return _err(RuntimeError("AI の利用が混み合っています。1分ほど待ってからもう一度お試しください。"), 429)
-    except anthropic.APIStatusError as e:
+
+    return _keepalive_json(work)
+
+
+def _analyze_error(e):
+    """読み取りの例外 → 利用者向けの日本語メッセージ。"""
+    if isinstance(e, anthropic.AuthenticationError):
+        return "Claude API キーが無効です。設定されているキーを確認してください。"
+    if isinstance(e, anthropic.RateLimitError):
+        return "AI の利用が混み合っています。1分ほど待ってからもう一度お試しください。"
+    if isinstance(e, anthropic.APIStatusError):
         if e.status_code == 413:
-            return _err(RuntimeError("写真の容量が大きすぎます。枚数を減らしてください。"), 413)
+            return "写真の容量が大きすぎます。枚数を減らしてください。"
         if e.status_code in (500, 502, 503, 529):
-            return _err(RuntimeError("AI 側が一時的に混み合っています。少し待ってからもう一度お試しください。"), 503)
-        return _err(RuntimeError(f"AI の呼び出しでエラーになりました（{e.status_code}）: {e.message}"), 502)
-    except anthropic.APIConnectionError:
-        return _err(RuntimeError("AI に接続できませんでした。少し待ってからもう一度お試しください。"), 502)
-    except Exception as e:
-        return _err(e)
+            return "AI 側が一時的に混み合っています。少し待ってからもう一度お試しください。"
+        return f"AI の呼び出しでエラーになりました（{e.status_code}）: {e.message}"
+    if isinstance(e, anthropic.APIConnectionError):
+        return "AI に接続できませんでした。少し待ってからもう一度お試しください。"
+    return str(e) or e.__class__.__name__
+
+
+def _keepalive_json(fn, every=10):
+    """時間のかかる処理を別スレッドで動かし、終わるまで空白を流し続けてから JSON を返す。
+    回線や中継（携帯回線・社内プロキシ）が、無言のまま長く続く通信を切るのを防ぐ。JSON は先頭の空白を無視する。
+    エラーも 200 で {"error": …} として返す（画面側は x-stream ヘッダーを見て判定する）。"""
+    async def gen():
+        loop = asyncio.get_running_loop()
+        fut = loop.run_in_executor(None, fn)
+        while True:
+            try:
+                result = await asyncio.wait_for(asyncio.shield(fut), timeout=every)
+                yield json.dumps(result, ensure_ascii=False).encode()
+                return
+            except asyncio.TimeoutError:
+                yield b" "
+            except Exception as e:  # noqa: BLE001
+                traceback.print_exc()
+                yield json.dumps({"error": _analyze_error(e)}, ensure_ascii=False).encode()
+                return
+
+    return StreamingResponse(gen(), media_type="application/json", headers={"x-stream": "1", "Cache-Control": "no-store"})
 
 
 @app.post("/api/quantities")
