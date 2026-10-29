@@ -14,6 +14,7 @@ import traceback
 
 from . import drive, links, service, store
 
+STRUCT = {"wood": "木造", "light_steel": "軽量鉄骨造", "heavy_steel": "重量鉄骨造", "rc": "RC造"}
 PROTOCOLS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 INSTRUCTIONS = (
     "ホームランディック社内の『現地写真レポート』です。Google ドライブの写真フォルダと住所から、"
@@ -82,7 +83,7 @@ def case_text(case, base):
     b = (case.get("reading") or {}).get("building") or {}
     lines = [f"■ 案件 {case['id']}　{case.get('title') or ''}　{case.get('address') or ''}"]
     if s.get("floor_area_m2"):
-        lines.append(f"建物（推定）: {b.get('structure', '')} {b.get('floors', '')}階建・延床 約{s['floor_area_m2']}㎡（{s.get('floor_area_tsubo')}坪）・"
+        lines.append(f"建物（推定）: {STRUCT.get(b.get('structure'), b.get('structure', ''))} {b.get('floors', '')}階建・延床 約{s['floor_area_m2']}㎡（{s.get('floor_area_tsubo')}坪）・"
                      f"推定築年 {b.get('built_year_est', '')}年頃")
     d = s.get("demolition_total")
     if d:
