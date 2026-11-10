@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>ホームランディック 現地写真レポート｜PR映像</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Sans+JP:wght@400;500&family=Shippori+Mincho:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+:root{
+  --ink:#101418; --ink2:#1a2026; --paper:#fbfbfb; --text:#2b2f33; --sub:#7d858c; --line:#cdd6dd; --soft:#e6ebef;
+  --accent:#8c9baa; --gold:#a18c4c; --goldL:#cdb97a; --red:#b5483f;
+  --serif:"Shippori Mincho","Noto Serif JP",serif; --sans:"Noto Sans JP",sans-serif; --lat:"Inter",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#000}
+#film{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--ink);font-family:var(--sans);color:var(--text)}
+.scene{position:absolute;inset:0;opacity:0;overflow:hidden}
+.dark{background:radial-gradient(1400px 900px at 50% 45%,#1d242b 0%,#101418 60%,#0a0d10 100%);color:#f3f1ea}
+.light{background:radial-gradient(1500px 1000px at 50% 40%,#ffffff 0%,#f7f8f9 60%,#eef1f3 100%)}
+canvas.bg{position:absolute;inset:0}
+[data-in]{opacity:0;will-change:transform,opacity}
+.center{position:absolute;left:0;right:0;text-align:center}
+.serif{font-family:var(--serif)}
+.split span{display:inline-block;white-space:pre}
+
+/* 共通：章見出し */
+.chap{position:absolute;left:110px;top:84px;display:flex;align-items:baseline;gap:22px}
+.chap__no{font-family:var(--serif);font-size:30px;color:var(--gold);letter-spacing:.1em}
+.chap__en{font-family:var(--lat);font-size:15px;letter-spacing:.42em;color:var(--accent)}
+.chap__ja{font-family:var(--serif);font-size:30px;letter-spacing:.2em;color:var(--text)}
+.chap__rule{position:absolute;left:110px;top:140px;height:1px;width:1700px;background:var(--line);transform-origin:left}
+.sample{position:absolute;right:110px;top:92px;font-size:14px;letter-spacing:.14em;color:var(--sub);border:1px solid var(--line);padding:5px 14px;background:#fff}
+.caption{position:absolute;left:110px;bottom:70px;font-family:var(--serif);font-size:40px;letter-spacing:.14em;color:var(--text)}
+.caption small{display:block;font-family:var(--sans);font-size:17px;letter-spacing:.12em;color:var(--sub);margin-top:10px}
+
+/* S1 */
+#s1 .line{top:470px;font-family:var(--serif);font-size:74px;letter-spacing:.22em;font-weight:500}
+#s1 .tiny{top:930px;font-family:var(--lat);font-size:14px;letter-spacing:.5em;color:#7d8791}
+/* S2 */
+#s2 .tasks{position:absolute;left:250px;top:215px;width:640px}
+#s2 .task{position:relative;height:104px;display:flex;align-items:center;gap:34px;font-family:var(--serif);font-size:46px;letter-spacing:.2em}
+#s2 .task i{font-style:normal;font-family:var(--lat);font-size:15px;letter-spacing:.3em;color:var(--goldL);width:44px}
+#s2 .task b{position:absolute;left:0;bottom:0;height:1px;width:100%;background:rgba(205,214,221,.28);transform-origin:left}
+#s2 .big{position:absolute;left:1010px;top:420px;font-family:var(--serif);font-size:76px;line-height:1.7;letter-spacing:.16em;font-weight:500}
+#s2 .big em{font-style:normal;color:var(--goldL)}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#goldline{position:absolute;left:0;top:539px;height:2px;width:1920px;background:linear-gradient(90deg,transparent,var(--goldL) 20%,#fff 50%,var(--goldL) 80%,transparent);transform:scaleX(0);opacity:0}
+/* S3 */
+#s3 .mark{position:absolute;left:910px;top:330px;width:100px}
+#s3 .ltext{position:absolute;left:810px;top:462px;width:300px}
+#s3 .ttl{top:560px;font-family:var(--serif);font-size:84px;letter-spacing:.34em;text-indent:.34em;font-weight:500;color:#23272b}
+#s3 .rule{position:absolute;left:860px;top:728px;width:200px;height:2px;background:var(--gold)}
+#s3 .en{top:762px;font-family:var(--lat);font-size:16px;letter-spacing:.62em;text-indent:.62em;color:var(--accent)}
+/* S4 */
+#photo{position:absolute;left:110px;top:190px;width:900px;height:675px;background:#fff;box-shadow:0 30px 80px rgba(20,30,40,.18);overflow:hidden}
+#photo img{position:absolute;inset:0;width:100%;height:100%}
+#scan{position:absolute;left:0;right:0;height:140px;background:linear-gradient(180deg,rgba(161,140,76,0) 0%,rgba(205,185,122,.28) 85%,rgba(255,255,255,.95) 99%,rgba(255,255,255,0) 100%);opacity:0}
+#marks{position:absolute;inset:0}
+.mk{position:absolute;border:2.5px solid var(--red);opacity:0}
+.mk.edge span{left:6px;bottom:auto;top:6px}
+.mk span{position:absolute;left:-2.5px;bottom:100%;background:var(--red);color:#fff;font-size:15px;letter-spacing:.06em;padding:2px 9px;white-space:nowrap}
+#thumbs{position:absolute;left:110px;top:888px;display:flex;gap:14px}
+#thumbs div{width:132px;height:99px;background-size:cover;border:1px solid var(--line);opacity:0}
+#thumbs div.on{outline:2px solid var(--gold);outline-offset:2px}
+#reads{position:absolute;left:1090px;top:186px;width:720px}
+.rd{display:grid;grid-template-columns:150px 1fr;align-items:baseline;padding:13px 0 12px;border-bottom:1px solid var(--soft)}
+.rd dt{font-size:16px;letter-spacing:.16em;color:var(--sub)}
+.rd dd{font-family:var(--serif);font-size:35px;letter-spacing:.08em;color:#23272b}
+.rd p{grid-column:2;font-size:14.5px;letter-spacing:.06em;color:var(--accent);margin-top:2px}
+.rd p::before{content:"根拠｜";color:var(--gold)}
+#s4 .caption,#s5 .caption{left:1090px;bottom:62px;font-size:36px}
+/* S5 */
+#elev{position:absolute;left:210px;top:200px;width:1500px;height:660px}
+#elev svg{width:100%;height:100%;overflow:visible}
+#sheets{position:absolute;left:110px;top:186px;width:1700px;height:700px}
+.sheet{position:absolute;left:0;top:-6px;width:930px;background:#fff;box-shadow:0 30px 80px rgba(20,30,40,.2);opacity:0}
+.sheet img{display:block;width:100%}
+#slist{position:absolute;left:1090px;top:250px;width:720px}
+.sl{position:relative;display:flex;align-items:baseline;gap:26px;padding:26px 0;border-bottom:1px solid var(--soft);font-family:var(--serif);font-size:38px;letter-spacing:.16em;color:#9aa3ab;opacity:0}
+.sl i{font-style:normal;font-family:var(--lat);font-size:14px;letter-spacing:.3em;width:60px}
+.sl b{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--gold);transform-origin:left;transform:scaleX(0)}
+/* S6 */
+#iso{position:absolute;left:70px;top:170px}
+#nums{position:absolute;left:1010px;top:200px;width:800px}
+.nb{position:relative;display:grid;grid-template-columns:200px 1fr;align-items:end;padding:22px 30px 20px;border-bottom:1px solid var(--line)}
+.nb h3{font-family:var(--serif);font-weight:500;font-size:26px;letter-spacing:.2em;padding-bottom:16px}
+.nb .v{text-align:right;font-family:var(--serif);font-size:104px;line-height:1;letter-spacing:.02em;color:#23272b}
+.nb .v u{text-decoration:none;font-size:32px;letter-spacing:.14em;margin-left:14px}
+.nb .r{grid-column:1/3;display:flex;align-items:center;gap:16px;margin-top:14px;font-size:15px;letter-spacing:.08em;color:var(--sub)}
+.nb .bar{flex:1;height:3px;background:var(--soft);position:relative}
+.nb .bar b{position:absolute;top:0;bottom:0;background:var(--accent);left:0;right:0;transform-origin:left}
+.nb .bar s{position:absolute;top:-5px;width:13px;height:13px;border-radius:50%;background:var(--gold);margin-left:-6px}
+.nb.total{background:#23272b;color:#fff;border:0;margin-top:20px}
+.nb.total .v{color:#fff}.nb.total .r{color:#aeb6bd}.nb.total .bar{background:#474d53}.nb.total .bar b{background:#aeb6bd}.nb.total .bar s{background:var(--goldL)}
+#facts{position:absolute;left:110px;top:800px;display:flex;gap:54px}
+.fact{font-size:15px;letter-spacing:.14em;color:var(--sub)}
+.fact b{display:block;font-family:var(--serif);font-weight:500;font-size:38px;letter-spacing:.06em;color:#23272b;margin-top:2px}
+.fact b u{text-decoration:none;font-size:20px;margin-left:5px}
+#s6 .caption{bottom:56px;font-size:36px}
+/* S7 */
+#wall{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+#wallP{position:absolute;inset:0;perspective:1700px;perspective-origin:50% 46%}
+.row{position:absolute;left:0;display:flex;gap:34px;white-space:nowrap}
+.row img{display:block;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#fff}
+#s7 .veil{position:absolute;inset:0;background:radial-gradient(900px 520px at 50% 50%,rgba(10,13,16,.9) 0%,rgba(10,13,16,.66) 55%,rgba(10,13,16,.25) 100%)}
+#s7 .fmt{top:380px;display:flex;justify-content:center;gap:70px}
+#s7 .f{text-align:center;color:#fff}
+#s7 .f b{display:block;font-family:var(--serif);font-weight:500;font-size:92px;letter-spacing:.1em;line-height:1.15}
+#s7 .f span{font-size:18px;letter-spacing:.24em;color:var(--goldL)}
+#s7 .sep{width:1px;background:rgba(205,185,122,.5);margin:18px 0}
+#s7 .cap{top:640px;font-family:var(--serif);font-size:42px;letter-spacing:.2em;color:#f3f1ea}
+/* S8 */
+#s8 .h{font-family:var(--serif);font-weight:500;color:#23272b;letter-spacing:.2em}
+#s8 .h1{top:290px;font-size:66px}
+#s8 .h2{top:400px;font-size:88px}
+#s8 .rule{position:absolute;left:860px;top:572px;width:200px;height:2px;background:var(--gold)}
+#s8 .brand{position:absolute;left:0;right:0;top:640px;display:flex;justify-content:center;align-items:center;gap:26px}
+#s8 .brand .m{width:62px}#s8 .brand .t{width:270px}
+#s8 .brand i{width:1px;height:46px;background:var(--line)}
+#s8 .brand span{font-family:var(--serif);font-size:30px;letter-spacing:.3em}
+#s8 .corp{top:742px;font-family:var(--serif);font-size:23px;letter-spacing:.3em;text-indent:.3em;color:#23272b}
+#s8 .corp em{font-style:normal;color:var(--sub);font-size:18px;margin-left:26px;letter-spacing:.26em}
+#s8 .note{top:900px;font-size:15px;letter-spacing:.1em;color:var(--sub);line-height:2}
+#s8 .made{top:990px;font-family:var(--lat);font-size:12.5px;letter-spacing:.34em;color:var(--accent)}
+#black{position:absolute;inset:0;background:#000;opacity:0}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 62%,rgba(0,0,0,.16) 100%);pointer-events:none}
+</style>
+</head>
+<body>
+<div id="film">
+
+<!-- S1 0–8 -->
+<section class="scene dark" id="s1" data-s="0,8.2">
+  <canvas class="bg" id="c1" width="1920" height="1080"></canvas>
+  <div class="center line split" data-in="1.0" data-out="3.9" data-st=".07">現地に立つ。写真を撮る。</div>
+  <div class="center line split" data-in="4.5" data-out="7.5" data-st=".07">そこから先が、長い。</div>
+  <div class="center tiny" data-in="1.6,1.5" data-out="7.4">HOMELANDICK　—　KOMAKI, AICHI</div>
+</section>
+
+<!-- S2 8–16 -->
+<section class="scene dark" id="s2" data-s="8,16.3">
+  <canvas class="bg" id="c2" width="1920" height="1080"></canvas>
+  <div class="tasks" id="tasks"></div>
+  <div class="big">
+    <div class="split" data-in="13.0" data-out="15.5,.4" data-st=".06">その全部を、</div>
+    <div class="split" data-in="13.7" data-out="15.5,.4" data-st=".06"><em>写真から。</em></div>
+  </div>
+  <div id="goldline"></div>
+</section>
+
+<!-- S3 16–21.33 -->
+<section class="scene light" id="s3" data-s="15.95,21.6">
+  <img class="mark" src="../public/img/logo-black.svg" data-in="16.5,.9" data-out="20.7,.5" data-y="0">
+  <img class="ltext" src="../public/img/logo-text.svg" data-in="16.9,.9" data-out="20.7,.5" data-y="14">
+  <div class="center ttl split" data-in="17.3" data-out="20.7,.5" data-st=".07">現地写真レポート</div>
+  <div class="rule" id="s3rule"></div>
+  <div class="center en" data-in="18.6,.9" data-out="20.7,.5" data-y="0">SITE PHOTO REPORT</div>
+</section>
+
+<!-- S4 21.33–34.67 -->
+<section class="scene light" id="s4" data-s="21.3,34.95">
+  <div class="chap" data-in="21.6" data-y="12"><span class="chap__no">01</span><span class="chap__en">READ</span><span class="chap__ja">写真を読む</span></div>
+  <div class="chap__rule" data-rule="21.7"></div>
+  <div class="sample" data-in="22.0" data-y="0">サンプル物件（架空）</div>
+  <div id="photo" data-in="22.0,1.0" data-y="40">
+    <img id="photoImg" src="../public/demo/photo1.jpg">
+    <div id="marks"></div>
+    <div id="scan"></div>
+  </div>
+  <div id="thumbs"></div>
+  <dl id="reads"></dl>
+  <div class="caption serif" data-in="31.6" data-y="18">根拠ごと、読み取る。<small>赤枠は、寸法や数量の根拠にした箇所。数字はその場で直せます。</small></div>
+</section>
+
+<!-- S5 34.67–45.33 -->
+<section class="scene light" id="s5" data-s="34.65,45.6">
+  <div class="chap" data-in="34.9" data-y="12"><span class="chap__no">02</span><span class="chap__en">DRAW</span><span class="chap__ja">図面を描く</span></div>
+  <div class="chap__rule" data-rule="35.0"></div>
+  <div class="sample" data-in="35.2" data-y="0">サンプル物件（架空）</div>
+  <div id="elev"></div>
+  <div id="sheets"></div>
+  <div id="slist"></div>
+  <div class="caption serif" data-in="41.2" data-y="18">立面図から、造成計画図まで。<small>読み取った寸法から作図。CAD（DXF）でも開けます。</small></div>
+</section>
+
+<!-- S6 45.33–56 -->
+<section class="scene light" id="s6" data-s="45.3,56.3">
+  <div class="chap" data-in="45.6" data-y="12"><span class="chap__no">03</span><span class="chap__en">ESTIMATE</span><span class="chap__ja">概算を出す</span></div>
+  <div class="chap__rule" data-rule="45.7"></div>
+  <div class="sample" data-in="45.9" data-y="0">サンプル物件（架空）</div>
+  <canvas id="iso" width="900" height="620"></canvas>
+  <div id="nums">
+    <div class="nb" data-in="46.6" data-n="291" data-lo="192" data-hi="453"><h3>解体工事</h3><div class="v"><em style="font-style:normal">0</em><u>万円</u></div>
+      <div class="r"><span>192万円</span><div class="bar"><b></b><s></s></div><span>453万円</span></div></div>
+    <div class="nb" data-in="47.5" data-n="266" data-lo="163" data-hi="476"><h3>造成工事</h3><div class="v"><em style="font-style:normal">0</em><u>万円</u></div>
+      <div class="r"><span>163万円</span><div class="bar"><b></b><s></s></div><span>476万円</span></div></div>
+    <div class="nb total" data-in="48.6" data-n="557" data-lo="354" data-hi="929"><h3>合計（税別）</h3><div class="v"><em style="font-style:normal">0</em><u>万円</u></div>
+      <div class="r"><span>354万円</span><div class="bar"><b></b><s></s></div><span>929万円</span></div></div>
+  </div>
+  <div id="facts">
+    <div class="fact" data-in="50.2" data-y="14">延床面積<b>132.5<u>㎡</u></b></div>
+    <div class="fact" data-in="50.5" data-y="14">廃材の発生量<b>約52.7<u>t</u></b></div>
+    <div class="fact" data-in="50.8" data-y="14">切土<b>5.3<u>㎥</u></b></div>
+    <div class="fact" data-in="51.1" data-y="14">盛土<b>55.7<u>㎥</u></b></div>
+    <div class="fact" data-in="51.4" data-y="14">土留め<b>44.5<u>m</u></b></div>
+  </div>
+  <div class="caption serif" data-in="52.0" data-y="18">幅と根拠のある、概算。<small>数量・単価・出典を内訳で。金額は参考値（推定）です。</small></div>
+</section>
+
+<!-- S7 56–64 -->
+<section class="scene dark" id="s7" data-s="55.95,64.3">
+  <div id="wallP"><div id="wall"><div class="row" id="rowA"></div><div class="row" id="rowB"></div><div class="row" id="rowC"></div></div></div>
+  <div class="veil"></div>
+  <div class="center fmt">
+    <div class="f" data-in="57.2" data-out="63.4,.5"><b>PDF</b><span>一式資料 18ページ</span></div><div class="sep" data-in="57.4" data-out="63.4,.5" data-y="0"></div>
+    <div class="f" data-in="57.7" data-out="63.4,.5"><b>Excel</b><span>内訳・単価を書き換えて再計算</span></div><div class="sep" data-in="57.9" data-out="63.4,.5" data-y="0"></div>
+    <div class="f" data-in="58.2" data-out="63.4,.5"><b>DXF</b><span>CADで開ける図面</span></div>
+  </div>
+  <div class="center cap split" data-in="59.4" data-out="63.4,.5" data-st=".05">一式の資料が、そのまま次の仕事へ。</div>
+</section>
+
+<!-- S8 64–76 -->
+<section class="scene light" id="s8" data-s="63.95,76.1">
+  <div class="center h h1 split" data-in="64.8" data-st=".06">現地写真から、</div>
+  <div class="center h h2 split" data-in="65.8" data-st=".06">解体・造成の概算と図面を。</div>
+  <div class="rule" id="s8rule"></div>
+  <div class="brand" data-in="68.6,1.0" data-y="16">
+    <img class="m" src="../public/img/logo-black.svg"><img class="t" src="../public/img/logo-text.svg"><i></i><span>現地写真レポート</span>
+  </div>
+  <div class="center corp" data-in="69.3,1.0" data-y="12">株式会社ホームランディック<em>愛知県小牧市</em></div>
+  <div class="center note" data-in="70.2,1.0" data-y="0">映像内の物件は操作確認用の架空のサンプルです。図面・数量・金額はすべて推定の参考値で、正式には現地調査・測量等が必要です。</div>
+  <div class="center made" data-in="71.0,1.0" data-y="0">NO CAMERA, NO STOCK FOOTAGE — EVERY FRAME GENERATED IN CODE BY CLAUDE</div>
+</section>
+
+<div id="flash"></div>
+<div id="vig"></div>
+<div id="black"></div>
+</div>
+
+<script>
+const DUR = 76, FPS = 30;
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const pr = (t, a, d) => cl((t - a) / d);
+const eo = (x) => 1 - Math.pow(1 - x, 3), eio = (x) => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2, eo5 = (x) => 1 - Math.pow(1 - x, 5);
+const lerp = (a, b, x) => a + (b - a) * x;
+function rng(seed) { let s = seed; return () => (s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296; }
+const SVGNS = "http://www.w3.org/2000/svg";
+
+/* ---------- 組み立て ---------- */
+const TASKS = ["寸法を拾う", "図面を起こす", "数量を数える", "単価を当てる", "土地を調べる", "見積にまとめる"];
+$("#tasks").innerHTML = TASKS.map((s, i) => `<div class="task" data-in="${(8.4 + i * .72).toFixed(2)},.6" data-out="${(15.2 + i * .04).toFixed(2)},.4" data-x="-30" data-y="0"><i>0${i + 1}</i>${s}<b data-rule="${(8.4 + i * .72).toFixed(2)}"></b></div>`).join("");
+
+const READS = [
+  ["構造・階数", "木造在来・2階建て", "モルタル外壁、鉄骨外階段、アルミサッシの仕様"],
+  ["桁行（長辺）", "約14.56m", "1戸の間口≈3.64m（2間）×4戸。玄関・窓の繰り返しから判定"],
+  ["梁間（短辺）", "約4.55m", "2F窓 W1.69m を基準に外壁幅を比例計算"],
+  ["軒高／最高", "約5.75m／約6.65m", "2F窓上〜軒の比率、屋根勾配≈4寸"],
+  ["戸数・間取り", "8戸（1K 約16.6㎡）", "玄関ドア4枚×2層、室外機の台数"],
+  ["推定築年", "1975〜80年頃", "外壁・サッシ・面格子の仕様から"],
+];
+$("#reads").innerHTML = READS.map((r, i) => `<div class="rd" data-in="${(25.2 + i * .95).toFixed(2)},.7" data-y="16"><dt>${r[0]}</dt><dd>${r[1]}</dd><p>${r[2]}</p></div>`).join("");
+$("#thumbs").innerHTML = [1, 2, 3, 4].map((i) => `<div style="background-image:url(../public/demo/photo${i}.jpg)" class="${i == 1 ? "on" : ""}" data-in="${(22.5 + i * .18).toFixed(2)},.6" data-y="18"></div>`).join("");
+
+const SHEETS = [["pg-12", "立面図", "A-01", 0, 0, 800], ["pg-14", "現況平面・解体範囲図", "S-01", 0, 0, 800], ["pg-15", "造成計画平面図", "C-01", 0, 0, 800], ["pg-16", "造成計画断面図", "C-02", 0, 0, 800]];
+$("#sheets").innerHTML = SHEETS.map((s, i) => `<div class="sheet" id="sh${i}"><img src="assets/${s[0]}.jpg"></div>`).join("");
+$("#slist").innerHTML = SHEETS.map((s, i) => `<div class="sl" id="sl${i}"><i>${s[2]}</i>${s[1]}<b></b></div>`).join("");
+
+const PORT = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 17, 18], LAND = [12, 13, 14, 15, 16];
+const pg = (n, h) => `<img src="assets/pg-${String(n).padStart(2, "0")}.jpg" style="height:${h}px">`;
+$("#rowA").innerHTML = [1, 2, 12, 3, 4, 14, 5, 6, 1, 2, 12, 3].map((n) => pg(n, 330)).join("");
+$("#rowB").innerHTML = [13, 7, 8, 15, 9, 10, 16, 11, 13, 7, 8, 15].map((n) => pg(n, 330)).join("");
+$("#rowC").innerHTML = [17, 16, 18, 1, 14, 2, 12, 3, 17, 16, 18, 1].map((n) => pg(n, 330)).join("");
+
+// 文字ごとに分割
+$$(".split").forEach((el) => {
+  const walk = (node) => {
+    [...node.childNodes].forEach((n) => {
+      if (n.nodeType === 3) { const f = document.createDocumentFragment(); [...n.textContent].forEach((ch) => { const s = document.createElement("span"); s.textContent = ch; s.className = "ch"; f.appendChild(s); }); n.replaceWith(f); }
+      else walk(n);
+    });
+  };
+  walk(el);
+  el._chs = $$(".ch", el);
+});
+
+/* ---------- 立面図（サンプルの読み取り結果から描く） ---------- */
+let ELEV = [];
+function buildElevation(reading) {
+  const b = reading.building, f = b.faces[0], W = f.width_m, EH = b.eave_h, RH = b.ridge_h, OV = b.roof_overhang_m;
+  const k = 78, ox = 215, oy = 600; // 1m = 78px
+  const X = (x) => ox + x * k, Z = (z) => oy - z * k;
+  const svg = document.createElementNS(SVGNS, "svg"); svg.setAttribute("viewBox", "0 0 1500 660");
+  const items = [];
+  const add = (tag, at, t0, d = .8, kind = "stroke") => {
+    const e = document.createElementNS(SVGNS, tag);
+    for (const k2 in at) e.setAttribute(k2, at[k2]);
+    if (kind === "stroke") { e.setAttribute("pathLength", 1); e.setAttribute("stroke-dasharray", 1); e.setAttribute("fill", at.fill || "none"); if (!at.stroke) e.setAttribute("stroke", "#23272b"); if (!at["stroke-width"]) e.setAttribute("stroke-width", 1.6); }
+    svg.appendChild(e); items.push({ e, t0, d, kind }); return e;
+  };
+  const L = (x0, z0, x1, z1, t0, d, o = {}) => add("path", { d: `M${X(x0)} ${Z(z0)}L${X(x1)} ${Z(z1)}`, ...o }, t0, d);
+  const R = (x, z, w, h, t0, d, o = {}) => add("path", { d: `M${X(x)} ${Z(z)}h${w * k}v${-h * k}h${-w * k}z`, ...o }, t0, d);
+  const T = (x, y, s, t0, o = {}) => { const e = add("text", { x, y, "font-family": "Inter, 'Noto Sans JP'", "font-size": 15, fill: "#5c656d", "letter-spacing": ".06em", ...o }, t0, .5, "fade"); e.textContent = s; return e; };
+  let t = 35.3;
+  L(-3.2, 0, W + 2.6, 0, t, 1.0, { "stroke-width": 2.6 });                 // GL
+  R(0, 0, W, EH, t + .3, 1.3, { "stroke-width": 2.4 });                     // 外壁
+  // 屋根（切妻・平側）
+  add("path", { d: `M${X(-OV)} ${Z(EH)}H${X(W + OV)}V${Z(RH)}H${X(-OV)}z`, "stroke-width": 2.2 }, t + .9, 1.0);
+  for (let i = 1; i < 32; i++) L(-OV + (W + 2 * OV) * i / 32, EH, -OV + (W + 2 * OV) * i / 32, RH, t + 1.3 + i * .012, .4, { "stroke-width": .7, stroke: "#8c9baa" });
+  L(0, b.floor_levels[1], W, b.floor_levels[1], t + 1.4, .8, { "stroke-width": .8, stroke: "#8c9baa" });
+  let n = 0;
+  for (const el of f.elements) {
+    const tt = t + 1.5 + (n++) * .04;
+    if (el.type === "window") { R(el.x, el.z, el.w, el.h, tt, .7, { "stroke-width": 1.8, fill: "rgba(140,155,170,.10)" }); L(el.x + el.w / 2, el.z, el.x + el.w / 2, el.z + el.h, tt + .3, .4, { "stroke-width": 1 }); R(el.x + .05, el.z + .05, el.w - .1, el.h - .1, tt + .2, .6, { "stroke-width": .7 }); }
+    else if (el.type === "canopy") R(el.x, el.z, el.w, el.h, tt, .5, { "stroke-width": 1.2 });
+    else if (el.type === "railing") { R(el.x, el.z, el.w, el.h, tt, .6, { "stroke-width": 1.2 }); for (let i = 1; i < 14; i++) L(el.x + el.w * i / 14, el.z, el.x + el.w * i / 14, el.z + el.h, tt + .2 + i * .01, .3, { "stroke-width": .7 }); }
+    else if (el.type === "box") R(el.x, el.z, el.w, el.h, tt, .5, { "stroke-width": 1.2 });
+    else if (el.type === "pipe") L(el.x, el.z, el.x, el.z + el.h, tt, .7, { "stroke-width": 1.2 });
+    else if (el.type === "stair_front") { L(el.x, 0, el.x, el.h + 1.1, tt, .6, { "stroke-width": 1.2 }); L(el.x + el.w, 0, el.x + el.w, el.h + 1.1, tt, .6, { "stroke-width": 1.2 }); for (let i = 1; i <= 16; i++) L(el.x, el.h * i / 16, el.x + el.w, el.h * i / 16, tt + .2 + i * .02, .3, { "stroke-width": .9 }); }
+    else if (el.type === "tree") { const cx = el.x + el.w / 2 - .6, r = 2.3; add("circle", { cx: X(cx), cy: Z(el.h - r - .4), r: r * k, "stroke-width": 1.1, stroke: "#8c9baa", "stroke-dasharray": "none" }, tt, 1.0); L(cx, 0, cx, el.h - 2 * r - .4, tt, .5, { "stroke-width": 1.1, stroke: "#8c9baa" }); }
+  }
+  // 寸法線
+  const td = t + 2.9, G = "#a18c4c";
+  const dimH = (x0, x1, z, label, t0) => { L(x0, z, x1, z, t0, .7, { stroke: G, "stroke-width": 1.1 }); L(x0, z + .16, x0, z - .16, t0, .3, { stroke: G, "stroke-width": 1.1 }); L(x1, z + .16, x1, z - .16, t0 + .5, .3, { stroke: G, "stroke-width": 1.1 }); T(X((x0 + x1) / 2), Z(z) + 22, label, t0 + .5, { "text-anchor": "middle", fill: G, "font-size": 17 }); };
+  dimH(0, W, -.55, "14,560", td);
+  for (let i = 0; i < 4; i++) dimH(i * 3.64, (i + 1) * 3.64, -.05 - .0, "", td + .2 + i * .08), items.pop(); // 目盛のみ（ラベルなし）
+  const xr = W + 1.75;
+  L(xr, 0, xr, RH, td + .5, .8, { stroke: G, "stroke-width": 1.1 });
+  [[0, "GL ±0"], [b.floor_levels[0], "1FL +450"], [b.floor_levels[1], "2FL +3,200"], [EH, "軒高 +5,750"], [RH, "最高高さ +6,650"]].forEach(([z, s], i) => {
+    L(xr - .16, z, xr + .16, z, td + .7 + i * .15, .3, { stroke: G, "stroke-width": 1.1 });
+    L(W + OV + .1, z, xr - .25, z, td + .7 + i * .15, .4, { stroke: "#cdd6dd", "stroke-width": .8 });
+    T(X(xr) + 22, Z(z) + 5, s, td + .9 + i * .15, { fill: G, "font-size": 16 });
+  });
+  T(X(W / 2), 716, "南立面図（道路側・居室）　S=1/100", td + 1.4, { "text-anchor": "middle", "font-family": "'Shippori Mincho'", "font-size": 22, fill: "#23272b", "letter-spacing": ".16em" });
+  $("#elev").appendChild(svg);
+  ELEV = items;
+}
+
+/* ---------- 写真の読み取り箇所 ---------- */
+let MARKS = [];
+function buildMarks(reading) {
+  const ms = reading.photos[0].marks;
+  $("#marks").innerHTML = ms.map((m) => `<div class="mk${m.x0 < .02 ? " edge" : ""}" style="left:${m.x0 * 100}%;top:${m.y0 * 100}%;width:${(m.x1 - m.x0) * 100}%;height:${(m.y1 - m.y0) * 100}%"><span>${m.label}</span></div>`).join("");
+  MARKS = $$(".mk");
+}
+
+/* ---------- 背景（設計グリッドと光） ---------- */
+function drawGrid(ctx, t, seed) {
+  ctx.clearRect(0, 0, 1920, 1080);
+  const a = cl(t / 2.5);
+  ctx.lineWidth = 1;
+  const off = (t * 6) % 60;
+  for (let x = -60 + off; x < 1980; x += 60) { ctx.strokeStyle = `rgba(140,155,170,${.075 * a})`; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1080); ctx.stroke(); }
+  for (let y = 0; y < 1080; y += 60) { ctx.strokeStyle = `rgba(140,155,170,${.075 * a})`; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1920, y); ctx.stroke(); }
+  const r = rng(seed);
+  for (let i = 0; i < 70; i++) {
+    const x = r() * 1920, y0 = r() * 1080, sp = 6 + r() * 16, ph = r() * 6.28, sz = 1 + r() * 1.8;
+    const y = ((y0 - t * sp) % 1080 + 1080) % 1080;
+    const al = (.18 + .3 * (0.5 + 0.5 * Math.sin(t * .9 + ph))) * a;
+    ctx.fillStyle = `rgba(205,185,122,${al})`; ctx.beginPath(); ctx.arc(x + Math.sin(t * .3 + ph) * 14, y, sz, 0, 6.28); ctx.fill();
+  }
+}
+
+/* ---------- 造成のアイソメ（現況の地形 → 計画高。高さは強調表示） ---------- */
+const GX = 20, GY = 13, SW = 19.5, SD = 12.5, FH = 0.47;
+const HG = (() => { const r = rng(7), h = []; for (let j = 0; j <= GY; j++) { h.push([]); for (let i = 0; i <= GX; i++) { const u = i / GX, v = j / GY; h[j].push(0.06 + 0.86 * (0.28 * u + 0.72 * v) * (0.82 + 0.18 * Math.sin(u * 5 + v * 3)) + (r() - .5) * .04); } } return h; })();
+function drawIso(ctx, t) {
+  ctx.clearRect(0, 0, 900, 620);
+  const a = eo(pr(t, 45.8, 1.6)), rise = eio(pr(t, 48.0, 2.2)), spin = (t - 45.3) * .012;
+  const sc = 31, zs = 150, cx = 440, cy = 170;
+  const P = (x, y, z) => { const xx = x - SW / 2, yy = y - SD / 2, c = Math.cos(.62 + spin), s = Math.sin(.62 + spin); const rx = xx * c - yy * s, ry = xx * s + yy * c; return [cx + rx * sc, cy + 210 - ry * sc * .5 - z * zs]; };
+  const quad = (p, fill, stroke, lw = 1) => { ctx.beginPath(); ctx.moveTo(...p[0]); for (let i = 1; i < p.length; i++) ctx.lineTo(...p[i]); ctx.closePath(); if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); } };
+  ctx.globalAlpha = a;
+  // 現況地盤（奥→手前）
+  for (let j = GY - 1; j >= 0; j--) for (let i = 0; i < GX; i++) {
+    const x0 = i / GX * SW, x1 = (i + 1) / GX * SW, y0 = j / GY * SD, y1 = (j + 1) / GY * SD;
+    const hs = [HG[j][i], HG[j][i + 1], HG[j + 1][i + 1], HG[j + 1][i]], hm = (hs[0] + hs[1] + hs[2] + hs[3]) / 4;
+    const cur = hs.map((h) => lerp(h, FH, rise));
+    const cut = hm > FH, d = Math.abs(hm - FH);
+    const base = `rgba(${cut ? "181,72,63" : "79,122,90"},${cl(d * 1.6, 0, .55) * rise})`;
+    quad([P(x0, y0, cur[0]), P(x1, y0, cur[1]), P(x1, y1, cur[2]), P(x0, y1, cur[3])], `rgba(${232 - hm * 30},${236 - hm * 26},${238 - hm * 22},1)`, "rgba(140,155,170,.55)", .8);
+    if (rise > 0) quad([P(x0, y0, cur[0]), P(x1, y0, cur[1]), P(x1, y1, cur[2]), P(x0, y1, cur[3])], base, null);
+  }
+  // 側面（手前の断面）
+  for (let i = 0; i < GX; i++) { const x0 = i / GX * SW, x1 = (i + 1) / GX * SW, h0 = lerp(HG[0][i], FH, rise), h1 = lerp(HG[0][i + 1], FH, rise); quad([P(x0, 0, h0), P(x1, 0, h1), P(x1, 0, -.25), P(x0, 0, -.25)], "rgba(205,214,221,.9)", "rgba(140,155,170,.5)", .6); }
+  for (let j = 0; j < GY; j++) { const y0 = j / GY * SD, y1 = (j + 1) / GY * SD, h0 = lerp(HG[j][GX], FH, rise), h1 = lerp(HG[j + 1][GX], FH, rise); quad([P(SW, y0, h0), P(SW, y1, h1), P(SW, y1, -.25), P(SW, y0, -.25)], "rgba(188,198,206,.9)", "rgba(140,155,170,.5)", .6); }
+  // 計画高の枠（金）
+  const fa = pr(t, 47.4, .9);
+  if (fa > 0) { ctx.globalAlpha = a * fa; quad([P(0, 0, FH), P(SW, 0, FH), P(SW, SD, FH), P(0, SD, FH)], null, "#a18c4c", 2.2); ctx.setLineDash([]); }
+  // 道路
+  ctx.globalAlpha = a * .9;
+  quad([P(-1.5, -4.4, .02), P(SW + 1.5, -4.4, .02), P(SW + 1.5, -.5, .02), P(-1.5, -.5, .02)], "rgba(174,182,189,.35)", "rgba(140,155,170,.6)", .8);
+  ctx.globalAlpha = a;
+  ctx.font = "500 15px 'Noto Sans JP'"; ctx.fillStyle = "#7d858c"; ctx.textAlign = "center";
+  const pl = P(SW / 2, -2.4, .02); ctx.fillText("前面道路（市道 幅員4.0m）", pl[0], pl[1] + 5);
+  // ラベル
+  const lab = (p, s, col, al, dx = 14, dy = -40) => { if (al <= 0) return; ctx.globalAlpha = a * al; ctx.strokeStyle = col; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(p[0] + dx, p[1] + dy); ctx.lineTo(p[0] + dx + 26, p[1] + dy); ctx.stroke(); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(p[0], p[1], 3.5, 0, 6.28); ctx.fill(); ctx.textAlign = "left"; ctx.font = "500 19px 'Shippori Mincho'"; ctx.fillText(s, p[0] + dx + 34, p[1] + dy + 6); };
+  lab(P(SW, SD, FH), "計画高 FH=0.47m", "#a18c4c", pr(t, 48.2, .6), 12, -46);
+  lab(P(SW * .2, SD * .2, FH), "盛土 55.7㎥", "#4f7a5a", pr(t, 49.6, .6), -150, 130);
+  lab(P(SW * .9, SD * .92, FH), "切土 5.3㎥", "#b5483f", pr(t, 50.0, .6), 40, 60);
+  ctx.globalAlpha = a * (1 - rise * .0);
+  ctx.font = "400 14px 'Noto Sans JP'"; ctx.fillStyle = "#7d858c"; ctx.textAlign = "left";
+  ctx.fillText("敷地 19.5m × 12.5m（243.75㎡）／現況の高低差 0.86m　※高さ方向は強調表示", 40, 606);
+  ctx.globalAlpha = 1;
+}
+
+/* ---------- 毎フレームの描画 ---------- */
+const scenes = $$(".scene").map((el) => { const [a, b] = el.dataset.s.split(",").map(Number); return { el, a, b }; });
+const anims = $$("[data-in]").map((el) => {
+  const [a, d = .8] = el.dataset.in.split(",").map(Number);
+  const o = el.dataset.out ? el.dataset.out.split(",").map(Number) : null;
+  return { el, a, d, o, y: el.dataset.y != null ? +el.dataset.y : 26, x: +(el.dataset.x || 0), st: +(el.dataset.st || 0), chs: el._chs };
+});
+const rules = $$("[data-rule]").map((el) => ({ el, a: +el.dataset.rule }));
+const c1 = $("#c1").getContext("2d"), c2 = $("#c2").getContext("2d"), isoC = $("#iso").getContext("2d");
+const nbs = $$(".nb").map((el) => ({ el, a: +el.dataset.in.split(",")[0], n: +el.dataset.n, lo: +el.dataset.lo, hi: +el.dataset.hi, em: $("em", el), bar: $(".bar b", el), dot: $(".bar s", el) }));
+const SHP = [[0, 20, 800], [900, 20, 800], [0, 20, 800], [900, 20, 800]];
+
+window.renderAt = function (t) {
+  // シーンの出入り（0.3秒のクロスフェード）
+  for (const s of scenes) {
+    const o = Math.min(pr(t, s.a, .3), 1 - pr(t, s.b - .3, .3));
+    s.el.style.opacity = o; s.el.style.visibility = o > 0 ? "visible" : "hidden";
+  }
+  for (const an of anims) {
+    const out = an.o ? pr(t, an.o[0], an.o[1] || .6) : 0;
+    if (an.chs) {
+      an.el.style.opacity = 1;
+      an.chs.forEach((c, i) => {
+        const p = eo5(pr(t, an.a + i * an.st, .9));
+        const q = an.o ? eio(pr(t, an.o[0] + i * an.st * .4, an.o[1] || .6)) : 0;
+        c.style.opacity = p * (1 - q);
+        c.style.transform = `translateY(${(1 - p) * 34 - q * 18}px)`;
+        c.style.filter = p < 1 ? `blur(${(1 - p) * 10}px)` : (q > 0 ? `blur(${q * 6}px)` : "none");
+      });
+    } else {
+      const p = eo5(pr(t, an.a, an.d));
+      an.el.style.opacity = p * (1 - eio(out));
+      an.el.style.transform = `translate(${(1 - p) * an.x}px,${(1 - p) * an.y - eio(out) * 10}px)`;
+    }
+  }
+  for (const r of rules) r.el.style.transform = `scaleX(${eio(pr(t, r.a, 1.1))})`;
+
+  if (t < 8.4) drawGrid(c1, t, 11);
+  if (t > 7.8 && t < 16.4) drawGrid(c2, t, 11);
+
+  // S2→S3: 金の線が走って白く開く
+  const gl = $("#goldline"), g = pr(t, 15.2, .75);
+  gl.style.opacity = g > 0 ? 1 : 0; gl.style.transform = `scaleX(${eio(g)}) scaleY(${1 + eio(pr(t, 15.75, .3)) * 60})`;
+  $("#flash").style.opacity = t < 17.2 ? Math.min(pr(t, 15.8, .2), 1 - pr(t, 16.0, 1.0)) * .95 : 0;
+  $("#s3rule").style.transform = `scaleX(${eio(pr(t, 18.2, 1.0)) * (1 - pr(t, 20.7, .5))})`;
+
+  // S4: 写真・スキャン・読み取り箇所
+  if (t > 21 && t < 35.2) {
+    const k = 1 + .03 * pr(t, 22, 13);
+    $("#photoImg").style.transform = `scale(${k})`; $("#marks").style.transform = `scale(${k})`;
+    const sp = pr(t, 23.1, 2.0), sc = $("#scan");
+    sc.style.opacity = sp > 0 && sp < 1 ? 1 : 0; sc.style.top = (-140 + eio(sp) * 815) + "px";
+    MARKS.forEach((m, i) => { const p = eo5(pr(t, 23.6 + i * .42, .6)); m.style.opacity = p; m.style.transform = `scale(${1.25 - .25 * p})`; });
+  }
+  // S5: 立面図を描く → 実際の図面
+  if (t > 34.4 && t < 45.8) {
+    const fade = 1 - eio(pr(t, 40.2, .6));
+    $("#elev").style.opacity = fade; $("#elev").style.transform = `scale(${1 - .04 * eio(pr(t, 40.2, .6))})`;
+    for (const it of ELEV) {
+      const p = pr(t, it.t0, it.d);
+      if (it.kind === "stroke") { it.e.style.strokeDashoffset = 1 - eio(p); it.e.style.opacity = p > 0 ? 1 : 0; if (it.e.getAttribute("fill") !== "none") it.e.style.fillOpacity = p; }
+      else it.e.style.opacity = p;
+    }
+    SHEETS.forEach((s, i) => {
+      // 1枚ずつ大きく見せる（約1秒ごとに切り替え）
+      const a = 40.6 + i * 1.05, p = eo5(pr(t, a, .7)), q = i < 3 ? eio(pr(t, a + 1.05, .5)) : 0;
+      const el = $("#sh" + i), li = $("#sl" + i), on = t >= a && (i === 3 || t < a + 1.05);
+      el.style.opacity = p * (1 - q); el.style.transform = `translateY(${(1 - p) * 50 - q * 20}px) scale(${.985 + .015 * pr(t, a, 1.6)})`;
+      li.style.opacity = eo5(pr(t, 40.5 + i * .12, .7)); li.style.color = on ? "#23272b" : "#9aa3ab";
+      li.querySelector("i").style.color = on ? "#a18c4c" : "#aeb6bd";
+      li.querySelector("b").style.transform = `scaleX(${on ? eio(pr(t, a, i === 3 ? 4 : 1.05)) : 0})`;
+    });
+  }
+  // S6: 数字
+  if (t > 45 && t < 56.5) {
+    drawIso(isoC, t);
+    for (const n of nbs) {
+      const p = eo5(pr(t, n.a + .15, 1.5));
+      n.em.textContent = Math.round(n.n * p);
+      n.bar.style.transform = `scaleX(${eio(pr(t, n.a + .3, 1.2))})`;
+      const f = (n.n - n.lo) / (n.hi - n.lo);
+      n.dot.style.left = (f * 100 * p) + "%"; n.dot.style.opacity = pr(t, n.a + .3, .4);
+    }
+  }
+  // S7: 資料の壁
+  if (t > 55.6 && t < 64.6) {
+    const u = t - 56, w = $("#wall");
+    w.style.transform = `rotateX(${24 - u * .9}deg) rotateY(${-16 + u * 1.5}deg) rotateZ(${-4 + u * .2}deg) scale(${1.02 + u * .012})`;
+    const rows = [["#rowA", -560, -1, 0], ["#rowB", -165, 1, -260], ["#rowC", 230, -1, -120]];
+    rows.forEach(([id, y, dir, ph], i) => { const el = $(id); el.style.top = y + "px"; el.style.left = (-1900 + ph + dir * u * 46 + (dir > 0 ? -300 : 0)) + "px"; el.style.opacity = eo(pr(t, 56 + i * .15, .9)); });
+  }
+  // S8
+  $("#s8rule").style.transform = `scaleX(${eio(pr(t, 67.6, 1.0))})`;
+  $("#black").style.opacity = pr(t, 74.6, 1.2);
+  $("#vig").style.opacity = 1;
+};
+
+window.ready = (async () => {
+  const d = await (await fetch("../public/demo/sample.json")).json();
+  buildElevation(d.reading); buildMarks(d.reading);
+  const txt = document.body.innerText + "0123456789,+±＝=FH";
+  await Promise.all(["400 20px 'Shippori Mincho'", "500 20px 'Shippori Mincho'", "600 20px 'Shippori Mincho'", "400 20px 'Noto Sans JP'", "500 20px 'Noto Sans JP'", "400 20px Inter", "500 20px Inter"].map((f) => document.fonts.load(f, txt + "現況高低差敷地前面道路市道幅員計画高盛土切土強調表示南立面図居室側軒最")));
+  await document.fonts.ready;
+  await Promise.all($$("img").map((i) => i.decode().catch(() => { })));
+  renderAt(0);
+  return true;
+})();
+// ブラウザで開いたときはそのまま再生（?t=秒 で静止）
+if (!navigator.webdriver) window.ready.then(() => { const q = new URLSearchParams(location.search).get("t"); if (q) return renderAt(+q); const t0 = performance.now(); (function loop() { renderAt(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })(); });
+</script>
+</body>
+</html>
