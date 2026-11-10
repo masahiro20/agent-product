@@ -54,7 +54,7 @@ if (si > 0) {
   const audio = path.join(ROOT, "video", "music.wav");
   const args = ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(OUT, "f%05d.jpg")];
   if (fs.existsSync(audio)) args.push("-i", audio, "-c:a", "aac", "-b:a", "192k", "-shortest");
-  args.push("-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(ROOT, "video", "homelandick_pr.mp4"));
+  args.push("-c:v", "libx264", "-preset", "slow", "-crf", "21", "-pix_fmt", "yuv420p", "-movflags", "+faststart", path.join(ROOT, "video", "homelandick_pr.mp4"));
   execFileSync("ffmpeg", args, { stdio: "inherit" });
   console.log("video/homelandick_pr.mp4");
 }
