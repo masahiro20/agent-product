@@ -69,34 +69,69 @@ def mel(s):
     return out
 
 
-# 仮のモチーフ（ハ長調で書く。イントロはそのまま、後半は +2 でニ長調）
+KEY = -3  # 全体の移調（半音）。ハ長調で書いて、歌いやすいイ長調（→転調後ロ長調）で鳴らす
+
+SMALL = "ゃゅょぁぃぅぇぉャュョァィゥェォ"
+
+
+def moras(text):
+    out = []
+    for ch in text.replace(" ", "").replace("　", ""):
+        if ch in SMALL and out:
+            out[-1] += ch
+        else:
+            out.append(ch)
+    return out
+
+
+def line(notes, rhythm, text):
+    """音名の並び・拍の並び・歌詞（1音に1モーラ）→ [(音名, 拍, 歌詞)]。'R' は休符。"""
+    ns, rs, ms = notes.split(), [float(x) for x in rhythm.split()], moras(text)
+    assert len(ns) == len(rs), (notes, rhythm)
+    assert sum(1 for n in ns if n != "R") == len(ms), (notes, text, len(ms))
+    it = iter(ms)
+    return [(None, r, "") if n == "R" else (n, r, next(it)) for n, r in zip(ns, rs)]
+
+
+# 仮のモチーフ（ハ長調で書く。後半は +2 で転調）
 MOTIF = mel("G4:.5 C5:.5 E5:1 D5:.5 C5:.5 G4:1  A4:.5 C5:.5 F5:1 E5:.5 D5:.5 C5:1  G4:.5 C5:.5 E5:.5 G5:.5 A5:1 G5:1  F5:.5 E5:.5 D5:1 C5:2")
 MOTIF_CH = [[("C", 4)], [("F", 4)], [("C/E", 2), ("Am", 2)], [("Dm7", 2), ("G", 2)]]
 
-A_CH = [[("C", 4)], [("G/B", 4)], [("Am", 4)], [("Em", 4)], [("F", 4)], [("C/E", 4)], [("Dm7", 4)], [("Gsus4", 2), ("G", 2)]]
-A1 = mel("E4:.5:ま E4:.5:っ G4:.5:し G4:.5:ろ A4:1:な R:1  G4:.5:ず E4:.5:め D4:.5:ん E4:1.5:に R:1 "
-         "C4:.5:さ C4:.5:い E4:.5:しょ E4:.5:の A4:1:せ G4:.5:ん E4:.5:を  G4:1:ひ E4:2:く R:1 "
-         "F4:.5:あ F4:.5:な A4:.5:た A4:.5:の C5:.5:こ C5:.5:と A4:.5:ば G4:.5:が  G4:.5:す E4:.5:こ G4:.5:し A4:.5:ず G4:1:つ R:1 "
-         "F4:.5:か F4:.5:た E4:.5:ち D4:.5:に F4:.5:な F4:.5:っ A4:.5:て G4:.5:い  G4:3:く R:1")
-A2 = mel("E4:.5:こ E4:.5:も G4:.5:れ G4:.5:び A4:1:の R:1  G4:.5:さ E4:.5:す D4:.5:ま E4:1.5:ど R:1 "
-         "C4:.5:か C4:.5:ぞ E4:.5:く E4:.5:が A4:1:つ G4:.5:ど E4:.5:う  G4:1:へ E4:2:や R:1 "
-         "F4:.5:こ F4:.5:ど A4:.5:も A4:.5:が C5:.5:お C5:.5:お A4:.5:き G4:.5:く  G4:.5:な E4:.5:る G4:.5:ひ A4:.5:ま C5:1:で R:1 "
-         "F4:.5:え F4:.5:が E4:.5:い D4:.5:て F4:.5:い F4:.5:る A4:.5:ん B4:.5:だ  G4:3:よ R:1")
+# 主題：七五調×4行（8小節）。同じ旋律に歌詞だけを替えて3回歌う
+R7, R5, R8, R5E = ".5 .5 1 .5 .5 .5 .5", ".5 .5 .5 .5 1.5 .5", ".5 .5 .5 .5 .5 .5 .5 .5", ".5 .5 .5 .5 2"
+TH_CH = [[("C", 4)], [("G/B", 4)], [("Am", 4)], [("Em", 4)], [("F", 4)], [("C/E", 4)], [("Dm7", 2), ("G", 2)], [("C", 4)]]
+P = [("E4 G4 C5 C5 B4 A4 G4", "G4 A4 G4 E4 D4 R"), ("E4 A4 C5 C5 D5 C5 A4", "B4 C5 B4 G4 G4 R"),
+     ("A4 C5 F5 F5 E5 D5 C5", "C5 D5 E5 D5 C5 R"), ("D5 D5 F5 D5 D5 C5 B4", "C5 C5 D5 E5 C5")]
+
+
+def theme(lines, name_row=None):
+    out = []
+    for i, (seven, five) in enumerate(lines):
+        if i == name_row:   # 「ホームランディック」は8モーラ：付点の1拍を8分2つに割る
+            n = P[i][0].split()
+            out += line(" ".join(n[:2] + [n[2], n[2]] + n[3:]), R8, seven)
+        else:
+            out += line(P[i][0], R7, seven)
+        out += line(P[i][1], R5E if i == 3 else R5, five)
+    return out
+
+
+A_CH = TH_CH
+A1 = theme([("しろいずめんに", "せんをひく"), ("あなたのこえが", "みちしるべ"), ("まどのむこうに", "ひがのぼる"), ("ここがはじまり", "いえづくり")])
+A2 = theme([("かぜのとおりを", "たしかめて"), ("ひかりのいろを", "えらんでく"), ("せいくらべする", "はしらにも"), ("おもいでがすむ", "いえになる")])
 B_CH = [[("Am", 4)], [("Em", 4)], [("F", 4)], [("Gsus4", 2), ("G", 2)]]
-B1 = mel("A4:.5:い A4:.5:え C5:1:は B4:.5:た A4:.5:て G4:1:て  G4:.5:お G4:.5:わ B4:.5:り B4:.5:じゃ A4:1:な G4:1:い "
-         "A4:.5:く A4:.5:ら C5:.5:し C5:.5:は D5:.5:そ D5:.5:こ C5:.5:か A4:.5:ら  B4:1:は C5:1:じ D5:1:ま D5:1:る")
-C_CH = [[("C", 4)], [("G/B", 4)], [("Am", 4)], [("Em", 4)], [("F", 4)], [("C/E", 4)], [("Dm7", 2), ("G", 2)], [("C", 3), ("A7", 1)]]
-C1 = mel("E5:.5:い E5:.5:っ D5:.5:しょ C5:.5:に E5:.5:つ G5:.5:く G5:.5:ろ E5:.5:う  D5:.5:せ D5:.5:か B4:.5:い G4:.5:に B4:.5:ひ D5:.5:と D5:.5:つ C5:.5:の "
-         "C5:1.5:い A4:1.5:え R:1  R:4 "
-         "A4:.5:ホ A4:.5:ー C5:.5:ム C5:.5:ラ C5:.5:ン F5:.5:ディ F5:.5:ッ E5:.5:ク  E5:1:ー R:1 G4:.5:あ C5:.5:な D5:.5:た E5:.5:の "
-         "F5:.5:ま F5:.5:い E5:.5:に D5:.5:ち D5:1:を C5:.5:え B4:.5:が  C5:3:く R:1")
-# 結び（ハ長調で書いて +2）
+B1 = line("A4 C5 E5 D5 B4 G4 A4 C5 F5 E5 D5 R", "1 1 2 1 1 2 1 1 1 1 3 1", "いえは いきる ばしょだから")
+C_CH = TH_CH[:7] + [[("C", 3), ("A7", 1)]]
+C1 = theme([("ともにえがこう", "このまちで"), ("せかいにひとつ", "きみのいえ"), ("ホームランディック", "ゆめをきく"), ("くらしをつつむ", "いえづくり")], name_row=2)
+# 結び：主題の後半（転調後）
 E_CH = [[("F", 4)], [("C/E", 4)], [("Dm7", 2), ("G", 2)], [("C", 4)]]
-E1 = mel("A4:.5:ホ A4:.5:ー C5:.5:ム C5:.5:ラ C5:.5:ン F5:.5:ディ F5:.5:ッ E5:.5:ク  E5:2:ー R:2  F5:.5:い F5:.5:え E5:.5:を R:.5 D5:.5:つ D5:.5:く D5:1:ろ  C5:3:う R:1")
+_n = P[2][0].split()
+E1 = (line(" ".join(_n[:2] + [_n[2], _n[2]] + _n[3:]), R8, "ホームランディック") + line(P[2][1], R5, "このまちで")
+      + line(P[3][0], R7, "いつもあなたの") + line(P[3][1], R5E, "そばにいる"))
 
 #            名前, 開始小節, コード, メロディ, 移調, メロディを歌にするか
-SECTIONS = [("intro", 0, MOTIF_CH, MOTIF, 0, False), ("A", 4, A_CH, A1, 0, True), ("A2", 12, A_CH, A2, 0, True), ("B", 20, B_CH, B1, 0, True),
-            ("chorus", 24, C_CH, C1, 0, True), ("motif", 32, MOTIF_CH, MOTIF, 2, False), ("end", 36, E_CH, E1, 2, True)]
+SECTIONS = [("intro", 0, MOTIF_CH, MOTIF, KEY, False), ("A", 4, A_CH, A1, KEY, True), ("A2", 12, A_CH, A2, KEY, True), ("B", 20, B_CH, B1, KEY, True),
+            ("chorus", 24, C_CH, C1, KEY, True), ("motif", 32, MOTIF_CH, MOTIF, KEY + 2, False), ("end", 36, E_CH, E1, KEY + 2, True)]
 LEVEL = {"intro": .35, "A": .45, "A2": .62, "B": .75, "chorus": 1.0, "motif": 1.15, "end": .85}
 
 # ---------------------------------------------------------------- 音色
@@ -235,7 +270,7 @@ def near(pc, center):
     return m if abs(m - center) <= 6 else m + (12 if m < center else -12)
 
 
-def render(with_lead=True):
+def render(lead="guide", vocal=None):
     mx = Mix()
     midi_mel, midi_ch = [], []
     for name, bar0, chs, melody, shift, sung in SECTIONS:
@@ -290,7 +325,7 @@ def render(with_lead=True):
                 m = midi(nm) + shift
                 if sung:
                     midi_mel.append((t, d, m, lyr))
-                    if with_lead:
+                    if lead == "guide":
                         mx.put(flute(m, d * .97, .9 + .25 * lv), t, .95, .05, .4)
                         mx.put(piano(m, 2.0, .35), t, .35, .15, .4)
                 elif name == "intro":      # モチーフ：遠くでオルゴールのように
@@ -303,6 +338,8 @@ def render(with_lead=True):
                     mx.put(brass(m - 12, d * .95), t, .5, .15, .5)
                     mx.put(glock(m + 12), t, .55, .4, .6)
             t += d
+    if vocal is not None:
+        mx.put(vocal, 0, 1.0, 0, .32)
     # ---- つなぎ
     mx.put(swell(BAR), 23 * BAR, .5, 0, .5)                       # サビ前
     mx.put(crash(), 24 * BAR, .55, .2, .5)
@@ -374,11 +411,74 @@ def save_midi(path, mel_ev, ch_ev):
         f.write(b"MThd" + struct.pack(">IHHH", 6, 1, 3, TPQ) + track(t0) + track(t1) + track(t2))
 
 
+STEP = {0: ("C", 0), 1: ("C", 1), 2: ("D", 0), 3: ("D", 1), 4: ("E", 0), 5: ("F", 0), 6: ("F", 1), 7: ("G", 0), 8: ("G", 1), 9: ("A", 0), 10: ("A", 1), 11: ("B", 0)}
+TYPE = {.5: ("eighth", 0), 1: ("quarter", 0), 1.5: ("quarter", 1), 2: ("half", 0), 3: ("half", 1), 4: ("whole", 0)}
+
+
+def save_musicxml(path):
+    """歌のパートを MusicXML にする（歌声合成の入力。休符も含めて曲頭から）。"""
+    ev = []   # (開始拍, 拍, midi or None, 歌詞)
+    for name, bar0, _, melody, shift, sung in SECTIONS:
+        b = bar0 * 4.0
+        for nm, beats, lyr in melody:
+            ev.append((b, beats, midi(nm) + shift if (nm and sung) else None, lyr))
+            b += beats
+    ev.append((BARS * 4.0, 4.0, None, ""))
+    bars = [[] for _ in range(BARS + 1)]
+    for b, beats, m, lyr in ev:
+        bars[int(b // 4)].append((beats, m, lyr))
+    x = ['<?xml version="1.0" encoding="UTF-8"?>', '<score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Vocal</part-name></score-part></part-list><part id="P1">']
+    for i, notes in enumerate(bars):
+        x.append(f'<measure number="{i + 1}">')
+        if i == 0:
+            x.append(f'<attributes><divisions>2</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>'
+                     f'<direction><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>{BPM}</per-minute></metronome></direction-type><sound tempo="{BPM}"/></direction>')
+        if not notes:
+            notes = [(4.0, None, "")]
+        for beats, m, lyr in notes:
+            ty, dot = TYPE[beats]
+            body = "<rest/>" if m is None else f'<pitch><step>{STEP[m % 12][0]}</step>' + (f'<alter>1</alter>' if STEP[m % 12][1] else "") + f'<octave>{m // 12 - 1}</octave></pitch>'
+            x.append(f'<note>{body}<duration>{int(beats * 2)}</duration><type>{ty}</type>' + ("<dot/>" if dot else "")
+                     + (f'<lyric><syllabic>single</syllabic><text>{lyr}</text></lyric>' if m is not None else "") + '</note>')
+        x.append('</measure>')
+    x.append('</part></score-partwise>')
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(x))
+
+
+def sing(xml_path):
+    """MusicXML を歌わせる（pysinsy：HMM 歌声合成 Sinsy と付属の女声）。→ SR に合わせたモノラル波形"""
+    import pysinsy
+    sy = pysinsy.sinsy.Sinsy()
+    assert sy.setLanguages("j", pysinsy.get_default_dic_dir())
+    assert sy.loadVoices(pysinsy.get_default_htsvoice())
+    assert sy.loadScoreFromMusicXML(xml_path)
+    wav, sr = sy.synthesize()
+    wav = np.asarray(wav, dtype=float)
+    wav /= np.abs(wav).max() + 1e-9
+    t = np.arange(int(len(wav) * SR / sr)) / SR
+    v = np.interp(t, np.arange(len(wav)) / sr, wav)[:N]
+    # 低域を切り、少し明るくする
+    sp = np.fft.rfft(v); fr = np.fft.rfftfreq(len(v), 1 / SR)
+    sp *= np.clip(fr / 140, 0, 1) ** 2 * (1 + .5 * np.clip((fr - 2500) / 2500, 0, 1))
+    v = np.fft.irfft(sp, len(v))
+    # やわらかい圧縮（小さい声を持ち上げる）
+    e = np.sqrt(np.convolve(v ** 2, np.ones(2205) / 2205, "same")) + 1e-4
+    v = v * (e / e.max()) ** -.35
+    return np.pad(v / np.abs(v).max(), (0, max(0, N - len(v)))) * .5
+
+
 if __name__ == "__main__":
-    full, mel_ev, ch_ev = render(True)
-    save_wav(os.path.join(HERE, "homelandick_theme.wav"), full)
+    import sys
+    out = lambda n: os.path.join(HERE, n)
+    save_musicxml(out("homelandick_theme.musicxml"))
+    vocal = None if "--no-vocal" in sys.argv else sing(out("homelandick_theme.musicxml"))
+    full, mel_ev, ch_ev = render("none" if vocal is not None else "guide", vocal)
+    save_wav(out("homelandick_theme.wav"), full)
     rng = np.random.default_rng(3)
-    kara, _, _ = render(False)
-    save_wav(os.path.join(HERE, "homelandick_theme_karaoke.wav"), kara)
-    save_midi(os.path.join(HERE, "homelandick_theme.mid"), mel_ev, ch_ev)
+    kara, _, _ = render("none")
+    save_wav(out("homelandick_theme_karaoke.wav"), kara)
+    if vocal is not None:
+        save_wav(out("homelandick_theme_vocal.wav"), np.stack([vocal, vocal], 1) * 1.3)
+    save_midi(out("homelandick_theme.mid"), mel_ev, ch_ev)
     print("ok", round(N / SR, 1), "sec", len(mel_ev), "notes")
