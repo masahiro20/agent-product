@@ -13,10 +13,10 @@ import wave
 import numpy as np
 
 SR = 44100
-BPM = 80
+BPM = 92
 BEAT = 60 / BPM
 BAR = BEAT * 4
-BARS = 40
+BARS = 42
 TAIL = 5.0
 N = int(SR * (BARS * BAR + TAIL))
 rng = np.random.default_rng(3)
@@ -69,7 +69,7 @@ def mel(s):
     return out
 
 
-KEY = -3  # 全体の移調（半音）。ハ長調で書いて、歌いやすいイ長調（→転調後ロ長調）で鳴らす
+KEY = -5  # 全体の移調（半音）。ハ長調で書いて、ト長調（→転調後イ長調）で鳴らす。歌声合成の声が安定するのは C4〜D5
 
 SMALL = "ゃゅょぁぃぅぇぉャュョァィゥェォ"
 
@@ -100,7 +100,7 @@ MOTIF_CH = [[("C", 4)], [("F", 4)], [("C/E", 2), ("Am", 2)], [("Dm7", 2), ("G", 
 # 主題：七五調×4行（8小節）。同じ旋律に歌詞だけを替えて3回歌う
 R7, R5, R8, R5E = ".5 .5 1 .5 .5 .5 .5", ".5 .5 .5 .5 1.5 .5", ".5 .5 .5 .5 .5 .5 .5 .5", ".5 .5 .5 .5 2"
 TH_CH = [[("C", 4)], [("G/B", 4)], [("Am", 4)], [("Em", 4)], [("F", 4)], [("C/E", 4)], [("Dm7", 2), ("G", 2)], [("C", 4)]]
-P = [("E4 G4 C5 C5 B4 A4 G4", "G4 A4 G4 E4 D4 R"), ("E4 A4 C5 C5 D5 C5 A4", "B4 C5 B4 G4 G4 R"),
+P = [("G4 G4 C5 C5 B4 A4 G4", "A4 B4 A4 G4 G4 R"), ("A4 A4 C5 C5 D5 C5 A4", "B4 C5 B4 G4 G4 R"),
      ("A4 C5 F5 F5 E5 D5 C5", "C5 D5 E5 D5 C5 R"), ("D5 D5 F5 D5 D5 C5 B4", "C5 C5 D5 E5 C5")]
 
 
@@ -121,18 +121,33 @@ A1 = theme([("しろいずめんに", "せんをひく"), ("あなたのこえ�
 A2 = theme([("かぜのとおりを", "たしかめて"), ("ひかりのいろを", "えらんでく"), ("せいくらべする", "はしらにも"), ("おもいでがすむ", "いえになる")])
 B_CH = [[("Am", 4)], [("Em", 4)], [("F", 4)], [("Gsus4", 2), ("G", 2)]]
 B1 = line("A4 C5 E5 D5 B4 G4 A4 C5 F5 E5 D5 R", "1 1 2 1 1 2 1 1 1 1 3 1", "いえは いきる ばしょだから")
-C_CH = TH_CH[:7] + [[("C", 3), ("A7", 1)]]
-C1 = theme([("ともにえがこう", "このまちで"), ("せかいにひとつ", "きみのいえ"), ("ホームランディック", "ゆめをきく"), ("くらしをつつむ", "いえづくり")], name_row=2)
-# 結び：主題の後半（転調後）
-E_CH = [[("F", 4)], [("C/E", 4)], [("Dm7", 2), ("G", 2)], [("C", 4)]]
-_n = P[2][0].split()
-E1 = (line(" ".join(_n[:2] + [_n[2], _n[2]] + _n[3:]), R8, "ホームランディック") + line(P[2][1], R5, "このまちで")
-      + line(P[3][0], R7, "いつもあなたの") + line(P[3][1], R5E, "そばにいる"))
+# サビ：王道進行（F–G–Em–Am）に、社名から始まる短いフック。2小節で1行、語尾を食って（シンコペーション）弾ませる
+C_CH = [[("F", 2), ("G", 2)], [("Em", 2), ("Am", 2)], [("F", 2), ("G", 2)], [("C", 4)],
+        [("F", 2), ("G", 2)], [("Em", 2), ("Am", 2)], [("Dm7", 2), ("G", 2)], [("C", 3), ("A7", 1)]]
+S5, S6 = ".5 .5 1 .5 1.5", ".5 .5 .5 .5 .5 1.5"
+HOOK = line("A4 A4 C5 C5 D5 G5 G5 E5", R8, "ホームランディック")
+C_TAIL = (HOOK + line("G5 E5 D5 E5 C5", S5, "このまちで")
+          + line("F5 F5 E5 D5 D5 E5 D5 B4", R8, "いっしょにつくろう") + line("C5 D5 E5 D5 C5", S5, "きみのいえ"))
+C1 = (HOOK + line("E5 D5 E5 D5 C5", S5, "ゆめのいえ")
+      + line("A4 C5 F5 F5 E5 D5 B4", R7, "きょうもだれかの") + line("C5 D5 E5 G5 G5 E5", S6, "あかりになる") + C_TAIL)
+E_CH = C_CH[4:7] + [[("C", 4)]]
+# 転調後は2度高くなるので、いちばん高い音を下げた形で歌う
+E1 = (line("A4 A4 C5 C5 D5 E5 E5 E5", R8, "ホームランディック") + line("E5 E5 D5 E5 C5", S5, "このまちで")
+      + line("F5 F5 E5 D5 D5 E5 D5 B4", R8, "いっしょにつくろう") + line("C5 D5 E5 D5 C5", S5, "きみのいえ"))
 
-#            名前, 開始小節, コード, メロディ, 移調, メロディを歌にするか
-SECTIONS = [("intro", 0, MOTIF_CH, MOTIF, KEY, False), ("A", 4, A_CH, A1, KEY, True), ("A2", 12, A_CH, A2, KEY, True), ("B", 20, B_CH, B1, KEY, True),
-            ("chorus", 24, C_CH, C1, KEY, True), ("motif", 32, MOTIF_CH, MOTIF, KEY + 2, False), ("end", 36, E_CH, E1, KEY + 2, True)]
-LEVEL = {"intro": .35, "A": .45, "A2": .62, "B": .75, "chorus": 1.0, "motif": 1.15, "end": .85}
+#            名前, 開始小節, コード, メロディ, 移調, 歌い方（"lyr"=歌詞 / "la"=1オクターブ下でラララ / None=歌わない）
+SECTIONS = [("intro", 0, MOTIF_CH, MOTIF, KEY, None), ("A", 4, A_CH, A1, KEY, "lyr"), ("A2", 12, A_CH, A2, KEY, "lyr"), ("B", 20, B_CH, B1, KEY, "lyr"),
+            ("chorus", 24, C_CH, C1, KEY, "lyr"), ("motif", 32, MOTIF_CH, MOTIF, KEY + 2, None), ("end", 36, E_CH, E1, KEY + 2, "lyr")]
+LEVEL = {"intro": .35, "A": .45, "A2": .62, "B": .75, "chorus": 1.0, "motif": 1.15, "end": 1.05}
+END_BAR = 40                         # 最後の和音を鳴らす小節
+TONIC = (KEY + 2) % 12               # 転調後の主音
+
+
+def vocal_note(nm, shift, mode, lyr):
+    """歌う音高と歌詞。歌わない音は None"""
+    if not nm or not mode:
+        return None
+    return (midi(nm) + shift - (12 if mode == "la" else 0), "ラ" if mode == "la" else lyr)
 
 # ---------------------------------------------------------------- 音色
 
@@ -242,6 +257,12 @@ def snare():
     return (np.sin(2 * np.pi * 190 * t) * np.exp(-t * 28) * .5 + band(.25, 1200, 8000) * np.exp(-t * 20)) * .4
 
 
+def clap():
+    t = tt(.18)
+    e = sum(np.exp(-np.clip(t - o, 0, None) * 55) * (t >= o) for o in (0, .011, .023))
+    return band(.18, 900, 5000) * e * .22
+
+
 def hat(d=.07):
     s = band(d, 6500, 13000)
     return s * np.exp(-tt(d) * 60) * .16
@@ -309,7 +330,7 @@ def render(lead="guide", vocal=None):
                     mx.put(strings(voic[1] + 12, dur + .5, .2), tc - .15, .16, .3, .6)
                 b += beats
             # ドラム
-            if name in ("A2", "B", "chorus", "motif", "end") and not (name == "end" and bi == 3):
+            if name in ("A2", "B", "chorus", "motif", "end"):
                 full = name in ("chorus", "motif", "end")
                 for kb in ((0, 2.5) if not full else (0, 1.5, 2.5)):
                     mx.put(kick(), t0 + kb * BEAT, .55 * lv, 0, .03)
@@ -317,17 +338,25 @@ def render(lead="guide", vocal=None):
                     mx.put(snare() if full else rim(), t0 + sb * BEAT, .6 * lv, .1, .25)
                 for k in range(8):
                     mx.put(hat(), t0 + k * BEAT / 2, (.9 if k % 2 == 0 else .5) * lv, .3, .15)
+                if full:                                   # サビ：手拍子とタンバリンで弾ませる
+                    for sb in (1, 3):
+                        mx.put(clap(), t0 + sb * BEAT, .5 * lv, -.25, .3)
+                    for k in range(16):
+                        mx.put(hat(.04), t0 + k * BEAT / 4, (.45 if k % 4 == 2 else .2) * lv, -.35, .15)
         # ---- 旋律
         t = bar0 * BAR
         for nm, beats, lyr in melody:
             d = beats * BEAT
+            vn = vocal_note(nm, shift, sung, lyr)
+            if vn:
+                midi_mel.append((t, d, vn[0], vn[1]))
+                if lead == "guide":
+                    mx.put(flute(vn[0], d * .97, .9 + .25 * lv), t, .95, .05, .4)
+                    mx.put(piano(vn[0], 2.0, .35), t, .35, .15, .4)
             if nm:
                 m = midi(nm) + shift
-                if sung:
-                    midi_mel.append((t, d, m, lyr))
-                    if lead == "guide":
-                        mx.put(flute(m, d * .97, .9 + .25 * lv), t, .95, .05, .4)
-                        mx.put(piano(m, 2.0, .35), t, .35, .15, .4)
+                if sung == "lyr":
+                    pass
                 elif name == "intro":      # モチーフ：遠くでオルゴールのように
                     mx.put(glock(m + 12), t, .5, .3, .7)
                     mx.put(piano(m, 3, .4), t, .4, .2, .6)
@@ -341,22 +370,25 @@ def render(lead="guide", vocal=None):
     if vocal is not None:
         mx.put(vocal, 0, 1.0, 0, .32)
     # ---- つなぎ
-    mx.put(swell(BAR), 23 * BAR, .5, 0, .5)                       # サビ前
-    mx.put(crash(), 24 * BAR, .55, .2, .5)
-    for k in range(8):                                             # 転調前の盛り上げ（スネアのロール）
-        mx.put(snare(), 31 * BAR + 2 * BEAT + k * BEAT / 4, .25 + .08 * k, .1, .3)
-    mx.put(swell(BAR * 1.2), 32 * BAR - BAR * 1.2, .7, 0, .5)
-    mx.put(crash(), 32 * BAR, .8, -.2, .5)
-    for k, n in enumerate(("D2", "A2", "D2", "A2")):
-        mx.put(timp(midi(n)), (32 + k) * BAR, .7, -.3, .5)
-    mx.put(crash(), 36 * BAR, .5, .2, .5)
+    st = {n: b0 for n, b0, *_ in SECTIONS}
+    mx.put(swell(BAR), st["chorus"] * BAR - BAR, .5, 0, .5)             # サビ前
+    mx.put(crash(), st["chorus"] * BAR, .55, .2, .5)
+    for k in range(8):                                                  # 転調前の盛り上げ（スネアのロール）
+        mx.put(snare(), st["motif"] * BAR - 2 * BEAT + k * BEAT / 4, .25 + .08 * k, .1, .3)
+    mx.put(swell(BAR * 1.2), st["motif"] * BAR - BAR * 1.2, .7, 0, .5)
+    mx.put(crash(), st["motif"] * BAR, .8, -.2, .5)
+    for k in range(4):
+        mx.put(timp(near(TONIC if k % 2 == 0 else TONIC + 7, 40)), (st["motif"] + k) * BAR, .7, -.3, .5)
+    mx.put(crash(), st["end"] * BAR, .5, .2, .5)
     # 最後の和音
-    for m in (38, 50, 57, 62, 66, 69, 74):
-        mx.put(piano(m, 6, .7), 39 * BAR, .55, 0, .5)
-    for m in (62, 66, 69, 81):
-        mx.put(strings(m, 6, .5), 39 * BAR, .4, 0, .6)
-    mx.put(glock(86, 4), 39 * BAR + .05, .5, .3, .7)
-    mx.put(timp(midi("D2"), 3), 39 * BAR, .5, 0, .5)
+    r = near(TONIC, 36)
+    for m in (r, r + 12, r + 19, r + 24, r + 28, r + 31, r + 36):
+        mx.put(piano(m, 6, .7), END_BAR * BAR, .55, 0, .5)
+    for m in (r + 24, r + 28, r + 31, r + 43):
+        mx.put(strings(m, 6, .5), END_BAR * BAR, .4, 0, .6)
+    mx.put(glock(r + 48, 4), END_BAR * BAR + .05, .5, .3, .7)
+    mx.put(timp(r, 3), END_BAR * BAR, .5, 0, .5)
+    mx.put(crash(), END_BAR * BAR, .4, 0, .5)
     # ---- リバーブ・まとめ
     def reverb(x, seed):
         g = np.random.default_rng(seed)
@@ -421,7 +453,8 @@ def save_musicxml(path):
     for name, bar0, _, melody, shift, sung in SECTIONS:
         b = bar0 * 4.0
         for nm, beats, lyr in melody:
-            ev.append((b, beats, midi(nm) + shift if (nm and sung) else None, lyr))
+            vn = vocal_note(nm, shift, sung, lyr)
+            ev.append((b, beats, vn[0] if vn else None, vn[1] if vn else ""))
             b += beats
     ev.append((BARS * 4.0, 4.0, None, ""))
     bars = [[] for _ in range(BARS + 1)]
